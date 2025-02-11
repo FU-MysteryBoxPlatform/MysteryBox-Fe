@@ -11,10 +11,10 @@ export default function middleware(request: NextRequest) {
 
   // Navigate to login page if not authenticated
   if (!accessToken && !authUrls.includes(url.pathname)) {
-    return NextResponse.redirect(`${url.origin}/login`);
+    // return NextResponse.redirect(`${url.origin}/login`);
   }
   if (accessToken && url.pathname === "/login") {
-    return NextResponse.redirect(`${url.origin}/`);
+    // return NextResponse.redirect(`${url.origin}/`);
   }
 
   return NextResponse.next();
