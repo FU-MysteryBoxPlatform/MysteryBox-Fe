@@ -42,6 +42,11 @@ export default function Header() {
             <DropdownMenuTrigger>
               <UserIcon className="w-7 h-7" />
             </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-4">
+              <div>
+                <Link href="collector/profile">Hồ sơ</Link>
+              </div>
+            </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
@@ -73,7 +78,7 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="p-4">
                       <div>
-                        <Link href="/">Hồ sơ</Link>
+                        <Link href="/collector/profile">Hồ sơ</Link>
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
