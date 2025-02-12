@@ -89,23 +89,23 @@ export default function Header() {
 
 const NAV_ITEMS = [
   {
-    name: "Home",
+    name: "Trang chủ",
     href: "/",
   },
   {
-    name: "Products",
+    name: "Sản phẩm",
     href: "/products",
   },
   {
-    name: "Sell",
+    name: "Bán",
     href: "/sell",
   },
   {
-    name: "Exchange",
+    name: "Trao đổi",
     href: "/exchange",
   },
   {
-    name: "Auctions",
+    name: "Đấu giá",
     href: "/auctions",
   },
 ];
