@@ -24,13 +24,13 @@ export default function Header() {
 
         <div className="hidden lg:flex items-center gap-8">
           {NAV_ITEMS.map((item) => (
-            <a
+            <Link
               key={item.name}
               href={item.href}
               className="text-gray-700 font-semibold hover:text-[#E12E43] transition-all"
             >
               {item.name}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -44,7 +44,7 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-4">
               <div>
-                <Link href="collector/profile">Hồ sơ</Link>
+                <Link href="/collector/profile">Hồ sơ</Link>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -59,13 +59,13 @@ export default function Header() {
               <div className="p-4">
                 <div className="grid gap-6 mb-6">
                   {NAV_ITEMS.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
                       href={item.href}
                       className="text-gray-700 font-semibold hover:text-[#E12E43] transition-all"
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
                 <div className="grid grid-cols-4 gap-6">
@@ -99,18 +99,18 @@ const NAV_ITEMS = [
   },
   {
     name: "Sản phẩm",
-    href: "/products",
+    href: "/collector/products",
   },
   {
     name: "Bán",
-    href: "/sell",
+    href: "/collector/sell",
   },
   {
     name: "Trao đổi",
-    href: "/exchange",
+    href: "/collector/exchange",
   },
   {
     name: "Đấu giá",
-    href: "/auctions",
+    href: "/collector/auctions",
   },
 ];

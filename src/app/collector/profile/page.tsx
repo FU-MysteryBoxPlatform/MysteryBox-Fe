@@ -15,7 +15,7 @@ export default function Page() {
             Hồ sơ của bạn
           </p>
 
-          <div className="flex items-start gap-6">
+          <div className="flex max-md:flex-col items-start gap-6">
             <div className="w-fit p-4 border border-gray-300 rounded-lg grid gap-2">
               {SIDEBAR.map((item) => {
                 return (
@@ -32,7 +32,7 @@ export default function Page() {
                 );
               })}
             </div>
-            <div className="p-6 border border-gray-300 rounded-lg flex-1"></div>
+            <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full"></div>
           </div>
         </div>
       </div>
