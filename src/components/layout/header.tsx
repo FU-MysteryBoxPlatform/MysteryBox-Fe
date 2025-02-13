@@ -44,7 +44,7 @@ export default function Header() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-4">
               <div>
-                <Link href="/collector/profile">Hồ sơ</Link>
+                <Link href="/profile">Hồ sơ</Link>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -78,7 +78,7 @@ export default function Header() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="p-4">
                       <div>
-                        <Link href="/collector/profile">Hồ sơ</Link>
+                        <Link href="/profile">Hồ sơ</Link>
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -99,18 +99,18 @@ const NAV_ITEMS = [
   },
   {
     name: "Sản phẩm",
-    href: "/collector/products",
+    href: "/products",
   },
   {
     name: "Bán",
-    href: "/collector/sell",
+    href: "/sell",
   },
   {
     name: "Trao đổi",
-    href: "/collector/exchange",
+    href: "/exchange",
   },
   {
     name: "Đấu giá",
-    href: "/collector/auctions",
+    href: "/auctions",
   },
 ];
