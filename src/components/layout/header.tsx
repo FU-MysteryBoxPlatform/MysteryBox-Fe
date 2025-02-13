@@ -43,8 +43,11 @@ export default function Header() {
               <UserIcon className="w-7 h-7" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="p-4">
-              <div>
+              <div className="px-2 py-1 hover:bg-gray-100">
                 <Link href="/profile">Hồ sơ</Link>
+              </div>
+              <div className="px-2 py-1 hover:bg-gray-100">
+                <Link href="/collection">Bộ sưu tập</Link>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -77,8 +80,11 @@ export default function Header() {
                       <UserIcon className="w-7 h-7" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="p-4">
-                      <div>
+                      <div className="px-2 py-1 hover:bg-gray-100">
                         <Link href="/profile">Hồ sơ</Link>
+                      </div>
+                      <div className="px-2 py-1 hover:bg-gray-100">
+                        <Link href="/collection">Bộ sưu tập</Link>
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>

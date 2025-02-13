@@ -1,6 +1,7 @@
 "use client";
 import Counter from "@/app/components/Counter";
 import GiftUnbox from "@/app/components/GiftUnbox";
+import { ImageUploader } from "@/app/components/ImageUpload";
 import {
   Dialog,
   DialogClose,
@@ -37,6 +38,7 @@ export default function Page() {
           {openDialog && <Confetti className="w-full h-full" />}
         </DialogContent>
       </Dialog>
+      <ImageUploader onChange={(url) => console.log(url)} />
     </div>
   );
 }
