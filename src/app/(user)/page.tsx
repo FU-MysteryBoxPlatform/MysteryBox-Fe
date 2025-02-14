@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import NewProductsSection from "../components/NewProductsSection";
+import OurProductsSection from "../components/OurProductsSection";
 
 export default function Home() {
   return (
@@ -26,6 +27,7 @@ export default function Home() {
       </div>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16">
         <NewProductsSection />
+        <OurProductsSection />
       </div>
     </div>
   );

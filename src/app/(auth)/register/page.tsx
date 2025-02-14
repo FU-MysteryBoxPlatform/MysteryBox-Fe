@@ -20,7 +20,10 @@ import Link from "next/link";
 
 const RegisterSchema = z
   .object({
-    username: z.string().min(1, "Vui lòng nhập username"),
+    email: z.string().email("Vui lòng nhập địa chỉ email hợp lệ"),
+    firstName: z.string().min(1, "Vui lòng nhập tên"),
+    lastName: z.string().min(1, "Vui lòng nhập họ"),
+    phoneNumber: z.string().min(1, "Vui lòng nhập số điện thoại"),
     password: z.string().min(1, "Vui lòng nhập mật khẩu"),
     rePassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
   })
@@ -59,15 +62,56 @@ export default function Register() {
           <form id="register-form">
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Tên đăng nhập</Label>
+                <Label htmlFor="name">Email</Label>
                 <Input
-                  id="username"
-                  placeholder="Nhập tên đăng nhập"
-                  {...register("username")}
+                  id="email"
+                  placeholder="Nhập email"
+                  {...register("email")}
                 />
-                {formState.errors.username && (
+                {formState.errors.email && (
                   <p className="text-red-500 text-sm">
-                    {formState.errors.username.message}
+                    {formState.errors.email.message}
+                  </p>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="lastName">Họ</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Nhập họ"
+                    {...register("lastName")}
+                  />
+                  {formState.errors.lastName && (
+                    <p className="text-red-500 text-sm">
+                      {formState.errors.lastName.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="firstName">Tên</Label>
+                  <Input
+                    id="firstName"
+                    placeholder="Nhập tên"
+                    {...register("firstName")}
+                  />
+                  {formState.errors.firstName && (
+                    <p className="text-red-500 text-sm">
+                      {formState.errors.firstName.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="phoneNumber">Số điện thoại</Label>
+                <Input
+                  id="phoneNumber"
+                  placeholder="Nhập số điện thoại"
+                  {...register("phoneNumber")}
+                />
+                {formState.errors.phoneNumber && (
+                  <p className="text-red-500 text-sm">
+                    {formState.errors.phoneNumber.message}
                   </p>
                 )}
               </div>
