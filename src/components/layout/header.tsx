@@ -1,22 +1,17 @@
-"use client";
-
-import { usePathname } from "next/navigation";
+import { MenuIcon } from "lucide-react";
+import Link from "next/link";
+import BellIcon from "../icons/BellIcon";
+import CartIcon from "../icons/CartIcon";
+import SearchIcon from "../icons/SearchIcon";
+import UserIcon from "../icons/UserIcon";
+import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import UserIcon from "../icons/UserIcon";
-import SearchIcon from "../icons/SearchIcon";
-import BellIcon from "../icons/BellIcon";
-import CartIcon from "../icons/CartIcon";
-import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
-import { MenuIcon } from "lucide-react";
-import Link from "next/link";
 
 export default function Header() {
-  const pathname = usePathname();
-  if (pathname === "/login" || pathname === "/register") return null;
   return (
     <div className="px-4 md:px-10 lg:px-16 py-4 bg-gray-50 border-b border-gray-200">
       <div className="flex items-center justify-between max-w-[1280px] mx-auto">

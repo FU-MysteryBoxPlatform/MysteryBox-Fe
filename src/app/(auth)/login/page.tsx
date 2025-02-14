@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 
 const LoginSchema = z.object({
-  username: z.string().min(1, "Vui lòng nhập username"),
+  email: z.string().email("Vui lòng nhập email hợp lệ"),
   password: z.string().min(1, "Vui lòng nhập mật khẩu"),
 });
 
@@ -30,7 +30,7 @@ export default function Login() {
 
   const { handleSubmit, register, formState } = useForm<LoginForm>({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
     resolver: zodResolver(LoginSchema),
@@ -53,18 +53,18 @@ export default function Login() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form id="login-form">
+          <form id="login-form" className="mb-2">
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Tên đăng nhập</Label>
+                <Label htmlFor="name">Email</Label>
                 <Input
-                  id="username"
-                  placeholder="Nhập tên đăng nhập"
-                  {...register("username")}
+                  id="email"
+                  placeholder="Nhập email"
+                  {...register("email")}
                 />
-                {formState.errors.username && (
+                {formState.errors.email && (
                   <p className="text-red-500 text-sm">
-                    {formState.errors.username.message}
+                    {formState.errors.email.message}
                   </p>
                 )}
               </div>
@@ -98,6 +98,12 @@ export default function Login() {
               </div>
             </div>
           </form>
+          <Link
+            href="/reset-password"
+            className="text-blue-500 underline mt-2 text-sm"
+          >
+            Quên mật khẩu?
+          </Link>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button
