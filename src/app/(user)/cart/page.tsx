@@ -18,8 +18,8 @@ export default function Page() {
 
   return (
     <div>
-      <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16 grid grid-cols-5 gap-10 py-10">
-        <div className="col-span-3">
+      <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16 grid md:grid-cols-5 gap-10 py-10">
+        <div className="md:col-span-3">
           <p className="text-xl font-semibold md:text-2xl lg:text-3xl mb-6 md:mb-10">
             Giỏ hàng của tôi
           </p>
@@ -47,7 +47,7 @@ export default function Page() {
             </div>
           )}
         </div>
-        <div className="col-span-2">
+        <div className="md:col-span-2 fixed max-md:bottom-0 md:sticky max-md:w-screen bg-white max-md:left-0 p-4 self-start md:top-10">
           <p className="text-lg md:text-xl lg:text-2xl font-semibold mb-6 md:mb-10">
             Thanh toán
           </p>

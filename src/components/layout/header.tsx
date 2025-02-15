@@ -13,9 +13,13 @@ import {
 } from "../ui/dropdown-menu";
 import { useContext } from "react";
 import { GlobalContext } from "@/provider/global-provider";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function Header() {
+  const pathname = usePathname();
   const { cart } = useContext(GlobalContext);
+
   return (
     <div className="px-4 md:px-10 lg:px-16 py-4 bg-gray-50 border-b border-gray-200">
       <div className="flex items-center justify-between max-w-[1280px] mx-auto">
@@ -48,13 +52,19 @@ export default function Header() {
             <DropdownMenuTrigger>
               <UserIcon className="w-7 h-7" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4">
-              <div className="px-2 py-1 hover:bg-gray-100">
-                <Link href="/profile">Hồ sơ</Link>
-              </div>
-              <div className="px-2 py-1 hover:bg-gray-100">
-                <Link href="/collection">Bộ sưu tập</Link>
-              </div>
+            <DropdownMenuContent className="p-4 grid gap-2">
+              {SUB_NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "px-2 py-1 hover:bg-gray-100 rounded-md",
+                    pathname.includes(item.href) && "bg-gray-100"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -87,13 +97,19 @@ export default function Header() {
                     <DropdownMenuTrigger>
                       <UserIcon className="w-7 h-7" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="p-4">
-                      <div className="px-2 py-1 hover:bg-gray-100">
-                        <Link href="/profile">Hồ sơ</Link>
-                      </div>
-                      <div className="px-2 py-1 hover:bg-gray-100">
-                        <Link href="/collection">Bộ sưu tập</Link>
-                      </div>
+                    <DropdownMenuContent className="p-4 grid gap-2">
+                      {SUB_NAV_ITEMS.map((item) => (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className={cn(
+                            "px-2 py-1 hover:bg-gray-100 rounded-md",
+                            pathname.includes(item.href) && "bg-gray-100"
+                          )}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -126,5 +142,20 @@ const NAV_ITEMS = [
   {
     name: "Đấu giá",
     href: "/auctions",
+  },
+];
+
+const SUB_NAV_ITEMS = [
+  {
+    name: "Hồ sơ",
+    href: "/profile",
+  },
+  {
+    name: "Bộ sưu tập",
+    href: "/collection",
+  },
+  {
+    name: "Đơn hàng",
+    href: "/orders",
   },
 ];

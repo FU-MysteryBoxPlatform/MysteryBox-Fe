@@ -22,7 +22,9 @@ export default function Home() {
             tellus, luctus nec ullamcorper mattis.
           </p>
 
-          <Button className="bg-[#E12E43] px-10 py-6 text-lg">Mua ngay</Button>
+          <Button className="bg-[#E12E43] hover:bg-[#B71C32] px-10 py-6 text-lg">
+            Mua ngay
+          </Button>
         </div>
       </div>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16">
