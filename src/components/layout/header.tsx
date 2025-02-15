@@ -1,3 +1,4 @@
+"use client";
 import { MenuIcon } from "lucide-react";
 import Link from "next/link";
 import BellIcon from "../icons/BellIcon";
@@ -10,8 +11,11 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useContext } from "react";
+import { GlobalContext } from "@/provider/global-provider";
 
 export default function Header() {
+  const { cart } = useContext(GlobalContext);
   return (
     <div className="px-4 md:px-10 lg:px-16 py-4 bg-gray-50 border-b border-gray-200">
       <div className="flex items-center justify-between max-w-[1280px] mx-auto">
@@ -32,7 +36,14 @@ export default function Header() {
         <div className="hidden items-center gap-8 lg:flex">
           <SearchIcon />
           <BellIcon />
-          <CartIcon />
+          <Link href="/cart">
+            <div className="relative">
+              <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
+                {cart?.length}
+              </div>
+              <CartIcon />
+            </div>
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger>
               <UserIcon className="w-7 h-7" />
@@ -69,7 +80,9 @@ export default function Header() {
                 <div className="grid grid-cols-4 gap-6">
                   <SearchIcon />
                   <BellIcon />
-                  <CartIcon />
+                  <Link href="/cart">
+                    <CartIcon />
+                  </Link>
                   <DropdownMenu>
                     <DropdownMenuTrigger>
                       <UserIcon className="w-7 h-7" />
