@@ -24,7 +24,7 @@ axiosClient.interceptors.request.use(
 );
 
 axiosClient.interceptors.response.use(
-  (response) => response.data,
+  (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       cookie.delete("ACCESS_TOKEN");

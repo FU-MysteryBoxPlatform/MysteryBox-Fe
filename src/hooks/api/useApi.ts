@@ -1,22 +1,25 @@
 import axiosClient from "@/axios-client";
-import { TBaseResponse } from "@/types";
+import type { TBaseResponse } from "@/types";
 import {
   useQuery,
   useMutation,
   type UseQueryOptions,
   type UseMutationOptions,
 } from "@tanstack/react-query";
-import type { AxiosError, AxiosResponse } from "axios";
+import type { AxiosError } from "axios";
 
 export function useApiQuery<T>(
   url: string,
-  options?: UseQueryOptions<AxiosResponse<TBaseResponse<T>>, AxiosError> & {
+  options?: UseQueryOptions<TBaseResponse<T>, AxiosError> & {
     pollingInterval?: number;
   }
 ) {
-  return useQuery<AxiosResponse<TBaseResponse<T>>, AxiosError>({
+  return useQuery<TBaseResponse<T>, AxiosError>({
     queryKey: [url],
-    queryFn: () => axiosClient.get<TBaseResponse<T>>(url),
+    queryFn: async () => {
+      const response = await axiosClient.get<TBaseResponse<T>>(url);
+      return response.data;
+    },
     ...options,
     refetchInterval: options?.pollingInterval,
   });
@@ -25,10 +28,13 @@ export function useApiQuery<T>(
 export function useApiMutation<T, U>(
   url: string,
   method: "post" | "put" | "patch" | "delete" = "post",
-  options?: UseMutationOptions<AxiosResponse<TBaseResponse<T>>, AxiosError, U>
+  options?: UseMutationOptions<TBaseResponse<T>, AxiosError, U>
 ) {
-  return useMutation<AxiosResponse<TBaseResponse<T>>, AxiosError, U>({
-    mutationFn: (data) => axiosClient[method]<TBaseResponse<T>>(url, data),
+  return useMutation<TBaseResponse<T>, AxiosError, U>({
+    mutationFn: async (data) => {
+      const response = await axiosClient[method]<TBaseResponse<T>>(url, data);
+      return response.data;
+    },
     ...options,
   });
 }

@@ -13,12 +13,22 @@ import {
 } from "../ui/dropdown-menu";
 import { useContext } from "react";
 import { GlobalContext } from "@/provider/global-provider";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import cookie from "@/utils/cookie";
 
 export default function Header() {
   const pathname = usePathname();
-  const { cart } = useContext(GlobalContext);
+  const { cart, setUser } = useContext(GlobalContext);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    cookie.delete("ACCESS_TOKEN");
+    cookie.delete("REFRESH_TOKEN");
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/login");
+  };
 
   return (
     <div className="px-4 md:px-10 lg:px-16 py-4 bg-gray-50 border-b border-gray-200">
@@ -65,6 +75,12 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
+              <button
+                className="px-2 py-1 hover:bg-gray-100 rounded-md text-red-500"
+                onClick={handleLogout}
+              >
+                Đăng xuất
+              </button>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -113,6 +129,12 @@ export default function Header() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
+                <button
+                  className="mt-4 py-1 hover:bg-gray-100 rounded-md text-red-500"
+                  onClick={handleLogout}
+                >
+                  Đăng xuất
+                </button>
               </div>
             </DrawerContent>
           </Drawer>

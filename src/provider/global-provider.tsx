@@ -1,4 +1,5 @@
 "use client";
+import { TAccount } from "@/types";
 import { createContext, useEffect, useState } from "react";
 
 type TProductInCart = {
@@ -11,6 +12,8 @@ type TProductInCart = {
 };
 
 type GlobalContextType = {
+  user: TAccount | null;
+  setUser: (user: TAccount | null) => void;
   cart: TProductInCart[] | null;
   setCart: (cart: TProductInCart[]) => void;
   addToCart: (product: Omit<TProductInCart, "quantity" | "selected">) => void;
@@ -20,6 +23,8 @@ type GlobalContextType = {
 };
 
 const initialGlobalContext: GlobalContextType = {
+  user: null,
+  setUser: () => null,
   cart: null,
   setCart: () => null,
   addToCart: () => null,
@@ -33,6 +38,7 @@ export const GlobalContext =
 
 export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCart] = useState<TProductInCart[]>([]);
+  const [user, setUser] = useState<TAccount | null>(null);
 
   const addToCart = (
     product: Omit<TProductInCart, "quantity" | "selected">
@@ -97,6 +103,12 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedCart) {
       setCart(JSON.parse(savedCart));
     }
+
+    // Lấy người dùng từ localStorage khi component được mount
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
   }, []);
 
   useEffect(() => {
@@ -107,6 +119,8 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <GlobalContext.Provider
       value={{
+        user,
+        setUser,
         cart,
         setCart,
         addToCart,

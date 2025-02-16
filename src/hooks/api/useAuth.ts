@@ -1,3 +1,4 @@
+import { TAccount } from "@/types";
 import { useApiMutation } from "./useApi";
 
 export type TRegisterData = {
@@ -18,8 +19,10 @@ export type TLoginData = {
 };
 
 export type TLoginResponse = {
-  accessToken: string;
+  mainRole: "COLLECTOR" | "MODERATOR";
+  token: string;
   refreshToken: string;
+  account: TAccount;
 };
 
 export const useRegister = () => {

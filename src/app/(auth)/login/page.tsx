@@ -14,11 +14,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EyeClosedIcon, EyeIcon } from "lucide-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useLogin } from "@/hooks/api/useAuth";
 import { toast } from "@/hooks/use-toast";
+import cookie from "@/utils/cookie";
+import { GlobalContext } from "@/provider/global-provider";
+import { useRouter } from "next/navigation";
 
 const LoginSchema = z.object({
   email: z.string().email("Vui lòng nhập email hợp lệ"),
@@ -29,6 +32,8 @@ type LoginForm = z.infer<typeof LoginSchema>;
 
 export default function Login() {
   const [isShowPassword, setIsShowPassword] = useState(false);
+  const { setUser } = useContext(GlobalContext);
+  const router = useRouter();
 
   const loginMutation = useLogin();
 
@@ -43,13 +48,19 @@ export default function Login() {
         password: data.password,
       },
       {
-        onSuccess: ({ data }) => {
-          if (data.isSuccess) {
-            console.log("success");
+        onSuccess: (data) => {
+          console.log({ data });
+          const { token, refreshToken, account } = data.result;
+          if (data) {
+            console.log({ token, refreshToken, account });
+            cookie.set("ACCESS_TOKEN", token);
+            cookie.set("REFRESH_TOKEN", refreshToken);
+            setUser(account);
+            localStorage.setItem("user", JSON.stringify(account));
+            router.push("/");
           } else {
             toast({
               title: "Đăng nhập thất bại",
-              description: data.message,
             });
           }
         },

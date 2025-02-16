@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRegister } from "@/hooks/api/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 const RegisterSchema = z
   .object({
@@ -40,6 +41,7 @@ export default function Register() {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowRePassword, setIsShowRePassword] = useState(false);
 
+  const router = useRouter();
   const registerMutation = useRegister();
 
   const { handleSubmit, register, formState } = useForm<RegisterForm>({
@@ -57,9 +59,12 @@ export default function Register() {
         password,
       },
       {
-        onSuccess: ({ data }) => {
+        onSuccess: (data) => {
           if (data.isSuccess) {
-            console.log("success");
+            toast({
+              title: "Đăng ký thành công",
+            });
+            router.push("/login");
           } else {
             toast({
               title: "Đăng ký thất bại",
