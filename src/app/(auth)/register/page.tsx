@@ -17,6 +17,8 @@ import { EyeClosedIcon, EyeIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useRegister } from "@/hooks/api/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 const RegisterSchema = z
   .object({
@@ -38,12 +40,35 @@ export default function Register() {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowRePassword, setIsShowRePassword] = useState(false);
 
+  const registerMutation = useRegister();
+
   const { handleSubmit, register, formState } = useForm<RegisterForm>({
     resolver: zodResolver(RegisterSchema),
   });
 
   const onSubmit = (data: RegisterForm) => {
-    console.log({ data });
+    const { email, firstName, lastName, phoneNumber, password } = data;
+    registerMutation.mutate(
+      {
+        email,
+        firstName,
+        lastName,
+        phoneNumber,
+        password,
+      },
+      {
+        onSuccess: ({ data }) => {
+          if (data.isSuccess) {
+            console.log("success");
+          } else {
+            toast({
+              title: "Đăng ký thất bại",
+              description: data.message,
+            });
+          }
+        },
+      }
+    );
   };
 
   return (
@@ -104,16 +129,19 @@ export default function Register() {
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="phoneNumber">Số điện thoại</Label>
-                <Input
-                  id="phoneNumber"
-                  placeholder="Nhập số điện thoại"
-                  {...register("phoneNumber")}
-                />
-                {formState.errors.phoneNumber && (
-                  <p className="text-red-500 text-sm">
-                    {formState.errors.phoneNumber.message}
-                  </p>
-                )}
+                <div className="flex items-center gap-2">
+                  <p>+84</p>
+                  <Input
+                    id="phoneNumber"
+                    placeholder="Nhập số điện thoại"
+                    {...register("phoneNumber")}
+                  />
+                  {formState.errors.phoneNumber && (
+                    <p className="text-red-500 text-sm">
+                      {formState.errors.phoneNumber.message}
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="framework">Mật khẩu</Label>

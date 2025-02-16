@@ -17,6 +17,8 @@ import { EyeClosedIcon, EyeIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useLogin } from "@/hooks/api/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 const LoginSchema = z.object({
   email: z.string().email("Vui lòng nhập email hợp lệ"),
@@ -28,16 +30,31 @@ type LoginForm = z.infer<typeof LoginSchema>;
 export default function Login() {
   const [isShowPassword, setIsShowPassword] = useState(false);
 
+  const loginMutation = useLogin();
+
   const { handleSubmit, register, formState } = useForm<LoginForm>({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
     resolver: zodResolver(LoginSchema),
   });
 
   const onSubmit = (data: LoginForm) => {
-    console.log({ data });
+    loginMutation.mutate(
+      {
+        email: data.email,
+        password: data.password,
+      },
+      {
+        onSuccess: ({ data }) => {
+          if (data.isSuccess) {
+            console.log("success");
+          } else {
+            toast({
+              title: "Đăng nhập thất bại",
+              description: data.message,
+            });
+          }
+        },
+      }
+    );
   };
 
   return (
