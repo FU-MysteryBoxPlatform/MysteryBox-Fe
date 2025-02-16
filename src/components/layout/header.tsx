@@ -33,6 +33,7 @@ export default function Header() {
   return (
     <div className="px-4 md:px-10 lg:px-16 py-4 bg-gray-50 border-b border-gray-200">
       <div className="flex items-center justify-between max-w-[1280px] mx-auto">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.png" alt="logo" className="w-[134px]" />
 
         <div className="hidden lg:flex items-center gap-8">

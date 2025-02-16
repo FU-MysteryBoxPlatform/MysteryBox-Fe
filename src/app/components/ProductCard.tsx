@@ -33,6 +33,7 @@ export default function ProductCard({
         >
           <CartIcon className="" />
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={image} alt={title} />
       </div>
       <p className="text-lg font-semibold mt-2">{title}</p>

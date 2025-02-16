@@ -25,10 +25,12 @@ export default function GiftUnbox({ onOpen }: GiftUnboxProps) {
             isOpen ? "animate-box-open" : "animate-wiggle"
           )}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/lid.png" alt="lid" className="w-[150px]" />
         </div>
         {/* Gift Box */}
         <div className="absolute left-1/2 -translate-x-1/2 w-[140px] z-1 top-[60px]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/box.png" alt="gift-box" className="w-[140px]" />
         </div>
       </div>

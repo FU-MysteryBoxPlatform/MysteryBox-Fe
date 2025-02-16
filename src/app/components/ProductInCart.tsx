@@ -25,6 +25,7 @@ export default function ProductInCart({
             toggleSelectProduct(id);
           }}
         />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image}
           alt={title}

@@ -6,6 +6,7 @@ export default function Home() {
   return (
     <div>
       <div className="relative py-[136px]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/background.png"
           alt="background"

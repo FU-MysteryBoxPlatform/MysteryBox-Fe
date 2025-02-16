@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GlobalContext } from "@/provider/global-provider";
 import { useContext, useMemo } from "react";
+import Image from "next/image";
 
 export default function Page() {
   const { cart, toggleSelectAllProducts } = useContext(GlobalContext);
@@ -38,10 +39,12 @@ export default function Page() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-4">
-              <img
+              <Image
                 src="/images/cart-empty.png"
                 alt="empty cart"
-                className="w-1/4"
+                width={120}
+                height={120}
+                objectFit="cover"
               />
               <p>Không có sản phẩm nào trong giỏ hàng</p>
             </div>

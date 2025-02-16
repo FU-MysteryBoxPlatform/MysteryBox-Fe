@@ -20,6 +20,7 @@ export default function Page() {
           <div className="flex max-md:flex-col items-start gap-6">
             <div className="flex flex-col items-center gap-4">
               <div className="flex flex-col items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/avt.png"
                   alt="avatar"
