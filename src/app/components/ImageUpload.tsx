@@ -55,7 +55,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         <div
           className={cn(
             className,
-            "flex cursor-pointer items-center justify-center rounded border-2 border-dashed border-black/60 hover:border-black/10"
+            "flex cursor-pointer items-center justify-center rounded border-2 border-dashed border-black/60 hover:border-black/10 text-center"
           )}
           onClick={() => {
             inputRef.current?.click();

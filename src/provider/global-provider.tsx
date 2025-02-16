@@ -12,6 +12,7 @@ type TProductInCart = {
 };
 
 type GlobalContextType = {
+  isFetchingUser: boolean;
   user: TAccount | null;
   setUser: (user: TAccount | null) => void;
   cart: TProductInCart[] | null;
@@ -23,6 +24,7 @@ type GlobalContextType = {
 };
 
 const initialGlobalContext: GlobalContextType = {
+  isFetchingUser: true,
   user: null,
   setUser: () => null,
   cart: null,
@@ -39,6 +41,7 @@ export const GlobalContext =
 export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCart] = useState<TProductInCart[]>([]);
   const [user, setUser] = useState<TAccount | null>(null);
+  const [isFetchingUser, setIsFetchingUser] = useState(true);
 
   const addToCart = (
     product: Omit<TProductInCart, "quantity" | "selected">
@@ -109,6 +112,8 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+
+    setIsFetchingUser(false);
   }, []);
 
   useEffect(() => {
@@ -119,6 +124,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <GlobalContext.Provider
       value={{
+        isFetchingUser,
         user,
         setUser,
         cart,

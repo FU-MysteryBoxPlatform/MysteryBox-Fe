@@ -16,11 +16,14 @@ import { GlobalContext } from "@/provider/global-provider";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import cookie from "@/utils/cookie";
+import { Button } from "../ui/button";
 
 export default function Header() {
   const pathname = usePathname();
-  const { cart, setUser } = useContext(GlobalContext);
+  const { cart, user, isFetchingUser, setUser } = useContext(GlobalContext);
   const router = useRouter();
+
+  const isLoggedIn = !!user;
 
   const handleLogout = () => {
     cookie.delete("ACCESS_TOKEN");
@@ -53,37 +56,45 @@ export default function Header() {
           <BellIcon />
           <Link href="/cart">
             <div className="relative">
-              <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
-                {cart?.length}
-              </div>
+              {cart?.length && cart?.length > 0 ? (
+                <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
+                  {cart?.length}
+                </div>
+              ) : null}
               <CartIcon />
             </div>
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <UserIcon className="w-7 h-7" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4 grid gap-2">
-              {SUB_NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "px-2 py-1 hover:bg-gray-100 rounded-md",
-                    pathname.includes(item.href) && "bg-gray-100"
-                  )}
+          {isFetchingUser ? null : isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <UserIcon className="w-7 h-7" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="p-4 grid gap-2">
+                {SUB_NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "px-2 py-1 hover:bg-gray-100 rounded-md",
+                      pathname.includes(item.href) && "bg-gray-100"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+                <button
+                  className="px-2 py-1 hover:bg-gray-100 rounded-md text-red-500"
+                  onClick={handleLogout}
                 >
-                  {item.name}
-                </Link>
-              ))}
-              <button
-                className="px-2 py-1 hover:bg-gray-100 rounded-md text-red-500"
-                onClick={handleLogout}
-              >
-                Đăng xuất
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  Đăng xuất
+                </button>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button className="bg-[#E12E43] text-white hover:bg-[#B71C32]">
+              Đăng nhập
+            </Button>
+          )}
         </div>
 
         <div className="lg:hidden">
@@ -107,28 +118,42 @@ export default function Header() {
                 <div className="grid grid-cols-4 gap-6">
                   <SearchIcon />
                   <BellIcon />
+
                   <Link href="/cart">
-                    <CartIcon />
+                    <div className="relative">
+                      {cart?.length && cart?.length > 0 ? (
+                        <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
+                          {cart?.length}
+                        </div>
+                      ) : null}
+                      <CartIcon />
+                    </div>
                   </Link>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <UserIcon className="w-7 h-7" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="p-4 grid gap-2">
-                      {SUB_NAV_ITEMS.map((item) => (
-                        <Link
-                          key={item.name}
-                          href={item.href}
-                          className={cn(
-                            "px-2 py-1 hover:bg-gray-100 rounded-md",
-                            pathname.includes(item.href) && "bg-gray-100"
-                          )}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {isFetchingUser ? null : isLoggedIn ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <UserIcon className="w-7 h-7" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="p-4 grid gap-2">
+                        {SUB_NAV_ITEMS.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={cn(
+                              "px-2 py-1 hover:bg-gray-100 rounded-md",
+                              pathname.includes(item.href) && "bg-gray-100"
+                            )}
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <Button className="bg-[#E12E43] text-white hover:bg-[#B71C32]">
+                      Đăng nhập
+                    </Button>
+                  )}
                 </div>
                 <button
                   className="mt-4 py-1 hover:bg-gray-100 rounded-md text-red-500"

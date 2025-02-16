@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { ImageUploader } from "./ImageUpload";
 
 const UpdateProfileSchema = z.object({
   firstName: z.string().min(1, "Vui lòng nhập tên"),
@@ -50,6 +51,12 @@ export default function FormUpdateProfile() {
       className="grid grid-cols-1 md:grid-cols-2 gap-4"
       onSubmit={handleSubmit(onsubmit)}
     >
+      <div className="col-span-2 flex items-center justify-center">
+        <ImageUploader
+          onChange={(url) => console.log(url)}
+          className="w-24 h-24 rounded-full"
+        />
+      </div>
       <div className="flex flex-col space-y-1.5">
         <Label htmlFor="name">Tên</Label>
         <Input

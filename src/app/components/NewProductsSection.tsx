@@ -1,14 +1,8 @@
 "use client";
-import { GlobalContext } from "@/provider/global-provider";
 import Link from "next/link";
-import { useContext } from "react";
 import ProductCard from "./ProductCard";
 
 export default function NewProductsSection() {
-  const { cart } = useContext(GlobalContext);
-
-  console.log({ cart });
-
   return (
     <div className="my-10 md:my-16">
       <p className="text-2xl md:text-4xl font-semibold text-center mb-2 md:mb-4">
