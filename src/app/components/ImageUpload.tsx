@@ -1,5 +1,7 @@
+import axiosClient from "@/axios-client";
+import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { type ChangeEvent, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 
 type ImageUploaderProps = {
   onChange: (value: string) => void;
@@ -17,6 +19,28 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(value || defaultValue);
 
+  const handleUploadFileToCloud = async (file: File) => {
+    const formData = new FormData();
+    formData.append("Files", file);
+    try {
+      const response = await axiosClient.post(
+        "/image/upload-images",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      onChange?.(response.data.result[0].path);
+    } catch (error) {
+      console.log({ error });
+      toast({
+        title: "Tải ảnh không thành công, vui lòng thử lại.",
+      });
+    }
+  };
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -24,11 +48,15 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       reader.onloadend = () => {
         const imageUrl = reader.result as string;
         setPreviewUrl(imageUrl);
-        onChange(imageUrl);
+        handleUploadFileToCloud(file);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  useEffect(() => {
+    setPreviewUrl(value || defaultValue);
+  }, [value, defaultValue]);
 
   return (
     <div>

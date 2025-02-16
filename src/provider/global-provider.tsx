@@ -121,6 +121,11 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
+  useEffect(() => {
+    // Lưu người dùng vào localStorage mỗi khi nó thay đổi
+    localStorage.setItem("user", JSON.stringify(user));
+  }, [user]);
+
   return (
     <GlobalContext.Provider
       value={{
