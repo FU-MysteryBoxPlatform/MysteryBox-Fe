@@ -1,4 +1,5 @@
 "use client";
+import FormUpdateProfile from "@/app/components/FormUpdateProfile";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -48,7 +49,17 @@ export default function Page() {
                 })}
               </div>
             </div>
-            <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full"></div>
+            {tab === "info" && (
+              <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full">
+                <FormUpdateProfile />
+              </div>
+            )}
+            {tab === "trade-history" && (
+              <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full"></div>
+            )}
+            {tab === "wallet" && (
+              <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full"></div>
+            )}
           </div>
         </div>
       </div>
