@@ -210,7 +210,7 @@ export default function Register() {
         <CardFooter className="flex justify-between">
           <Button
             form="register-form"
-            className="w-full"
+            className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]"
             onClick={handleSubmit(onSubmit)}
           >
             Đăng ký

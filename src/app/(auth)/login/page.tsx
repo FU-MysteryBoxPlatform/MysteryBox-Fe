@@ -136,7 +136,7 @@ export default function Login() {
         <CardFooter className="flex justify-between">
           <Button
             form="login-form"
-            className="w-full"
+            className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]"
             onClick={handleSubmit(onSubmit)}
           >
             Đăng nhập

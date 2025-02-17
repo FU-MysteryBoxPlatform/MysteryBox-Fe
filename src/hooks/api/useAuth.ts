@@ -25,6 +25,16 @@ export type TLoginResponse = {
   account: TAccount;
 };
 
+export type TForgotPasswordData = {
+  email: string;
+};
+
+export type TResetPasswordData = {
+  email: string;
+  recoveryCode: string;
+  newPassword: string;
+};
+
 export const useRegister = () => {
   return useApiMutation<TRegisterResponse, TRegisterData>(
     "/account/create-account",
@@ -34,4 +44,18 @@ export const useRegister = () => {
 
 export const useLogin = () => {
   return useApiMutation<TLoginResponse, TLoginData>("/account/login", "post");
+};
+
+export const useForgotPassword = () => {
+  return useApiMutation<TForgotPasswordData, string>(
+    "/account/send-email-forgot-password",
+    "post"
+  );
+};
+
+export const useResetPassword = () => {
+  return useApiMutation<TResetPasswordData, TResetPasswordData>(
+    "/account/forgot-password",
+    "put"
+  );
 };

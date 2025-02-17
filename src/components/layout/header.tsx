@@ -91,7 +91,10 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button className="bg-[#E12E43] text-white hover:bg-[#B71C32]">
+            <Button
+              className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
+              onClick={() => router.push("/login")}
+            >
               Đăng nhập
             </Button>
           )}
@@ -120,7 +123,7 @@ export default function Header() {
                   <BellIcon />
 
                   <Link href="/cart">
-                    <div className="relative">
+                    <div className="relative w-fit">
                       {cart?.length && cart?.length > 0 ? (
                         <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
                           {cart?.length}
@@ -150,17 +153,22 @@ export default function Header() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    <Button className="bg-[#E12E43] text-white hover:bg-[#B71C32]">
+                    <Button
+                      className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
+                      onClick={() => router.push("/login")}
+                    >
                       Đăng nhập
                     </Button>
                   )}
                 </div>
-                <button
-                  className="mt-4 py-1 hover:bg-gray-100 rounded-md text-red-500"
-                  onClick={handleLogout}
-                >
-                  Đăng xuất
-                </button>
+                {isLoggedIn && (
+                  <button
+                    className="mt-4 py-1 hover:bg-gray-100 rounded-md text-red-500"
+                    onClick={handleLogout}
+                  >
+                    Đăng xuất
+                  </button>
+                )}
               </div>
             </DrawerContent>
           </Drawer>
