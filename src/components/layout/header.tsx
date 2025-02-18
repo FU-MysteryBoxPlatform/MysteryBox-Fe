@@ -208,7 +208,7 @@ const SUB_NAV_ITEMS = [
   },
   {
     name: "Bộ sưu tập",
-    href: "/collection",
+    href: "/my-collection",
   },
   {
     name: "Đơn hàng",

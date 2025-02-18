@@ -1,4 +1,5 @@
 "use client";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 import axiosClient from "@/axios-client";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeClosedIcon, EyeIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -38,6 +40,7 @@ type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;
 type FormResetPasswordForm = z.infer<typeof FormResetPasswordSchema>;
 
 function FormResetPassword({ email }: { email: string }) {
+  const router = useRouter();
   const [isShowPassword, setIsShowPassword] = useState(false);
   const [isShowRePassword, setIsShowRePassword] = useState(false);
 
@@ -60,6 +63,7 @@ function FormResetPassword({ email }: { email: string }) {
             toast({
               title: data.message[0],
             });
+            router.push("/login");
           }
         },
       }
@@ -139,10 +143,11 @@ function FormResetPassword({ email }: { email: string }) {
       </div>
       <Button
         form="reset-password-form"
+        disabled={resetPasswordMutation.isPending}
         className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]"
         onClick={handleSubmit(onSubmit)}
       >
-        Gửi
+        {resetPasswordMutation.isPending ? <LoadingIndicator /> : "Gửi"}
       </Button>
     </form>
   );

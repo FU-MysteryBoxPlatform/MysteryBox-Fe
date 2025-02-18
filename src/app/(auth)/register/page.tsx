@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useRegister } from "@/hooks/api/useAuth";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 const RegisterSchema = z
   .object({
@@ -210,10 +211,11 @@ export default function Register() {
         <CardFooter className="flex justify-between">
           <Button
             form="register-form"
+            disabled={registerMutation.isPending}
             className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]"
             onClick={handleSubmit(onSubmit)}
           >
-            Đăng ký
+            {registerMutation.isPending ? <LoadingIndicator /> : "Đăng ký"}
           </Button>
         </CardFooter>
       </Card>

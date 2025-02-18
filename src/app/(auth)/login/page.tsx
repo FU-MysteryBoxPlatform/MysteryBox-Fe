@@ -22,6 +22,7 @@ import { toast } from "@/hooks/use-toast";
 import cookie from "@/utils/cookie";
 import { GlobalContext } from "@/provider/global-provider";
 import { useRouter } from "next/navigation";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 const LoginSchema = z.object({
   email: z.string().email("Vui lòng nhập email hợp lệ"),
@@ -136,10 +137,11 @@ export default function Login() {
         <CardFooter className="flex justify-between">
           <Button
             form="login-form"
+            disabled={loginMutation.isPending}
             className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]"
             onClick={handleSubmit(onSubmit)}
           >
-            Đăng nhập
+            {loginMutation.isPending ? <LoadingIndicator /> : "Đăng nhập"}
           </Button>
         </CardFooter>
       </Card>
