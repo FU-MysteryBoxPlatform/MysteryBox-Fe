@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { formatPriceVND } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface saleData {
   saleId: string;
@@ -82,22 +83,6 @@ const SaleDetailsPage = () => {
     }
   }, [params.id]);
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   if (loading) {
     return (
@@ -166,7 +151,7 @@ const SaleDetailsPage = () => {
               </h3>
 
               <div className="aspect-square w-full relative rounded-lg overflow-hidden shadow-md">
-                <img
+                <Image
                   src={
                     sale?.inventory?.product?.imagePath || "/placeholder.svg"
                   }
@@ -273,7 +258,9 @@ const SaleDetailsPage = () => {
         </CardContent>
 
         <div className="flex justify-center my-4 ">
-          <Button size={"lg"} className="bg-[#E12E43] text-white">Mua ngay</Button>
+          <Button size={"lg"} className="bg-[#E12E43] text-white">
+            Mua ngay
+          </Button>
         </div>
       </Card>
     </div>
