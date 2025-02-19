@@ -5,18 +5,34 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSaleDetail } from "@/hooks/api/useSale";
+import { toast } from "@/hooks/use-toast";
 import { formatPriceVND } from "@/lib/utils";
-import { Calendar, DollarSign, Loader2, Package, User } from "lucide-react";
+import { GlobalContext } from "@/provider/global-provider";
+import dayjs from "dayjs";
+import { Loader2, Package, SquareArrowOutUpRight } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useContext } from "react";
 
 const SaleDetailsPage = () => {
   const params = useParams();
+  const { addToCart } = useContext(GlobalContext);
 
   const { data: sale, isLoading } = useSaleDetail((params.id as string) || "");
 
   const dataSale = sale?.result[0];
 
-  console.log({ dataSale });
+  const handleAddToCart = () => {
+    addToCart({
+      id: dataSale?.saleId || "",
+      image: dataSale?.inventory?.product?.imagePath || "",
+      title: dataSale?.inventory?.product?.name || "",
+      price: dataSale?.unitPrice || 0,
+    });
+    toast({
+      title: "Thêm vào giỏ hàng thành công!",
+    });
+  };
 
   if (isLoading) {
     return (
@@ -105,19 +121,18 @@ const SaleDetailsPage = () => {
 
             {/* Sale Information */}
             <div className="space-y-8">
-              <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold flex items-center gap-2 mb-4 text-primary">
-                  <DollarSign className="w-6 h-6" />
-                  Thông tin sản phẩm
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Thông tin sản phẩm</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-2">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-600">Giá gốc:</span>
                     <span className="font-medium text-lg">
                       {formatPriceVND(dataSale?.inventory?.product?.price || 0)}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-600">Giảm:</span>
                     <span className="font-medium text-green-600">
                       {Math.floor(
@@ -126,66 +141,66 @@ const SaleDetailsPage = () => {
                       %
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-600">Giá sau khi giảm:</span>
                     <span className="font-bold text-xl text-primary">
                       {formatPriceVND(dataSale?.unitPrice || 0)}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-2">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-600">Số lượng đã bán:</span>
                     <span className="font-medium text-lg">
                       {dataSale?.quantitySold}
                     </span>
                   </div>
-                </div>
-              </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Ngày đăng sản phẩm:</span>
+                    <span className="font-medium text-lg">
+                      {dayjs(dataSale?.saleDate).format("DD/MM/YYYY")}
+                    </span>
+                  </div>
+                  <Button
+                    className="bg-[#E12E43] text-white w-full hover:bg-[#B71C32]"
+                    onClick={handleAddToCart}
+                  >
+                    Thêm vào giỏ hàng
+                  </Button>
+                </CardContent>
+              </Card>
 
-              <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold flex items-center gap-2 mb-4 text-primary">
-                  <User className="w-6 h-6" />
-                  Người bán
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                    <span className="text-gray-600">Name:</span>
-                    <span className="font-medium">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <p>Thông tin người bán</p>
+                    <Link href={`/profile`}>
+                      <SquareArrowOutUpRight className="w-4 h-4" />
+                    </Link>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Tên người bán:</span>
+                    <span className="font-medium font-semibold">
                       {`${dataSale?.inventory?.account?.firstName} ${dataSale?.inventory?.account?.lastName}`}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-600">Email:</span>
-                    <span className="font-medium">
+                    <span className="font-medium font-semibold">
                       {dataSale?.inventory?.account?.email}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center py-2">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-600">Phone:</span>
-                    <span className="font-medium">
+                    <span className="font-medium font-semibold">
                       0{dataSale?.inventory?.account?.phoneNumber}
                     </span>
                   </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-                <h3 className="text-xl font-semibold flex items-center gap-2 mb-4 text-primary">
-                  <Calendar className="w-6 h-6" />
-                  Ngày đăng sản phẩm
-                </h3>
-                <span className="font-medium text-lg">
-                  {dataSale?.saleDate}
-                </span>
-              </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </CardContent>
-
-        <div className="flex justify-center my-4 ">
-          <Button size={"lg"} className="bg-[#E12E43] text-white">
-            Mua ngay
-          </Button>
-        </div>
       </Card>
     </div>
   );

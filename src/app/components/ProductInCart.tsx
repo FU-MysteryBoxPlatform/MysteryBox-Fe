@@ -4,6 +4,7 @@ import { ProductCardProps } from "./ProductCard";
 import { GlobalContext } from "@/provider/global-provider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatPriceVND } from "@/lib/utils";
+import Link from "next/link";
 
 export default function ProductInCart({
   id,
@@ -27,11 +28,13 @@ export default function ProductInCart({
           }}
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image}
-          alt={title}
-          className="w-[120px] h-[120px] rounded-lg"
-        />
+        <Link href={`/sale-detail/${id}`}>
+          <img
+            src={image}
+            alt={title}
+            className="w-[120px] h-[120px] rounded-lg"
+          />
+        </Link>
         <div className="grid gap-2 flex-1">
           <p className="font-semibold text-lg">{title}</p>
           <p className="text-sm text-gray-500">{formatPriceVND(price)}</p>

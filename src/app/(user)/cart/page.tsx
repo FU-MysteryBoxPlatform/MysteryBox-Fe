@@ -6,9 +6,13 @@ import { GlobalContext } from "@/provider/global-provider";
 import { useContext, useMemo } from "react";
 import Image from "next/image";
 import { formatPriceVND } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const { cart, toggleSelectAllProducts } = useContext(GlobalContext);
+  const router = useRouter();
+  const { cart, user, toggleSelectAllProducts } = useContext(GlobalContext);
+  const isLoggedIn = !!user;
+
   const totalPrice = useMemo(
     () =>
       cart?.reduce(
@@ -16,7 +20,15 @@ export default function Page() {
         0
       ),
     [cart]
-  ) ;
+  );
+
+  const handleCheckout = () => {
+    if (isLoggedIn) {
+      router.push("/checkout");
+    } else {
+      router.push("/login?from=cart");
+    }
+  };
 
   return (
     <div>
@@ -58,9 +70,15 @@ export default function Page() {
           <div>
             <div className="flex items-center gap-2 justify-between mb-4">
               <p className="text-lg font-semibold">Tổng tiền:</p>
-              <p className="text-xl font-bold">{formatPriceVND(totalPrice ?? 0)}</p>
+              <p className="text-xl font-bold">
+                {formatPriceVND(totalPrice ?? 0)}
+              </p>
             </div>
-            <Button className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]">
+            <Button
+              disabled={cart?.every((item) => !item.selected)}
+              className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32] disabled:bg-gray-400 disabled:hover:bg-gray-400"
+              onClick={handleCheckout}
+            >
               Thanh toán
             </Button>
           </div>

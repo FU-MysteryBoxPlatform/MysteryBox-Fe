@@ -21,7 +21,7 @@ import { useLogin } from "@/hooks/api/useAuth";
 import { toast } from "@/hooks/use-toast";
 import cookie from "@/utils/cookie";
 import { GlobalContext } from "@/provider/global-provider";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 const LoginSchema = z.object({
@@ -34,7 +34,9 @@ type LoginForm = z.infer<typeof LoginSchema>;
 export default function Login() {
   const [isShowPassword, setIsShowPassword] = useState(false);
   const { setUser } = useContext(GlobalContext);
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const from = searchParams.get("from");
 
   const loginMutation = useLogin();
 
@@ -50,15 +52,13 @@ export default function Login() {
       },
       {
         onSuccess: (data) => {
-          console.log({ data });
           const { token, refreshToken, account } = data.result;
           if (data) {
-            console.log({ token, refreshToken, account });
             cookie.set("ACCESS_TOKEN", token);
             cookie.set("REFRESH_TOKEN", refreshToken);
             setUser(account);
             localStorage.setItem("user", JSON.stringify(account));
-            router.push("/");
+            router.push(`/${from}`);
           } else {
             toast({
               title: "Đăng nhập thất bại",

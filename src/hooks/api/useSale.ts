@@ -1,4 +1,5 @@
 import { useApiQuery } from "./useApi";
+import { SalesData } from "@/types";
 
 export type TProductSale = {
   name: string;
@@ -27,7 +28,7 @@ export type TSaleInventory = {
   };
 };
 
-export type TSaleData = {
+export type TSaleDetailData = {
   saleId: string;
   inventoryId: string;
   inventory: TSaleInventory;
@@ -39,10 +40,10 @@ export type TSaleData = {
   };
 };
 
-export const useSale = () => {
-  return useApiQuery<TSaleData[]>("/sale/get-sale-data");
+export const useAllSale = (page: number, size: number) => {
+  return useApiQuery<SalesData[]>(`/sale/get-all-sale/${page}/${size}`);
 };
 
 export const useSaleDetail = (id: string) => {
-  return useApiQuery<TSaleData[]>(`/sale/get-sale-by-id/${id}`);
+  return useApiQuery<TSaleDetailData[]>(`/sale/get-sale-by-id/${id}`);
 };
