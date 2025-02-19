@@ -1,21 +1,11 @@
 "use client";
-import axiosClient from "@/axios-client";
-import { SalesData } from "@/types";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import ProductCard from "./ProductCard";
-import { useAllSale } from "@/hooks/api/useSale";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAllSale } from "@/hooks/api/useSale";
+import Link from "next/link";
+import ProductCard from "./ProductCard";
 
 export default function OurProductsSection() {
-  const [page, setPage] = useState(1);
-  const [products, setProducts] = useState<SalesData[]>([]);
-
-  const { data: sales, isLoading } = useAllSale(page, 10);
-
-  useEffect(() => {
-    setProducts((prev) => [...prev, ...(sales?.result || [])]);
-  }, [sales]);
+  const { data: sales, isLoading } = useAllSale(1, 10);
 
   return (
     <div className="my-10 md:my-16">
@@ -39,7 +29,7 @@ export default function OurProductsSection() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
-          {products.map((product) => (
+          {sales?.result.map((product) => (
             <ProductCard
               image={product.collectionProduct.product.imagePath}
               price={product.sale.unitPrice}
