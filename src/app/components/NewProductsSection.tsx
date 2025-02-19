@@ -26,31 +26,31 @@ export default function NewProductsSection() {
 
 const NEW_PRODUCTS = [
   {
-    id: 1,
+    id: "1",
     image: "/mock-images/image1.png",
     title: "Itar",
     price: 100,
   },
   {
-    id: 2,
+    id: "2",
     image: "/mock-images/image2.png",
     title: "White Cap",
     price: 100,
   },
   {
-    id: 3,
+    id: "3",
     image: "/mock-images/image3.png",
     title: "Jae Namaz",
     price: 100,
   },
   {
-    id: 4,
+    id: "4",
     image: "/mock-images/image4.png",
     title: "Dates",
     price: 100,
   },
   {
-    id: 5,
+    id: "5",
     image: "/mock-images/image5.png",
     title: "Miswak",
     price: 100,
