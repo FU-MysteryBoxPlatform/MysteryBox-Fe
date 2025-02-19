@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 export default function Page() {
   return (
     <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full">
@@ -13,7 +15,7 @@ export default function Page() {
               key={item.id}
               className="flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 cursor-pointer hover:bg-gray-100"
             >
-              <img
+              <Image
                 src={item.thumbImg}
                 alt="thumb"
                 className="w-full h-40 object-cover rounded-lg"

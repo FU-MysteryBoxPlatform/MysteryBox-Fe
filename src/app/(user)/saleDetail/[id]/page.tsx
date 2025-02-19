@@ -46,11 +46,6 @@ interface saleData {
   };
 }
 
-interface ApiResponse {
-  result: saleData[];
-  isSuccess: boolean;
-  messages: string[];
-}
 
 const SaleDetailsPage = () => {
   const params = useParams();

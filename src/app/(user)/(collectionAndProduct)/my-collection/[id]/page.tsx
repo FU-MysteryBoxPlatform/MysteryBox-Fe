@@ -1,5 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 
 export default function Page() {
@@ -30,7 +31,7 @@ export default function Page() {
                   : "border-green-400 hover:bg-green-100"
               )}
             >
-              <img
+              <Image
                 src={item.thumbImg}
                 alt="thumb"
                 className="w-full h-40 object-cover rounded-lg"
