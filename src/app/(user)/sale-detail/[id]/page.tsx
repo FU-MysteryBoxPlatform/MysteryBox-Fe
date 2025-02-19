@@ -7,13 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSaleDetail } from "@/hooks/api/useSale";
 import { formatPriceVND } from "@/lib/utils";
 import { Calendar, DollarSign, Loader2, Package, User } from "lucide-react";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 
 const SaleDetailsPage = () => {
   const params = useParams();
 
   const { data: sale, isLoading } = useSaleDetail((params.id as string) || "");
+
+  const dataSale = sale?.result[0];
+
+  console.log({ dataSale });
 
   if (isLoading) {
     return (
@@ -44,7 +47,7 @@ const SaleDetailsPage = () => {
       <Card className="shadow-lg border-none bg-white rounded-xl overflow-hidden">
         <CardHeader className=" text-black p-6">
           <CardTitle className="text-3xl font-bold uppercase">
-            Chi tiết bộ sưu tập: {sale.result?.inventory?.product?.name}
+            Chi tiết bộ sưu tập: {dataSale?.inventory?.product?.name}
           </CardTitle>
           {/* <Badge
             variant={
@@ -68,33 +71,33 @@ const SaleDetailsPage = () => {
               </h3>
 
               <div className="aspect-square w-full relative rounded-lg overflow-hidden shadow-md">
-                <Image
+                <img
                   src={
-                    sale.result?.inventory?.product?.imagePath ||
+                    dataSale?.inventory?.product?.imagePath ||
                     "/placeholder.svg"
                   }
-                  alt={sale.result?.inventory?.product?.name}
+                  alt={dataSale?.inventory?.product?.name}
                   className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                 />
               </div>
 
               <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-medium text-lg text-primary">
-                  {sale.result?.inventory?.product?.name}
+                  {dataSale?.inventory?.product?.name}
                 </h4>
                 <p className="text-sm text-gray-600">
-                  {sale.result?.inventory?.product?.description}
+                  {dataSale?.inventory?.product?.description}
                 </p>
                 <div className="flex items-center gap-2">
                   <Badge
                     variant="outline"
                     className="text-primary border-primary"
                   >
-                    {sale.result?.inventory.product.rarityStatus.name}
+                    {dataSale?.inventory?.product?.rarityStatus.name}
                   </Badge>
                   <span className="text-sm text-gray-500">
                     Độ hiếm:{" "}
-                    {sale.result?.inventory?.product.rarityStatus?.dropRate}%
+                    {dataSale?.inventory?.product?.rarityStatus?.dropRate}%
                   </span>
                 </div>
               </div>
@@ -111,14 +114,14 @@ const SaleDetailsPage = () => {
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Giá gốc:</span>
                     <span className="font-medium text-lg">
-                      {formatPriceVND(sale.result?.inventory?.product?.price)}
+                      {formatPriceVND(dataSale?.inventory?.product?.price || 0)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Giảm:</span>
                     <span className="font-medium text-green-600">
                       {Math.floor(
-                        Number(sale.result?.inventory.product.discount) * 100
+                        Number(dataSale?.inventory?.product?.discount) * 100
                       )}
                       %
                     </span>
@@ -126,13 +129,13 @@ const SaleDetailsPage = () => {
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Giá sau khi giảm:</span>
                     <span className="font-bold text-xl text-primary">
-                      {formatPriceVND(sale.result?.unitPrice)}
+                      {formatPriceVND(dataSale?.unitPrice || 0)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-gray-600">Số lượng đã bán:</span>
                     <span className="font-medium text-lg">
-                      {sale.result?.quantitySold}
+                      {dataSale?.quantitySold}
                     </span>
                   </div>
                 </div>
@@ -147,19 +150,19 @@ const SaleDetailsPage = () => {
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Name:</span>
                     <span className="font-medium">
-                      {`${sale.result?.inventory?.account?.firstName} ${sale.result?.inventory?.account?.lastName}`}
+                      {`${dataSale?.inventory?.account?.firstName} ${dataSale?.inventory?.account?.lastName}`}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Email:</span>
                     <span className="font-medium">
-                      {sale.result?.inventory?.account?.email}
+                      {dataSale?.inventory?.account?.email}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-gray-600">Phone:</span>
                     <span className="font-medium">
-                      0{sale.result?.inventory?.account?.phoneNumber}
+                      0{dataSale?.inventory?.account?.phoneNumber}
                     </span>
                   </div>
                 </div>
@@ -171,7 +174,7 @@ const SaleDetailsPage = () => {
                   Ngày đăng sản phẩm
                 </h3>
                 <span className="font-medium text-lg">
-                  {sale.result?.saleDate}
+                  {dataSale?.saleDate}
                 </span>
               </div>
             </div>
