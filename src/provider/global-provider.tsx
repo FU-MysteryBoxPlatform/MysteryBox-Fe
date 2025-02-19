@@ -3,7 +3,7 @@ import { TAccount } from "@/types";
 import { createContext, useEffect, useState } from "react";
 
 type TProductInCart = {
-  id: number;
+  id: string;
   image: string;
   title: string;
   price: number;
@@ -18,8 +18,8 @@ type GlobalContextType = {
   cart: TProductInCart[] | null;
   setCart: (cart: TProductInCart[]) => void;
   addToCart: (product: Omit<TProductInCart, "quantity" | "selected">) => void;
-  removeFromCart: (id: number, quantity?: number) => void;
-  toggleSelectProduct: (id: number) => void;
+  removeFromCart: (id: string, quantity?: number) => void;
+  toggleSelectProduct: (id: string) => void;
   toggleSelectAllProducts: () => void;
 };
 
@@ -62,7 +62,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const removeFromCart = (id: number, quantity?: number) => {
+  const removeFromCart = (id: string, quantity?: number) => {
     if (quantity) {
       const itemRemoved = cart.find((item) => item.id === id);
       if (itemRemoved?.quantity && itemRemoved?.quantity <= quantity) {
@@ -85,7 +85,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const toggleSelectProduct = (id: number) => {
+  const toggleSelectProduct = (id: string) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
         item.id === id ? { ...item, selected: !item.selected } : item

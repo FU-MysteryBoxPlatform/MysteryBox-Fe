@@ -3,6 +3,7 @@ import Counter from "./Counter";
 import { ProductCardProps } from "./ProductCard";
 import { GlobalContext } from "@/provider/global-provider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { formatPriceVND } from "@/lib/utils";
 
 export default function ProductInCart({
   id,
@@ -33,7 +34,7 @@ export default function ProductInCart({
         />
         <div className="grid gap-2 flex-1">
           <p className="font-semibold text-lg">{title}</p>
-          <p className="text-sm text-gray-500">${price}</p>
+          <p className="text-sm text-gray-500">{formatPriceVND(price)}</p>
           <Counter
             count={quantity}
             onIncrease={() => {

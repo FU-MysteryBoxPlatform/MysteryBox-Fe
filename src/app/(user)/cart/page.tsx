@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { GlobalContext } from "@/provider/global-provider";
 import { useContext, useMemo } from "react";
 import Image from "next/image";
+import { formatPriceVND } from "@/lib/utils";
 
 export default function Page() {
   const { cart, toggleSelectAllProducts } = useContext(GlobalContext);
@@ -15,7 +16,7 @@ export default function Page() {
         0
       ),
     [cart]
-  );
+  ) ;
 
   return (
     <div>
@@ -57,7 +58,7 @@ export default function Page() {
           <div>
             <div className="flex items-center gap-2 justify-between mb-4">
               <p className="text-lg font-semibold">Tổng tiền:</p>
-              <p className="text-xl font-bold">${totalPrice}</p>
+              <p className="text-xl font-bold">{formatPriceVND(totalPrice ?? 0)}</p>
             </div>
             <Button className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]">
               Thanh toán

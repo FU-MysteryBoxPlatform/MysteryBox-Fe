@@ -1,10 +1,12 @@
 import CartIcon from "@/components/icons/CartIcon";
 import { useToast } from "@/hooks/use-toast";
+import { formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
+import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
 export type ProductCardProps = {
-  id: number;
+  id: string;
   image: string;
   title: string;
   price: number;
@@ -17,7 +19,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const { addToCart } = useContext(GlobalContext);
   const { toast } = useToast();
-
+const route = useRouter();
   return (
     <div className="flex flex-col">
       <div className="relative">
@@ -34,10 +36,12 @@ export default function ProductCard({
           <CartIcon className="" />
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt={title} />
+        <img src={image} alt={title} onClick={()=> route.push(`/saleDetail/${id}`)} />
       </div>
       <p className="text-lg font-semibold mt-2">{title}</p>
-      <p className="text-sm text-gray-500">${price}</p>
+      <p className="text-sm text-gray-500">
+        {formatPriceVND(price)}
+      </p>
     </div>
   );
 }
