@@ -18,6 +18,12 @@ import { ImageUploader } from "./ImageUpload";
 import { useUpdateAccount } from "@/hooks/api/useAccount";
 import dayjs from "dayjs";
 import { toast } from "@/hooks/use-toast";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
 
 const UpdateProfileSchema = z.object({
   firstName: z.string().min(1, "Vui lòng nhập tên"),
@@ -31,6 +37,8 @@ export default function FormUpdateProfile() {
   const { user, setUser } = useContext(GlobalContext);
   const [dob, setDob] = useState<Date | undefined>(new Date());
   const [image, setImage] = useState("");
+
+  console.log({ user });
 
   const updateAccountMutation = useUpdateAccount();
 
@@ -69,6 +77,7 @@ export default function FormUpdateProfile() {
     setValue("lastName", user?.lastName || "");
     setValue("gender", user?.gender ? "1" : "0");
     setDob(new Date(user?.dob || ""));
+    setImage(user?.avatar || "");
   }, [setValue, user]);
 
   return (
@@ -106,7 +115,7 @@ export default function FormUpdateProfile() {
           </p>
         )}
       </div>
-      <div className="flex flex-col space-y-1.5 col-span-2">
+      <div className="flex flex-col space-y-1.5">
         <Label htmlFor="name">Giới tính</Label>
         <Select
           {...register("gender")}
@@ -123,14 +132,22 @@ export default function FormUpdateProfile() {
           </SelectContent>
         </Select>
       </div>
-      <div className="flex flex-col space-y-1.5 col-span-2">
+      <div className="flex flex-col space-y-1.5">
         <Label htmlFor="name">Ngày sinh</Label>
-        <Calendar
-          mode="single"
-          selected={dob}
-          onSelect={setDob}
-          className="rounded-md border w-fit"
-        />
+        <Popover>
+          <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
+            <p>{dayjs(dob).format("DD/MM/YYYY")}</p>
+            <CalendarIcon />
+          </PopoverTrigger>
+          <PopoverContent>
+            <Calendar
+              mode="single"
+              selected={dob}
+              onSelect={setDob}
+              className="rounded-md border w-fit"
+            />
+          </PopoverContent>
+        </Popover>
       </div>
       <Button
         type="submit"

@@ -19,7 +19,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   const { addToCart } = useContext(GlobalContext);
   const { toast } = useToast();
-const route = useRouter();
+  const route = useRouter();
   return (
     <div className="flex flex-col">
       <div className="relative">
@@ -36,12 +36,15 @@ const route = useRouter();
           <CartIcon className="" />
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt={title} onClick={()=> route.push(`/saleDetail/${id}`)} />
+        <img
+          src={image}
+          alt={title}
+          onClick={() => route.push(`/sale-detail/${id}`)}
+          className="cursor-pointer"
+        />
       </div>
       <p className="text-lg font-semibold mt-2">{title}</p>
-      <p className="text-sm text-gray-500">
-        {formatPriceVND(price)}
-      </p>
+      <p className="text-sm text-gray-500">{formatPriceVND(price)}</p>
     </div>
   );
 }

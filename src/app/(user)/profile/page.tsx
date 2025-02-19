@@ -1,13 +1,17 @@
 "use client";
 import FormUpdateProfile from "@/app/components/FormUpdateProfile";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useContext } from "react";
 
 export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") || "info";
+  const { user, isFetchingUser } = useContext(GlobalContext);
 
   return (
     <div>
@@ -21,14 +25,22 @@ export default function Page() {
             <div className="flex flex-col items-center gap-4">
               <div className="flex flex-col items-center gap-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/avt.png"
-                  alt="avatar"
-                  className="w-20 h-20 border-4 border-[#E12E43] rounded-full"
-                />
-                <p className="text-center text-lg font-semibold">
-                  thenameis_hiep
-                </p>
+                {user?.avatar ? (
+                  <img
+                    src={user?.avatar}
+                    alt="avatar"
+                    className="w-20 h-20 border-4 border-[#E12E43] rounded-full"
+                  />
+                ) : (
+                  <div className="w-20 h-20 border-4 border-[#E12E43] rounded-full bg-gray-300"></div>
+                )}
+                {isFetchingUser ? (
+                  <Skeleton className="w-16 h-4 " />
+                ) : (
+                  <p className="text-center text-lg font-semibold">
+                    {user?.firstName + " " + user?.lastName}
+                  </p>
+                )}
                 <Link href="/profile/edit" className="text-sm underline">
                   Cập nhật hồ sơ
                 </Link>
