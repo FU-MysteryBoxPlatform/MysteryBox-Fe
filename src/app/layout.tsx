@@ -6,6 +6,7 @@ import { GlobalProvider } from "@/provider/global-provider";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +36,7 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
             <Header />
-            {children}
+            <Suspense>{children}</Suspense>
             <Toaster />
             <Footer />
           </body>
