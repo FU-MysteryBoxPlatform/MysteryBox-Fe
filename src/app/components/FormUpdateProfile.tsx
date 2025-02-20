@@ -38,8 +38,6 @@ export default function FormUpdateProfile() {
   const [dob, setDob] = useState<Date | undefined>(new Date());
   const [image, setImage] = useState("");
 
-  console.log({ user });
-
   const updateAccountMutation = useUpdateAccount();
 
   const { handleSubmit, register, formState, setValue } =
