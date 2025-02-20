@@ -25,7 +25,7 @@ export default function Page() {
       customerId: user?.id,
       paymentMethod: 0,
       note: "",
-      orderDetailDtos: cart?.map((item) => ({
+      orderDetailDtos: cart?.filter(a=> a.selected).map((item) => ({
         saleId: item.id,
         quantity: item.quantity,
         note: item.title,
