@@ -70,6 +70,7 @@ export default function InventoryCard({
       setError("quantity", {
         message: "Số lượng bán vượt quá số lượng bạn sở hữu",
       });
+      return;
     }
 
     mutateSellInventory(
