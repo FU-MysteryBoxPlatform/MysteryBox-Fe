@@ -13,6 +13,7 @@ type TProductInCart = {
 
 type GlobalContextType = {
   isFetchingUser: boolean;
+  isFetchingCart: boolean;
   user: TAccount | null;
   setUser: (user: TAccount | null) => void;
   cart: TProductInCart[] | null;
@@ -25,6 +26,7 @@ type GlobalContextType = {
 
 const initialGlobalContext: GlobalContextType = {
   isFetchingUser: true,
+  isFetchingCart: true,
   user: null,
   setUser: () => null,
   cart: null,
@@ -42,6 +44,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCart] = useState<TProductInCart[]>([]);
   const [user, setUser] = useState<TAccount | null>(null);
   const [isFetchingUser, setIsFetchingUser] = useState(true);
+  const [isFetchingCart, setIsFetchingCart] = useState(true);
 
   const addToCart = (
     product: Omit<TProductInCart, "quantity" | "selected">
@@ -106,6 +109,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedCart) {
       setCart(JSON.parse(savedCart));
     }
+    setIsFetchingCart(false);
 
     // Lấy người dùng từ localStorage khi component được mount
     const savedUser = localStorage.getItem("user");
@@ -130,6 +134,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     <GlobalContext.Provider
       value={{
         isFetchingUser,
+        isFetchingCart,
         user,
         setUser,
         cart,

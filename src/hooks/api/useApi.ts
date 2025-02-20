@@ -28,11 +28,19 @@ export function useApiQuery<T>(
 export function useApiMutation<T, U>(
   url: string,
   method: "post" | "put" | "patch" | "delete" = "post",
+  contentType:
+    | "application/json"
+    | "multipart/form-data"
+    | string = "application/json",
   options?: UseMutationOptions<TBaseResponse<T>, AxiosError, U>
 ) {
   return useMutation<TBaseResponse<T>, AxiosError, U>({
     mutationFn: async (data) => {
-      const response = await axiosClient[method]<TBaseResponse<T>>(url, data);
+      const response = await axiosClient[method]<TBaseResponse<T>>(url, data, {
+        headers: {
+          "Content-Type": contentType,
+        },
+      });
       return response.data;
     },
     ...options,

@@ -1,8 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
+
   return (
     <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full">
       <p className="text-lg md:text-xl font-bold mb-4 md:mb-6">
@@ -13,10 +16,13 @@ export default function Page() {
           return (
             <div
               key={item.id}
-              className="flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 cursor-pointer hover:bg-gray-100"
+              className="flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 cursor-pointer hover:bg-gray-100 cursor-pointer"
+              onClick={() => router.push(`/my-collection/${item.id}`)}
             >
               <Image
                 src={item.thumbImg}
+                width={120}
+                height={120}
                 alt="thumb"
                 className="w-full h-40 object-cover rounded-lg"
               />

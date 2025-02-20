@@ -35,10 +35,11 @@ export default function ProductCard({
         >
           <CartIcon className="" />
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+
         <img
           src={image}
           alt={title}
+          loading="lazy"
           onClick={() => route.push(`/sale-detail/${id}`)}
           className="cursor-pointer"
         />

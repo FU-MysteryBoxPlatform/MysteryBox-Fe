@@ -58,7 +58,7 @@ export default function Login() {
             cookie.set("REFRESH_TOKEN", refreshToken);
             setUser(account);
             localStorage.setItem("user", JSON.stringify(account));
-            router.push(`/${from}`);
+            router.push(!!from ? `/${from}` : "/");
           } else {
             toast({
               title: "Đăng nhập thất bại",

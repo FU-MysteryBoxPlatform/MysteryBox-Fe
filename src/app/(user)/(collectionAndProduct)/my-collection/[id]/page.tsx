@@ -33,6 +33,8 @@ export default function Page() {
             >
               <Image
                 src={item.thumbImg}
+                width={120}
+                height={120}
                 alt="thumb"
                 className="w-full h-40 object-cover rounded-lg"
               />

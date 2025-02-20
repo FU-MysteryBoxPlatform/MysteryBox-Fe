@@ -25,11 +25,13 @@ export default function Page() {
       customerId: user?.id,
       paymentMethod: 0,
       note: "",
-      orderDetailDtos: cart?.map((item) => ({
-        saleId: item.id,
-        quantity: item.quantity,
-        note: item.title,
-      })),
+      orderDetailDtos: cart
+        ?.filter((item) => item.selected)
+        .map((item) => ({
+          saleId: item.id,
+          quantity: item.quantity,
+          note: item.title,
+        })),
       returnUrl: `${window.location.host}/payment`,
     } as Order;
 
@@ -40,7 +42,7 @@ export default function Page() {
             title: "Tạo đơn hàng thành công!",
           });
           window.location.href = data.result;
-        }else{
+        } else {
           toast({
             title: data.messages[0],
           });
