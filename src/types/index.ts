@@ -1,7 +1,7 @@
 export type TBaseResponse<T> = {
   result: T;
   isSuccess: boolean;
-  message: string[];
+  messages: string[];
 };
 
 export type TAccount = {

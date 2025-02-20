@@ -1,12 +1,15 @@
 "use client";
 import CheckoutProductCard from "@/app/components/CheckoutProductCard";
 import { Button } from "@/components/ui/button";
+import { Order, useCheckOut } from "@/hooks/api/useCartApi";
+import { toast } from "@/hooks/use-toast";
 import { formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import { useContext, useMemo } from "react";
 
 export default function Page() {
-  const { cart } = useContext(GlobalContext);
+  const { cart, user } = useContext(GlobalContext);
+  const checkout = useCheckOut();
 
   const totalPrice = useMemo(() => {
     return (
@@ -18,7 +21,34 @@ export default function Page() {
   }, [cart]);
 
   const handlePayWithVNPay = () => {
-    console.log("pay with vnpay");
+    const payload = {
+      customerId: user?.id,
+      paymentMethod: 0,
+      note: "",
+      orderDetailDtos: cart?.map((item) => ({
+        saleId: item.id,
+        quantity: item.quantity,
+        note: item.title,
+      })),
+      returnUrl: `${window.location.host}/payment`,
+    } as Order;
+
+    checkout.mutate(payload, {
+      onSuccess: (data) => {
+        if (data.isSuccess) {
+          toast({
+            title: "Tạo đơn hàng thành công!",
+          });
+          window.location.href = data.result;
+        }else{
+          toast({
+            title: data.messages[0],
+          });
+        }
+      },
+    });
+
+    console.log(payload);
   };
 
   return (
