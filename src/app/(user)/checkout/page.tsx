@@ -53,6 +53,10 @@ export default function Page() {
     console.log(payload);
   };
 
+  const handlePayWithMomo = () => {
+    console.log("pay with momo");
+  };
+
   return (
     <div>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16">
@@ -65,17 +69,30 @@ export default function Page() {
               <p className="text-lg font-semibold md:text-xl mb-4">
                 Phương thức thanh toán
               </p>
-              <Button
-                className="bg-white text-[#E12E43] border border-[#E12E43] hover:bg-white"
-                onClick={handlePayWithVNPay}
-              >
-                <img
-                  src="/vnpay.png"
-                  alt="vnpay"
-                  className="w-16 object-cover"
-                />
-                Thanh toán với VNPay
-              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  className="bg-white text-[#E12E43] border border-[#E12E43] hover:bg-white"
+                  onClick={handlePayWithVNPay}
+                >
+                  <img
+                    src="/vnpay.png"
+                    alt="vnpay"
+                    className="w-16 object-cover"
+                  />
+                  Thanh toán với VNPay
+                </Button>
+                <Button
+                  className="bg-white text-[#E12E43] border border-[#E12E43] hover:bg-white"
+                  onClick={handlePayWithMomo}
+                >
+                  <img
+                    src="/momo.png"
+                    alt="momo"
+                    className="w-4 object-cover"
+                  />
+                  Thanh toán với Momo
+                </Button>
+              </div>
             </div>
             <div>
               <p className="text-lg font-semibold md:text-xl mb-4">
