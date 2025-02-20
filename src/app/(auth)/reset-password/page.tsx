@@ -61,7 +61,7 @@ function FormResetPassword({ email }: { email: string }) {
         onSuccess: (data) => {
           if (data.isSuccess) {
             toast({
-              title: data.message[0],
+              title: data.messages[0],
             });
             router.push("/login");
           }
