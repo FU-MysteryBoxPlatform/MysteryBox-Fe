@@ -69,7 +69,7 @@ export default function Register() {
           } else {
             toast({
               title: "Đăng ký thất bại",
-              description: data.message,
+              description: data.messages[0],
             });
           }
         },
