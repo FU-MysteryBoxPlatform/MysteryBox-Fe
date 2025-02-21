@@ -13,7 +13,8 @@ export default function Page() {
           return (
             <div
               key={item.id}
-              className="flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 cursor-pointer hover:bg-gray-100"
+              className="flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 hover:bg-gray-100 cursor-pointer"
+              onClick={() => router.push(`/my-collection/${item.id}`)}
             >
               <Image
                 src={item.thumbImg}

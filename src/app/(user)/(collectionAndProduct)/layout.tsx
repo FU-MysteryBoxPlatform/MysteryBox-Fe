@@ -37,11 +37,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 const SIDEBAR = [
   {
-    name: "Sản phẩm",
-    value: "my-product",
-  },
-  {
     name: "Bộ sưu tập",
     value: "my-collection",
+  },
+  {
+    name: "Kho vật phẩm",
+    value: "my-product",
   },
 ];
