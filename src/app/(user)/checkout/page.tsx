@@ -21,15 +21,24 @@ export default function Page() {
   }, [cart]);
 
   const handlePayWithVNPay = () => {
+    handleCheckOut(false);
+  };
+
+  const handlePayWithMomo = () => {
+    handleCheckOut(true);
+  };
+const handleCheckOut = (isMomo: boolean) => {
     const payload = {
       customerId: user?.id,
-      paymentMethod: 0,
+      paymentMethod: isMomo? 1: 0,
       note: "",
-      orderDetailDtos: cart?.filter(a=> a.selected).map((item) => ({
-        saleId: item.id,
-        quantity: item.quantity,
-        note: item.title,
-      })),
+      orderDetailDtos: cart
+        ?.filter((a) => a.selected)
+        .map((item) => ({
+          saleId: item.id,
+          quantity: item.quantity,
+          note: item.title,
+        })),
       returnUrl: `${window.location.host}/payment`,
     } as Order;
 
@@ -40,7 +49,7 @@ export default function Page() {
             title: "Tạo đơn hàng thành công!",
           });
           window.location.href = data.result;
-        }else{
+        } else {
           toast({
             title: data.messages[0],
           });
@@ -49,12 +58,7 @@ export default function Page() {
     });
 
     console.log(payload);
-  };
-
-  const handlePayWithMomo = () => {
-    console.log("pay with momo");
-  };
-
+}
   return (
     <div>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16">
