@@ -20,7 +20,7 @@ export type TAccount = {
   storeCreditExpireDay: string;
   isManuallyCreated: boolean;
   roles: TRole[];
-  mainRole: "COLLECTOR" | "MODERATOR";
+  mainRole: "COLLECTOR" | "MODERATOR"|'ADMIN';
   isBanned: boolean;
 };
 
