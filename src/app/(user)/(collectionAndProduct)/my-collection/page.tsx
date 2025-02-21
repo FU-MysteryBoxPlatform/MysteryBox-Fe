@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
   return (
     <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full">
       <p className="text-lg md:text-xl font-bold mb-4 md:mb-6">
