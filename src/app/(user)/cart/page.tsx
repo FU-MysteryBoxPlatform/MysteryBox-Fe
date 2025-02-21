@@ -7,10 +7,12 @@ import { useContext, useMemo } from "react";
 import Image from "next/image";
 import { formatPriceVND } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Page() {
   const router = useRouter();
-  const { cart, user, toggleSelectAllProducts } = useContext(GlobalContext);
+  const { cart, user, isFetchingCart, toggleSelectAllProducts } =
+    useContext(GlobalContext);
   const isLoggedIn = !!user;
 
   const totalPrice = useMemo(
@@ -44,7 +46,21 @@ export default function Page() {
             />
             <p className="text-sm font-semibold">Chọn tất cả</p>
           </div>
-          {cart?.length && cart?.length > 0 ? (
+          {isFetchingCart ? (
+            <div className="grid gap-3">
+              {Array(3)
+                .fill("0")
+                .map((_, idx) => (
+                  <div className="flex gap-4 ml-6" key={idx}>
+                    <Skeleton className="w-[120px] h-[120px] mb-2" />
+                    <div className="flex-1 flex flex-col items-start gap-2">
+                      <Skeleton className="w-1/2 h-4" />
+                      <Skeleton className="w-1/6 h-4" />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : cart?.length && cart?.length > 0 ? (
             <div className="grid gap-3">
               {cart?.map((item) => (
                 <ProductInCart key={item.id} {...item} />
