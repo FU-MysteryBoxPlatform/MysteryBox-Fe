@@ -27,10 +27,10 @@ export default function Page() {
   const handlePayWithMomo = () => {
     handleCheckOut(true);
   };
-const handleCheckOut = (isMomo: boolean) => {
+  const handleCheckOut = (isMomo: boolean) => {
     const payload = {
       customerId: user?.id,
-      paymentMethod: isMomo? 1: 0,
+      paymentMethod: isMomo ? 1 : 0,
       note: "",
       orderDetailDtos: cart
         ?.filter((a) => a.selected)
@@ -39,7 +39,9 @@ const handleCheckOut = (isMomo: boolean) => {
           quantity: item.quantity,
           note: item.title,
         })),
-      returnUrl: `${window.location.host}/payment`,
+      returnUrl: `window.location.host`.includes("localhost")
+        ? `http://${window.location.host}/payment`
+        : `https://${window.location.host}/payment`,
     } as Order;
 
     checkout.mutate(payload, {
@@ -58,7 +60,7 @@ const handleCheckOut = (isMomo: boolean) => {
     });
 
     console.log(payload);
-}
+  };
   return (
     <div>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16">
