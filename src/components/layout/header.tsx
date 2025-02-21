@@ -33,6 +33,8 @@ export default function Header() {
     router.push("/login");
   };
 
+  console.log({ user });
+
   return (
     <div className="px-4 md:px-10 lg:px-16 py-4 bg-gray-50 border-b border-gray-200">
       <div className="flex items-center justify-between max-w-[1280px] mx-auto">
@@ -76,6 +78,7 @@ export default function Header() {
                     href={item.href}
                     className={cn(
                       "px-2 py-1 hover:bg-gray-100 rounded-md",
+                      user.mainRole !== item.role && "hidden",
                       pathname.includes(item.href) && "bg-gray-100"
                     )}
                   >
@@ -144,6 +147,7 @@ export default function Header() {
                             href={item.href}
                             className={cn(
                               "px-2 py-1 hover:bg-gray-100 rounded-md",
+                              user.mainRole !== item.role && "hidden",
                               pathname.includes(item.href) && "bg-gray-100"
                             )}
                           >
@@ -205,13 +209,21 @@ const SUB_NAV_ITEMS = [
   {
     name: "Hồ sơ",
     href: "/profile",
+    role: "COLLECTOR",
   },
   {
     name: "Bộ sưu tập",
     href: "/my-collection",
+    role: "COLLECTOR",
   },
   {
     name: "Đơn hàng",
     href: "/orders",
+    role: "COLLECTOR",
+  },
+  {
+    name: "Quản lý",
+    href: "/manage-collection",
+    role: "MODERATORS",
   },
 ];

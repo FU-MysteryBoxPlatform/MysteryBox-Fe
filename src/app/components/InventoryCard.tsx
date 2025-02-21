@@ -175,7 +175,7 @@ export default function InventoryCard({
               <Input
                 id="quantity"
                 type="number"
-                placeholder="Nhập giá bán"
+                placeholder="Nhập số lượng bán"
                 {...register("quantity")}
               />
               {formState.errors.quantity && (
