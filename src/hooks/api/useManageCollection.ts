@@ -17,6 +17,8 @@ export type TCollection = {
 
 export type TCollectionRequest = {
   keyword?: string;
+  pageNumber: number;
+  pageSize: number;
   minimumPrice?: number;
   maximumPrice?: number;
   startTime?: string;
@@ -28,9 +30,9 @@ export type TCollectionResponse = {
   items: TCollection[];
 };
 
-export const useGetCollections = (pageNumber: number, pageSize: number) => {
+export const useGetCollections = () => {
   return useApiMutation<TCollectionResponse, TCollectionRequest>(
-    `collection/get-collection-by-filter?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    `collection/get-collection-by-filter`,
     "post"
   );
 };

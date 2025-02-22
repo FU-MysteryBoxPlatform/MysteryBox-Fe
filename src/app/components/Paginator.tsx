@@ -7,6 +7,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
 import { JSX } from "react";
 
 const generatePaginationLinks = (
@@ -90,8 +91,13 @@ export default function Paginator({
         {showPreviousNext && totalPages ? (
           <PaginationItem>
             <PaginationPrevious
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage - 1 < 1}
+              onClick={() => {
+                if (currentPage - 1 < 1) return;
+                else onPageChange(currentPage - 1);
+              }}
+              className={cn(
+                currentPage - 1 < 1 && "cursor-not-allowed select-none"
+              )}
             />
           </PaginationItem>
         ) : null}
@@ -99,8 +105,13 @@ export default function Paginator({
         {showPreviousNext && totalPages ? (
           <PaginationItem>
             <PaginationNext
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage > totalPages - 1}
+              onClick={() => {
+                if (currentPage > totalPages - 1) return;
+                else onPageChange(currentPage + 1);
+              }}
+              className={cn(
+                currentPage > totalPages - 1 && "cursor-not-allowed select-none"
+              )}
             />
           </PaginationItem>
         ) : null}

@@ -34,6 +34,8 @@ export default function Page() {
               <Image
                 src={item.thumbImg}
                 alt="thumb"
+                width={120}
+                height={120}
                 className="w-full h-40 object-cover rounded-lg"
               />
               <p className="text-sm font-semibold">{item.name}</p>

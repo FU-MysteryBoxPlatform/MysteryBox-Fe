@@ -1,7 +1,7 @@
 "use client";
-import FormCreateCollection from "@/app/components/FormCreateCollection";
+
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-import Paginator from "@/app/components/Paginator";
+import RequestSaleDetail from "@/app/components/RequestSaleDetail";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,12 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -31,14 +25,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  TCollection,
-  useGetCollections,
-} from "@/hooks/api/useManageCollection";
+import { Sale, useManageSale } from "@/hooks/api/useManageSale";
 import { debounce } from "@/utils/functions";
 import { updateQueryParam } from "@/utils/query-params";
-import dayjs from "dayjs";
-import { MoreHorizontal, PlusIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -49,19 +38,16 @@ export default function Page() {
   const minPriceParam = searchParams.get("minPrice");
   const maxPriceParam = searchParams.get("maxPrice");
 
-  const [openCreateCollectionModal, setOpenCreateCollectionModal] =
-    useState(false);
-
-  const [collections, setCollections] = useState<TCollection[]>([]);
-  const [totalPages, setTotalPages] = useState(0);
-
-  const [page, setPage] = useState(+(pageParam ?? 1));
+  const [saleData, setSaleData] = useState<Sale[]>([]);
   const [keyword, setKeyword] = useState(keywordParam ?? "");
-
+  const [page, setPage] = useState(+(pageParam ?? 1));
   const [minPrice, setMinPrice] = useState(minPriceParam ?? "");
   const [maxPrice, setMaxPrice] = useState(maxPriceParam ?? "");
 
-  const { mutate: mutateGetCollections, isPending } = useGetCollections();
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [productSale, setProductSale] = useState<Sale>();
+
+  const { mutate: mutateManageSale, isPending } = useManageSale();
 
   const handleFilterByKeyword = (value: string) => {
     debounce(() => {
@@ -91,45 +77,40 @@ export default function Page() {
   };
 
   useEffect(() => {
-    mutateGetCollections(
+    mutateManageSale(
       {
         keyword,
         pageNumber: page,
         pageSize: 10,
+        saleStatus: 0,
         minimumPrice: +minPrice,
         maximumPrice: +maxPrice,
       },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setCollections(data.result.items);
-            setTotalPages(data.result.totalPages);
+            setSaleData(data.result);
           }
         },
       }
     );
-  }, [keyword, maxPrice, minPrice, mutateGetCollections, page]);
+  }, [keyword, maxPrice, minPrice, mutateManageSale, page]);
 
   return (
     <div className="w-full">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 justify-between">
-            Bộ sưu tập
-            <Button
-              className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
-              onClick={() => setOpenCreateCollectionModal(true)}
-            >
-              <PlusIcon className="h-4 w-4" />
-              Tạo bộ sưu tập
-            </Button>
+            Sản phẩm rao bán
           </CardTitle>
-          <CardDescription>Quản lý tất cả các bộ sưu tập</CardDescription>
+          <CardDescription>
+            Quản lý tất cả các sản phẩm được người sưu tập rao bán
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex items-center gap-4">
             <Input
-              placeholder="Tìm kiếm bộ sưu tập"
+              placeholder="Tìm kiếm sản phẩm"
               defaultValue={keyword}
               onChange={(e) => handleFilterByKeyword(e.target.value)}
             />
@@ -156,80 +137,66 @@ export default function Page() {
                     <TableHead className="w-[100px] sm:table-cell">
                       Ảnh
                     </TableHead>
-                    <TableHead>Tên bộ sưu tập</TableHead>
-                    <TableHead>Trạng thái</TableHead>
-                    <TableHead>Tổng vật phẩm</TableHead>
-                    <TableHead className="md:table-cell">
-                      Thời gian bắt đầu
-                    </TableHead>
-                    <TableHead className="md:table-cell">
-                      Thời gian kết thúc
-                    </TableHead>
+                    <TableHead>Tên sản phẩm</TableHead>
+                    <TableHead>Số lượng</TableHead>
+                    <TableHead>Người bán</TableHead>
+                    <TableHead className="md:table-cell">Giá bán</TableHead>
                     <TableHead>Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {collections.map((collection) => (
-                    <TableRow key={collection.collectionId}>
+                  {saleData?.map((sale) => (
+                    <TableRow key={sale.saleId}>
                       <TableCell className="sm:table-cell">
                         <img
                           alt="Product image"
                           className="aspect-square rounded-md object-cover w-12 h-12"
                           height="64"
-                          src={collection.imagePath}
+                          src={sale.inventory.product.imagePath}
                           width="64"
                         />
                       </TableCell>
                       <TableCell className="md:table-cell font-medium line-clamp-2">
-                        {collection.collectionName}
+                        {sale.inventory.product.name}
                       </TableCell>
                       <TableCell className="md:table-cell">
-                        {collection.isActived ? "Đã bắt đầu" : "Chưa bắt đầu"}
+                        {sale.quantitySold}
                       </TableCell>
                       <TableCell className="md:table-cell">
-                        {collection.totalItem}
+                        {sale.inventory.account.firstName +
+                          " " +
+                          sale.inventory.account.lastName}
                       </TableCell>
                       <TableCell className="md:table-cell">
-                        {dayjs(collection.startTime).format(
-                          "YYYY-MM-DD HH:mm A"
-                        )}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {dayjs(collection.endTime).format("YYYY-MM-DD HH:mm A")}
+                        {sale.unitPrice.toLocaleString()}
                       </TableCell>
                       <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Sửa</DropdownMenuItem>
-                            <DropdownMenuItem>Xóa</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button
+                          className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
+                          onClick={() => {
+                            setOpenDetailModal(true);
+                            setProductSale(sale);
+                          }}
+                        >
+                          Xem chi tiết
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              {collections.length > 0 ? (
-                <Paginator
-                  currentPage={page}
-                  totalPages={totalPages}
-                  onPageChange={(pageNumber) => {
-                    setPage(pageNumber);
-                    updateQueryParam("page", pageNumber);
-                  }}
-                  showPreviousNext
-                />
+              {saleData?.length && saleData?.length > 0 ? (
+                <div></div>
               ) : (
+                // <Paginator
+                //   currentPage={page}
+                //   totalPages={Math.ceil(SITES.length / 10)}
+                //   onPageChange={(pageNumber) => {
+                //     setPage(pageNumber);
+                //     updateQueryParam("page", pageNumber);
+                //   }}
+                //   showPreviousNext
+                // />
                 <div className="w-full text-center mt-10">
                   Không có bộ sưu tập nào
                 </div>
@@ -238,16 +205,12 @@ export default function Page() {
           )}
         </CardContent>
       </Card>
-
-      <Dialog
-        open={openCreateCollectionModal}
-        onOpenChange={setOpenCreateCollectionModal}
-      >
-        <DialogContent>
+      <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
+        <DialogContent className="max-w-[800px]">
           <DialogHeader>
-            <DialogTitle>Tạo bộ sưu tập</DialogTitle>
+            <DialogTitle>Chi tiết sản phẩm</DialogTitle>
           </DialogHeader>
-          <FormCreateCollection />
+          {productSale && <RequestSaleDetail sale={productSale} />}
         </DialogContent>
       </Dialog>
     </div>
