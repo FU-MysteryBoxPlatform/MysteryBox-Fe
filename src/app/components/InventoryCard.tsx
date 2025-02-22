@@ -33,7 +33,8 @@ export type InventoryCardProps = {
   image: string;
   title: string;
   price: number;
-  stock?: number;
+  stock: number;
+  status: number;
   showPrice?: boolean;
   isPersonal?: boolean;
 };
@@ -49,7 +50,8 @@ export default function InventoryCard({
   image,
   title,
   price,
-  stock = 4,
+  stock,
+  status,
   showPrice = true,
   isPersonal = false,
 }: InventoryCardProps) {
@@ -107,9 +109,11 @@ export default function InventoryCard({
                 <Ellipsis className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setOpenSellModal(true)}>
-                  Bán
-                </DropdownMenuItem>
+                {status === 0 && (
+                  <DropdownMenuItem onClick={() => setOpenSellModal(true)}>
+                    Bán
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem>Trao đổi</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -134,10 +138,10 @@ export default function InventoryCard({
           alt={title}
           loading="lazy"
           onClick={() => route.push(`/sale-detail/${id}`)}
-          className="cursor-pointer"
+          className="cursor-pointer aspect-square object-cover"
         />
       </div>
-      <p className="text-lg font-semibold mt-2">{title}</p>
+      <p className="font-semibold mt-2 line-clamp-2">{title}</p>
       {showPrice && (
         <p className="text-sm text-gray-500">{formatPriceVND(price)}</p>
       )}

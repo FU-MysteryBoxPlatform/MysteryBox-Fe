@@ -33,8 +33,6 @@ export default function Header() {
     router.push("/login");
   };
 
-  console.log({ user });
-
   return (
     <div className="px-4 md:px-10 lg:px-16 py-4 bg-gray-50 border-b border-gray-200">
       <div className="flex items-center justify-between max-w-[1280px] mx-auto">
@@ -56,7 +54,7 @@ export default function Header() {
         <div className="hidden items-center gap-8 lg:flex">
           <SearchIcon />
           <BellIcon />
-          {!isFetchingUser && user?.mainRole === "COLLECTOR" && (
+          {!isFetchingUser && user?.mainRole !== "MODERATORS" && (
             <Link href="/cart">
               <div className="relative">
                 {cart?.length && cart?.length > 0 ? (
@@ -127,7 +125,7 @@ export default function Header() {
                   <SearchIcon />
                   <BellIcon />
 
-                  {!isFetchingUser && user?.mainRole === "COLLECTOR" && (
+                  {!isFetchingUser && user?.mainRole !== "MODERATORS" && (
                     <Link href="/cart">
                       <div className="relative w-fit">
                         {cart?.length && cart?.length > 0 ? (
