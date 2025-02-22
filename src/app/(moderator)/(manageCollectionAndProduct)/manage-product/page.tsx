@@ -26,65 +26,70 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Sale, useManageSale } from "@/hooks/api/useManageSale";
-import { debounce } from "@/utils/functions";
-import { updateQueryParam } from "@/utils/query-params";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import queryString from "query-string";
+import { useEffect, useRef, useState } from "react";
 
 export default function Page() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const keywordParam = searchParams.get("keyword");
-  const pageParam = searchParams.get("page");
-  const minPriceParam = searchParams.get("minPrice");
-  const maxPriceParam = searchParams.get("maxPrice");
+  const params = queryString.parse(searchParams.toString());
+  const ref = useRef<NodeJS.Timeout>(null);
+
+  const keyword = params["keyword"];
+  const page = params["page"];
+  const minPrice = params["minPrice"];
+  const maxPrice = params["maxPrice"];
+  //   const saleStatus = params["saleStatus"];
 
   const [saleData, setSaleData] = useState<Sale[]>([]);
-  const [keyword, setKeyword] = useState(keywordParam ?? "");
-  const [page, setPage] = useState(+(pageParam ?? 1));
-  const [minPrice, setMinPrice] = useState(minPriceParam ?? "");
-  const [maxPrice, setMaxPrice] = useState(maxPriceParam ?? "");
-
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [productSale, setProductSale] = useState<Sale>();
 
   const { mutate: mutateManageSale, isPending } = useManageSale();
 
   const handleFilterByKeyword = (value: string) => {
-    debounce(() => {
-      updateQueryParam("keyword", value);
-      updateQueryParam("page", 1);
-      setPage(1);
-      setKeyword(value);
-    }, 1000)();
+    if (ref.current) {
+      clearTimeout(ref.current);
+    }
+    ref.current = setTimeout(() => {
+      params["keyword"] = value;
+      params["page"] = "1";
+      router.push(`?${queryString.stringify(params)}`);
+    }, 1000);
   };
 
   const handleFilterByMinPrice = (value: string) => {
-    debounce(() => {
-      updateQueryParam("minPrice", value);
-      updateQueryParam("page", 1);
-      setPage(1);
-      setMinPrice(value);
-    }, 1000)();
+    if (ref.current) {
+      clearTimeout(ref.current);
+    }
+    ref.current = setTimeout(() => {
+      params["minPrice"] = value;
+      params["page"] = "1";
+      router.push(`?${queryString.stringify(params)}`);
+    }, 1000);
   };
 
   const handleFilterByMaxPrice = (value: string) => {
-    debounce(() => {
-      updateQueryParam("maxPrice", value);
-      updateQueryParam("page", 1);
-      setPage(1);
-      setMaxPrice(value);
-    }, 1000)();
+    if (ref.current) {
+      clearTimeout(ref.current);
+    }
+    ref.current = setTimeout(() => {
+      params["maxPrice"] = value;
+      params["page"] = "1";
+      router.push(`?${queryString.stringify(params)}`);
+    }, 1000);
   };
 
   useEffect(() => {
     mutateManageSale(
       {
-        keyword,
-        pageNumber: page,
+        keyword: keyword as string,
+        pageNumber: +(page || 1),
         pageSize: 10,
         saleStatus: 0,
-        minimumPrice: +minPrice,
-        maximumPrice: +maxPrice,
+        minimumPrice: minPrice ? +minPrice : undefined,
+        maximumPrice: maxPrice ? +maxPrice : undefined,
       },
       {
         onSuccess: (data) => {
@@ -111,17 +116,17 @@ export default function Page() {
           <div className="mb-4 flex items-center gap-4">
             <Input
               placeholder="Tìm kiếm sản phẩm"
-              defaultValue={keyword}
+              defaultValue={keyword as string}
               onChange={(e) => handleFilterByKeyword(e.target.value)}
             />
             <Input
               placeholder="Giá nhỏ nhất"
-              defaultValue={minPrice}
+              defaultValue={minPrice as string}
               onChange={(e) => handleFilterByMinPrice(e.target.value)}
             />
             <Input
               placeholder="Giá lớn nhất"
-              defaultValue={maxPrice}
+              defaultValue={maxPrice as string}
               onChange={(e) => handleFilterByMaxPrice(e.target.value)}
             />
           </div>
