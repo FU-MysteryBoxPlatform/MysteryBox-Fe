@@ -44,7 +44,7 @@ export default function Page() {
   });
   const isSuccess = searchParams.get("resultCode") === "0" ? true : false;
   const checkout = useUpdateTransaction(data.extraData, isSuccess ? 1 : 2);
-  const { cart, setCart } = useContext(GlobalContext);
+  const {  setCart } = useContext(GlobalContext);
 
   useEffect(() => {
     if (searchParams) {
