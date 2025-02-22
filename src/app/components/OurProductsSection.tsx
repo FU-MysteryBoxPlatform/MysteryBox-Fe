@@ -1,11 +1,30 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAllSale } from "@/hooks/api/useSale";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
+import { Sale, useManageSale } from "@/hooks/api/useManageSale";
+import { useEffect, useState } from "react";
 
 export default function OurProductsSection() {
-  const { data: sales, isLoading } = useAllSale(1, 10);
+  const [saleData, setSaleData] = useState<Sale[]>([]);
+  const { mutate: mutateManageSale, isPending } = useManageSale();
+
+  useEffect(() => {
+    mutateManageSale(
+      {
+        pageNumber: 1,
+        pageSize: 8,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            setSaleData(data.result);
+          }
+        },
+      }
+    );
+  }, [mutateManageSale]);
+  console.log({ saleData });
 
   return (
     <div className="my-10 md:my-16">
@@ -15,7 +34,7 @@ export default function OurProductsSection() {
       <p className="text-center text-gray-500 mb-6">
         Khám phá những sản phẩm mới được ra mắt cùng cộng đồng
       </p>
-      {isLoading && (
+      {isPending && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
           {Array(8)
             .fill("0")
@@ -28,9 +47,9 @@ export default function OurProductsSection() {
             ))}
         </div>
       )}
-      {!isLoading && (
+      {!isPending && saleData.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
-          {sales?.result?.map((product) => (
+          {/* {saleData?.result?.map((product) => (
             <ProductCard
               image={product.collectionProduct.product.imagePath}
               price={product.sale.unitPrice}
@@ -38,12 +57,11 @@ export default function OurProductsSection() {
               title={product.collectionProduct.product.name}
               id={product.sale.saleId}
             />
-          ))}
+          ))} */}
         </div>
+      ) : (
+        <div className="text-center">Chưa có sản phẩm nào được bán</div>
       )}
-      <Link href="/products" className="mx-auto px-10 w-fit underline block">
-        Xem thêm
-      </Link>
     </div>
   );
 }
