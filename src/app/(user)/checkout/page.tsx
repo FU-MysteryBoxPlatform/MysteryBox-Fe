@@ -50,7 +50,10 @@ export default function Page() {
           toast({
             title: "Tạo đơn hàng thành công!",
           });
-          window.location.href = data.result;
+          if (data.result) {
+            window.location.href = data.result;
+          }
+          console.log(data.result);
         } else {
           toast({
             title: data.messages[0],

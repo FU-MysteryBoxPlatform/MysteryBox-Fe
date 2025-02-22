@@ -23,3 +23,9 @@ export const useCheckOut = () => {
     "post"
   );
 };
+export const useUpdateTransaction = (transactionId: string, transactionStatus:number) => {
+  return useApiMutation<unknown, unknown>(
+    `/transaction/update-transaction-status?transactionId=${transactionId}&transactionStatus=${transactionStatus}`,
+    "put"
+  );
+};
