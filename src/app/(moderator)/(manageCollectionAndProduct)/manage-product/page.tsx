@@ -185,20 +185,9 @@ export default function Page() {
                   ))}
                 </TableBody>
               </Table>
-              {saleData?.length && saleData?.length > 0 ? (
-                <div></div>
-              ) : (
-                // <Paginator
-                //   currentPage={page}
-                //   totalPages={Math.ceil(SITES.length / 10)}
-                //   onPageChange={(pageNumber) => {
-                //     setPage(pageNumber);
-                //     updateQueryParam("page", pageNumber);
-                //   }}
-                //   showPreviousNext
-                // />
+              {saleData?.length === 0 && (
                 <div className="w-full text-center mt-10">
-                  Không có bộ sưu tập nào
+                  Không có sản phẩm nào
                 </div>
               )}
             </>
