@@ -1,10 +1,30 @@
 "use client";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
 import { usePathname, useRouter } from "next/navigation";
+import { useContext } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+
+  const { user, isFetchingUser } = useContext(GlobalContext);
+
+  if (isFetchingUser) {
+    return (
+      <div className="w-screen h-[90vh] flex items-center justify-center">
+        <LoadingIndicator />
+      </div>
+    );
+  }
+  if (user?.mainRole !== "MODERATORS") {
+    return (
+      <div className="w-screen h-[90vh] flex items-center justify-center">
+        Bạn không có quyền truy cập trang này
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -20,7 +20,7 @@ export type TAccount = {
   storeCreditExpireDay: string;
   isManuallyCreated: boolean;
   roles: TRole[];
-  mainRole: "COLLECTOR" | "MODERATOR"|'ADMIN';
+  mainRole: "COLLECTOR" | "MODERATORS" | "ADMIN";
   isBanned: boolean;
 };
 
@@ -144,4 +144,3 @@ export type SalesData = {
   sale: Sale;
   collectionProduct: CollectionProduct;
 };
-

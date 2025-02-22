@@ -56,16 +56,18 @@ export default function Header() {
         <div className="hidden items-center gap-8 lg:flex">
           <SearchIcon />
           <BellIcon />
-          <Link href="/cart">
-            <div className="relative">
-              {cart?.length && cart?.length > 0 ? (
-                <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
-                  {cart?.length}
-                </div>
-              ) : null}
-              <CartIcon />
-            </div>
-          </Link>
+          {!isFetchingUser && user?.mainRole === "COLLECTOR" && (
+            <Link href="/cart">
+              <div className="relative">
+                {cart?.length && cart?.length > 0 ? (
+                  <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
+                    {cart?.length}
+                  </div>
+                ) : null}
+                <CartIcon />
+              </div>
+            </Link>
+          )}
           {isFetchingUser ? null : isLoggedIn ? (
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -125,16 +127,18 @@ export default function Header() {
                   <SearchIcon />
                   <BellIcon />
 
-                  <Link href="/cart">
-                    <div className="relative w-fit">
-                      {cart?.length && cart?.length > 0 ? (
-                        <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
-                          {cart?.length}
-                        </div>
-                      ) : null}
-                      <CartIcon />
-                    </div>
-                  </Link>
+                  {!isFetchingUser && user?.mainRole === "COLLECTOR" && (
+                    <Link href="/cart">
+                      <div className="relative w-fit">
+                        {cart?.length && cart?.length > 0 ? (
+                          <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
+                            {cart?.length}
+                          </div>
+                        ) : null}
+                        <CartIcon />
+                      </div>
+                    </Link>
+                  )}
                   {isFetchingUser ? null : isLoggedIn ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger>

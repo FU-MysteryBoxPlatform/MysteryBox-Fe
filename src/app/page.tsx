@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import NewProductsSection from "../components/NewProductsSection";
-import OurProductsSection from "../components/OurProductsSection";
+import NewProductsSection from "./components/NewProductsSection";
+import OurProductsSection from "./components/OurProductsSection";
 
 export default function Home() {
   return (
