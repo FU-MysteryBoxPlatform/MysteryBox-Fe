@@ -13,13 +13,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  if (user?.mainRole !== "COLLECTOR") {
-    return (
-      <div className="w-screen h-[90vh] flex items-center justify-center">
-        Bạn không có quyền truy cập trang này
-      </div>
-    );
-  }
+  console.log(user);
+  // if (user?.mainRole !== "COLLECTOR") {
+  //   return (
+  //     <div className="w-screen h-[90vh] flex items-center justify-center">
+  //       Bạn không có quyền truy cập trang này
+  //     </div>
+  //   );
+  // }
   return (
     <>
       <Suspense>{children}</Suspense>
