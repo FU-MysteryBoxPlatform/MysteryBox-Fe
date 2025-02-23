@@ -32,7 +32,7 @@ export default function Page() {
         onSuccess: (data) => {
           console.log(data);
           setInventories(data.result.listProduct);
-        //  setTotalPages(data.result);
+         setTotalPages(data.result.totalPages);
         },
       }
     );

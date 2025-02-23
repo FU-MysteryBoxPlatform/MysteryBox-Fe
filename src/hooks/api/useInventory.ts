@@ -69,6 +69,7 @@ inventories: Inventory[]
 export type TInventoryResponse = {
   account: TAccount;
   listProduct: TInventoryProductResponse[];
+  totalPages:number;
 };
 
 export const useSellInventory = () => {
