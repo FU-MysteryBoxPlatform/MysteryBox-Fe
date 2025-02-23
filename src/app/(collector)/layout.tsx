@@ -19,8 +19,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   if (user?.mainRole === "MODERATORS" || user?.mainRole === "ADMIN") {
     return (
       <div className="w-screen h-[90vh] flex items-center justify-center">
-        <p>Bạn không có quyền truy cập trang này</p>
-        <Link href="/management" className="underline">
+        <p>Bạn không có quyền truy cập trang này.</p>
+        <Link href="/management" className="underline block text-center ml-2">
           Đến trang quản lý
         </Link>
       </div>
