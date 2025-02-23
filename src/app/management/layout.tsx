@@ -1,8 +1,7 @@
-"use client";
+"use client";;
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GlobalContext } from "@/provider/global-provider";
-import { usePathname, useRouter } from "next/navigation";
 import { useContext } from "react";
 import { AdminSidebar } from "../components/AdminSidebar";
 
