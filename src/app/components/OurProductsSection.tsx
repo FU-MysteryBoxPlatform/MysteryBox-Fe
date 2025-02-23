@@ -2,6 +2,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sale, useManageSale } from "@/hooks/api/useManageSale";
 import { useEffect, useState } from "react";
+import ProductCard from "./ProductCard";
 
 export default function OurProductsSection() {
   const [saleData, setSaleData] = useState<Sale[]>([]);
@@ -47,15 +48,15 @@ export default function OurProductsSection() {
       )}
       {!isPending && saleData.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
-          {/* {saleData?.result?.map((product) => (
+          {saleData.length> 0 && saleData?.map((product, index) => (
             <ProductCard
-              image={product.collectionProduct.product.imagePath}
-              price={product.sale.unitPrice}
-              key={product.sale.saleId}
-              title={product.collectionProduct.product.name}
-              id={product.sale.saleId}
+              image={product.inventory.product.imagePath}
+              price={product.unitPrice}
+              key={product.inventoryId}
+              title={product.inventory.product.name}
+              id={product.saleId}
             />
-          ))} */}
+          ))}
         </div>
       ) : (
         <div className="text-center">Chưa có sản phẩm nào được bán</div>
