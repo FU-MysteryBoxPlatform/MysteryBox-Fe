@@ -58,7 +58,9 @@ export default function Login() {
             cookie.set("REFRESH_TOKEN", refreshToken);
             setUser(account);
             localStorage.setItem("user", JSON.stringify(account));
-            router.push(!!from ? `/${from}` : "/");
+            if (account.mainRole === "COLLECTOR") {
+              router.push(!!from ? `/${from}` : "/");
+            } else router.push("/management");
           } else {
             toast({
               title: "Đăng nhập thất bại",

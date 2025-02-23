@@ -1,7 +1,7 @@
 "use client";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { GlobalContext } from "@/provider/global-provider";
 import { Suspense, useContext } from "react";
-import LoadingIndicator from "../components/LoadingIndicator";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, isFetchingUser } = useContext(GlobalContext);
