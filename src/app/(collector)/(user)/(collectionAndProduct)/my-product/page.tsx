@@ -2,7 +2,7 @@
 import InventoryCard from "@/app/components/InventoryCard";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
-import { Inventory, useGetInventory } from "@/hooks/api/useInventory";
+import { Inventory, TInventoryProductResponse, useGetInventory } from "@/hooks/api/useInventory";
 import { GlobalContext } from "@/provider/global-provider";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
@@ -16,7 +16,9 @@ export default function Page() {
   const page = params["page"] || 1;
 
   const [totalPages, setTotalPages] = useState(0);
-  const [inventories, setInventories] = useState<Inventory[]>([]);
+  const [inventories, setInventories] = useState<TInventoryProductResponse[]>(
+    []
+  );
   const { mutate: mutateGetInventory, isPending } = useGetInventory();
 
   useEffect(() => {
@@ -29,8 +31,8 @@ export default function Page() {
       {
         onSuccess: (data) => {
           console.log(data);
-          setInventories(data.result.items);
-          setTotalPages(data.result.totalPages);
+          setInventories(data.result.listProduct);
+        //  setTotalPages(data.result);
         },
       }
     );
@@ -51,13 +53,13 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
           {inventories.map((product) => (
             <InventoryCard
-              key={product.productId}
-              id={product.productId}
+              key={product.product.name}
+              id={product.product.productId || ""}
               image={product.product.imagePath}
               title={product.product.name}
               price={product.product.price}
-              stock={product.quantity}
-              status={product.itemStatus.id}
+              stock={Number(product.inventories.length)}
+              status={product.inventories[0].itemStatus.id}
               isPersonal
               showPrice={false}
             />

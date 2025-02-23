@@ -14,6 +14,7 @@ export type TProductSale = {
     name: string;
   };
   imagePath: string;
+  productId?: string;
 };
 
 export type TSaleInventory = {

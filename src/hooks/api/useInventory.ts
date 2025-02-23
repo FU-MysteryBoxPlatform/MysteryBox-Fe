@@ -1,5 +1,7 @@
+import { TAccount } from "@/types";
 import { useApiMutation } from "./useApi";
 import { Account } from "./useManageSale";
+import { TProductSale } from "./useSale";
 
 export interface Inventory {
   inventoryId: string;
@@ -60,10 +62,13 @@ export type TGetInventory = {
   maximumPrice?: string;
   itemStatus?: string;
 };
-
+export type TInventoryProductResponse ={
+product: TProductSale;
+inventories: Inventory[]
+}
 export type TInventoryResponse = {
-  totalPages: number;
-  items: Inventory[];
+  account: TAccount;
+  listProduct: TInventoryProductResponse[];
 };
 
 export const useSellInventory = () => {
@@ -72,7 +77,7 @@ export const useSellInventory = () => {
 
 export const useGetInventory = () => {
   return useApiMutation<TInventoryResponse, TGetInventory>(
-    "/inventory/get-all-item-in-inventory",
+    "/inventory/get-list-product-in-inventory",
     "post"
   );
 };
