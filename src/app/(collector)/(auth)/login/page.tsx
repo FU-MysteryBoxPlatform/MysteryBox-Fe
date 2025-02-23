@@ -45,6 +45,8 @@ export default function Login() {
   });
 
   const onSubmit = (data: LoginForm) => {
+    console.log({ data });
+
     loginMutation.mutate(
       {
         email: data.email,
@@ -52,8 +54,8 @@ export default function Login() {
       },
       {
         onSuccess: (data) => {
-          const { token, refreshToken, account } = data.result;
-          if (data) {
+          if (data.isSuccess) {
+            const { token, refreshToken, account } = data.result;
             cookie.set("ACCESS_TOKEN", token);
             cookie.set("REFRESH_TOKEN", refreshToken);
             setUser(account);
@@ -63,7 +65,7 @@ export default function Login() {
             } else router.push("/management");
           } else {
             toast({
-              title: "Đăng nhập thất bại",
+              title: data.messages[0],
             });
           }
         },
