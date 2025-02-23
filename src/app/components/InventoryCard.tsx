@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSellInventory } from "@/hooks/api/useInventory";
 import LoadingIndicator from "./LoadingIndicator";
+import Image from "next/image";
 
 export type InventoryCardProps = {
   id: string;
@@ -102,8 +103,11 @@ export default function InventoryCard({
   return (
     <div className="flex flex-col">
       <div className="relative">
+        <div className="absolute top-2 left-2 rounded-full flex items-center justify-center text-xs w-6 h-6 bg-gray-200">
+          x{stock}
+        </div>
         {isPersonal ? (
-          <div className="absolute top-2 right-2 p-1 bg-gray-200 rounded-lg flex items-center justify-center cursor-pointer">
+          <div className="absolute top-2 right-2 p-1 bg-gray-200 rounded-sm flex items-center justify-center cursor-pointer">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Ellipsis className="h-4 w-4" />
@@ -120,7 +124,7 @@ export default function InventoryCard({
           </div>
         ) : (
           <div
-            className="absolute top-2 right-2 p-1 bg-gray-200 rounded-lg flex items-center justify-center cursor-pointer"
+            className="absolute top-2 right-2 p-2 bg-gray-200 rounded-sm flex items-center justify-center cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               addToCart({ id, image, title, price });
@@ -129,16 +133,17 @@ export default function InventoryCard({
               });
             }}
           >
-            <CartIcon className="" />
+            <CartIcon className="w-4 h-4" />
           </div>
         )}
 
-        <img
+        <Image
           src={image}
           alt={title}
-          loading="lazy"
+          width={120}
+          height={120}
           onClick={() => route.push(`/sale-detail/${id}`)}
-          className="cursor-pointer aspect-square object-cover"
+          className="cursor-pointer w-full aspect-square object-cover border border-gray-200"
         />
       </div>
       <p className="font-semibold mt-2 line-clamp-2">{title}</p>

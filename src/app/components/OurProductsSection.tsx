@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sale, useManageSale } from "@/hooks/api/useManageSale";
 import { useEffect, useState } from "react";
@@ -6,7 +6,8 @@ import ProductCard from "./ProductCard";
 
 export default function OurProductsSection() {
   const [saleData, setSaleData] = useState<Sale[]>([]);
-  const { mutate: mutateManageSale, isPending } = useManageSale();
+  const { mutate: mutateManageSale } = useManageSale();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     mutateManageSale(
@@ -18,12 +19,12 @@ export default function OurProductsSection() {
         onSuccess: (data) => {
           if (data.isSuccess) {
             setSaleData(data.result);
+            setIsLoading(false);
           }
         },
       }
     );
   }, [mutateManageSale]);
-  console.log({ saleData });
 
   return (
     <div className="my-10 md:my-16">
@@ -33,11 +34,10 @@ export default function OurProductsSection() {
       <p className="text-center text-gray-500 mb-6">
         Khám phá những sản phẩm mới được ra mắt cùng cộng đồng
       </p>
-      {isPending && (
+      {isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
           {Array(8)
             .fill("0")
-            .slice(0, 8)
             .map((product) => (
               <div key={product} className="flex flex-col items-center">
                 <Skeleton className="w-full h-[150px] mb-2" />
@@ -46,17 +46,20 @@ export default function OurProductsSection() {
             ))}
         </div>
       )}
-      {!isPending && saleData.length > 0 ? (
+      {saleData.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
-          {saleData.length> 0 && saleData?.map((product, index) => (
-            <ProductCard
-              image={product.inventory.product.imagePath}
-              price={product.unitPrice}
-              key={product.inventoryId}
-              title={product.inventory.product.name}
-              id={product.saleId}
-            />
-          ))}
+          {saleData.length > 0 &&
+            saleData
+              .slice(0, 8)
+              ?.map((product) => (
+                <ProductCard
+                  image={product.inventory.product.imagePath}
+                  price={product.unitPrice}
+                  key={product.inventoryId}
+                  title={product.inventory.product.name}
+                  id={product.saleId}
+                />
+              ))}
         </div>
       ) : (
         <div className="text-center">Chưa có sản phẩm nào được bán</div>

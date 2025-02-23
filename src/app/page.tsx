@@ -29,7 +29,7 @@ export default function Home() {
         </div>
       </div>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16">
-        <NewProductsSection />
+        {/* <NewProductsSection /> */}
         <OurProductsSection />
       </div>
     </div>

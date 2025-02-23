@@ -24,7 +24,7 @@ export default function ProductCard({
     <div className="flex flex-col">
       <div className="relative">
         <div
-          className="absolute top-2 right-2 p-1 bg-gray-200 rounded-lg flex items-center justify-center cursor-pointer"
+          className="absolute top-2 right-2 p-2 bg-gray-200 rounded-sm flex items-center justify-center cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
             addToCart({ id, image, title, price });
@@ -33,14 +33,15 @@ export default function ProductCard({
             });
           }}
         >
-          <CartIcon className="" />
+          <CartIcon className="w-4 h-4" />
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image}
           alt={title}
+          loading="lazy"
           onClick={() => route.push(`/sale-detail/${id}`)}
-          className="cursor-pointer"
+          className="cursor-pointer aspect-square object-cover w-full"
         />
       </div>
       <p className="text-lg font-semibold mt-2">{title}</p>
