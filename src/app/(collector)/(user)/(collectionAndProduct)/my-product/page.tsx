@@ -2,7 +2,7 @@
 import InventoryCard from "@/app/components/InventoryCard";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
-import { Inventory, TInventoryProductResponse, useGetInventory } from "@/hooks/api/useInventory";
+import { TInventoryProductResponse, useGetInventory } from "@/hooks/api/useInventory";
 import { GlobalContext } from "@/provider/global-provider";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
