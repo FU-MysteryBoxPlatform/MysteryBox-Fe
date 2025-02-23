@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { Bitcoin, ChartArea, HandCoins, Settings } from "lucide-react";
+import { ChartArea, HandCoins } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,25 +17,25 @@ import { usePathname } from "next/navigation";
 // Menu items.
 const items = [
   {
-    title: "Dashboard",
-    url: "/private-site/admin",
+    title: "Manage Collection",
+    url: "/management/manage-collection",
     icon: ChartArea,
   },
   {
-    title: "Pricing",
-    url: "/private-site/admin/pricing",
+    title: "Manage Product",
+    url: "/management/manage-product",
     icon: HandCoins,
   },
-  {
-    title: "Withdraw",
-    url: "/private-site/admin/withdraw",
-    icon: Bitcoin,
-  },
-  {
-    title: "Transactions",
-    url: "/private-site/admin/transactions",
-    icon: Settings,
-  },
+  // {
+  //   title: "Withdraw",
+  //   url: "/private-site/admin/withdraw",
+  //   icon: Bitcoin,
+  // },
+  // {
+  //   title: "Transactions",
+  //   url: "/private-site/admin/transactions",
+  //   icon: Settings,
+  // },
 ];
 
 export function AdminSidebar() {
