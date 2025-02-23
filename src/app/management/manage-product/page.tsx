@@ -81,6 +81,27 @@ export default function Page() {
     }, 1000);
   };
 
+  const refetchSaleData = () => {
+    setOpenDetailModal(false);
+    mutateManageSale(
+      {
+        keyword: keyword as string,
+        pageNumber: +(page || 1),
+        pageSize: 10,
+        saleStatus: 0,
+        minimumPrice: minPrice ? +minPrice : undefined,
+        maximumPrice: maxPrice ? +maxPrice : undefined,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            setSaleData(data.result);
+          }
+        },
+      }
+    );
+  };
+
   useEffect(() => {
     mutateManageSale(
       {
@@ -204,7 +225,9 @@ export default function Page() {
           <DialogHeader>
             <DialogTitle>Chi tiết sản phẩm</DialogTitle>
           </DialogHeader>
-          {productSale && <RequestSaleDetail sale={productSale} />}
+          {productSale && (
+            <RequestSaleDetail sale={productSale} onApprove={refetchSaleData} />
+          )}
         </DialogContent>
       </Dialog>
     </div>

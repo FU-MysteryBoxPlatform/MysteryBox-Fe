@@ -1,15 +1,30 @@
-"use client";;
+"use client";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GlobalContext } from "@/provider/global-provider";
 import { useContext } from "react";
 import { AdminSidebar } from "../components/AdminSidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import UserIcon from "@/components/icons/UserIcon";
+import { useRouter } from "next/navigation";
+import cookie from "@/utils/cookie";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  // const router = useRouter();
-  // const pathname = usePathname();
+  const router = useRouter();
 
-  const { user, isFetchingUser } = useContext(GlobalContext);
+  const { user, isFetchingUser, setUser } = useContext(GlobalContext);
+
+  const handleLogout = () => {
+    cookie.delete("ACCESS_TOKEN");
+    cookie.delete("REFRESH_TOKEN");
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/login");
+  };
 
   if (isFetchingUser) {
     return (
@@ -29,7 +44,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AdminSidebar />
-      <div className="w-full">{children}</div>
+      <div className="w-full">
+        <div className="py-6 px-10 border-b border-gray-200 flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <UserIcon className="w-7 h-7" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="p-4 grid gap-2">
+              <button
+                className="px-2 py-1 hover:bg-gray-100 rounded-md text-red-500"
+                onClick={handleLogout}
+              >
+                Đăng xuất
+              </button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {children}
+      </div>
     </SidebarProvider>
   );
 }

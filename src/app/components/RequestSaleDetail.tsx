@@ -3,9 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Sale } from "@/hooks/api/useManageSale";
 import { toast } from "@/hooks/use-toast";
 
-export default function RequestSaleDetail({ sale }: { sale: Sale }) {
-  console.log({ sale: sale.saleId });
-
+export default function RequestSaleDetail({
+  sale,
+  onApprove,
+}: {
+  sale: Sale;
+  onApprove: () => void;
+}) {
   const handleApproveSale = async () => {
     try {
       const response = await axiosClient.put(
@@ -13,6 +17,7 @@ export default function RequestSaleDetail({ sale }: { sale: Sale }) {
       );
 
       if (response.data.isSuccess) {
+        onApprove();
         toast({
           title: "Đã duyệt sản phẩm thành công!",
         });
@@ -24,7 +29,11 @@ export default function RequestSaleDetail({ sale }: { sale: Sale }) {
 
   return (
     <div className="flex gap-6">
-      <img src={sale?.inventory.product.imagePath} alt="w-16 h-16 rounded-md" />
+      <img
+        src={sale?.inventory.product.imagePath}
+        alt={sale?.inventory.product.name}
+        className="w-[400px] h-[400px] rounded-md object-cover aspect-square"
+      />
       <div className="flex flex-col gap-2">
         <p className="text-lg font-bold">{sale?.inventory.product.name}</p>
         <p className="text-gray-500 text-sm">

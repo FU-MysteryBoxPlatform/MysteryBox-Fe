@@ -16,25 +16,15 @@ import { usePathname } from "next/navigation";
 // Menu items.
 const items = [
   {
-    title: "Manage Collection",
+    title: "Quản lý bộ sưu tập",
     url: "/management/manage-collection",
     icon: ChartArea,
   },
   {
-    title: "Manage Product",
+    title: "Quản lý vật phẩm",
     url: "/management/manage-product",
     icon: HandCoins,
   },
-  // {
-  //   title: "Withdraw",
-  //   url: "/private-site/admin/withdraw",
-  //   icon: Bitcoin,
-  // },
-  // {
-  //   title: "Transactions",
-  //   url: "/private-site/admin/transactions",
-  //   icon: Settings,
-  // },
 ];
 
 export function AdminSidebar() {
