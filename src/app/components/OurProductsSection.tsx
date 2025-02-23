@@ -1,7 +1,5 @@
-"use client";
+"use client";;
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import ProductCard from "./ProductCard";
 import { Sale, useManageSale } from "@/hooks/api/useManageSale";
 import { useEffect, useState } from "react";
 
