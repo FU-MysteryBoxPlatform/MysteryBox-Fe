@@ -45,8 +45,6 @@ export default function Login() {
   });
 
   const onSubmit = (data: LoginForm) => {
-    console.log({ data });
-
     loginMutation.mutate(
       {
         email: data.email,
@@ -62,7 +60,9 @@ export default function Login() {
             localStorage.setItem("user", JSON.stringify(account));
             if (account.mainRole === "COLLECTOR") {
               router.push(!!from ? `/${from}` : "/");
-            } else router.push("/management");
+            } else {
+              router.push("/management");
+            }
           } else {
             toast({
               title: data.messages[0],

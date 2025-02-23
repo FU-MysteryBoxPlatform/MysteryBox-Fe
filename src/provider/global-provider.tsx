@@ -1,5 +1,6 @@
 "use client";
 import { TAccount } from "@/types";
+import cookie from "@/utils/cookie";
 import { createContext, useEffect, useState } from "react";
 
 type TProductInCart = {
@@ -113,7 +114,13 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Lấy người dùng từ localStorage khi component được mount
     const savedUser = localStorage.getItem("user");
-    if (savedUser) {
+
+    const accessToken = cookie.get("ACCESS_TOKEN");
+
+    // Nếu token không có thì xóa user khỏi localStorage
+    if (!accessToken) {
+      localStorage.removeItem("user");
+    } else if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
 

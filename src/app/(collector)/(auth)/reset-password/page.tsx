@@ -59,12 +59,14 @@ function FormResetPassword({ email }: { email: string }) {
       },
       {
         onSuccess: (data) => {
+          console.log({ data });
+
           if (data.isSuccess) {
             toast({
               title: data.messages[0],
             });
             router.push("/login");
-          }
+          } else toast({ title: data.messages[0] });
         },
       }
     );
@@ -174,7 +176,7 @@ export default function Page() {
       );
       if (response.data.isSuccess) {
         setIsValidated(true);
-      }
+      } else toast({ title: response.data.messages[0] });
     } catch (error) {
       console.log({ error });
     }
