@@ -102,7 +102,7 @@ export default function Page() {
   }, [keyword, maxPrice, minPrice, mutateManageSale, page]);
 
   return (
-    <div className="w-full">
+    <div className="w-full p-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 justify-between">
