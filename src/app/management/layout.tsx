@@ -7,8 +7,8 @@ import { useContext } from "react";
 import { AdminSidebar } from "../components/AdminSidebar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const pathname = usePathname();
+  // const router = useRouter();
+  // const pathname = usePathname();
 
   const { user, isFetchingUser } = useContext(GlobalContext);
 
