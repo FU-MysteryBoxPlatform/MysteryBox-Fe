@@ -45,5 +45,5 @@ export const useAllSale = (page: number, size: number) => {
 };
 
 export const useSaleDetail = (id: string) => {
-  return useApiQuery<TSaleDetailData[]>(`/sale/get-sale-by-id/${id}`);
+  return useApiQuery<TSaleDetailData>(`/sale/get-sale-by-id/${id}`);
 };

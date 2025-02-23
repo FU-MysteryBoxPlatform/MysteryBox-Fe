@@ -20,7 +20,7 @@ const SaleDetailsPage = () => {
 
   const { data: sale, isLoading } = useSaleDetail((params.id as string) || "");
 
-  const dataSale = sale?.result[0];
+  const dataSale = sale?.result;
 
   const handleAddToCart = () => {
     addToCart({
