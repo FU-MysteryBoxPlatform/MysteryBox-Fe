@@ -2,7 +2,7 @@
 import InventoryCard from "@/app/components/InventoryCard";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
-import { TInventoryProductResponse, useGetInventory } from "@/hooks/api/useInventory";
+import { TInventoryItem, useGetInventory } from "@/hooks/api/useInventory";
 import { GlobalContext } from "@/provider/global-provider";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
@@ -16,9 +16,7 @@ export default function Page() {
   const page = params["page"] || 1;
 
   const [totalPages, setTotalPages] = useState(0);
-  const [inventories, setInventories] = useState<TInventoryProductResponse[]>(
-    []
-  );
+  const [inventories, setInventories] = useState<TInventoryItem[]>([]);
   const { mutate: mutateGetInventory, isPending } = useGetInventory();
 
   useEffect(() => {
@@ -31,14 +29,12 @@ export default function Page() {
       {
         onSuccess: (data) => {
           console.log(data);
-          setInventories(data.result.listProduct);
-         setTotalPages(data.result.totalPages);
+          setInventories(data.result.listProduct.items);
+          setTotalPages(data.result.listProduct.totalPages);
         },
       }
     );
   }, [mutateGetInventory, page, user?.id]);
-
-  console.log({ inventories });
 
   return (
     <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full">

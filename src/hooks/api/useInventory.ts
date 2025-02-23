@@ -15,6 +15,11 @@ export interface Inventory {
   itemStatus: ItemStatus;
 }
 
+export type TInventoryItem = {
+  inventories: Inventory[];
+  product: TProductSale;
+};
+
 export interface Product {
   productId: string;
   name: string;
@@ -62,14 +67,17 @@ export type TGetInventory = {
   maximumPrice?: string;
   itemStatus?: string;
 };
-export type TInventoryProductResponse ={
-product: TProductSale;
-inventories: Inventory[]
-}
+export type TInventoryProductResponse = {
+  product: TProductSale;
+  inventories: Inventory[];
+};
+
 export type TInventoryResponse = {
   account: TAccount;
-  listProduct: TInventoryProductResponse[];
-  totalPages:number;
+  listProduct: {
+    items: TInventoryItem[];
+    totalPages: number;
+  };
 };
 
 export const useSellInventory = () => {
