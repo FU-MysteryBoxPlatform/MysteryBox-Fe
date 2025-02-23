@@ -35,10 +35,22 @@ export type TResetPasswordData = {
   newPassword: string;
 };
 
+export type TRegisterOTPData = {
+  email: string;
+  verifyCode: string;
+};
+
 export const useRegister = () => {
   return useApiMutation<TRegisterResponse, TRegisterData>(
     "/account/create-account",
     "post"
+  );
+};
+
+export const useRegisterOTP = () => {
+  return useApiMutation<string, TRegisterOTPData>(
+    "/account/active-account",
+    "put"
   );
 };
 

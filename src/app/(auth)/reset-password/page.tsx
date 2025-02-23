@@ -172,7 +172,6 @@ export default function Page() {
           },
         }
       );
-      console.log({ response });
       if (response.data.isSuccess) {
         setIsValidated(true);
       }
