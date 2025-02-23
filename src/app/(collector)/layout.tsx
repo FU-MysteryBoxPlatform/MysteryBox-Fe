@@ -15,13 +15,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  // if (user?.mainRole === "MODERATORS" || user?.mainRole === "ADMIN") {
-  //   return (
-  //     <div className="w-screen h-[90vh] flex items-center justify-center">
-  //       Bạn không có quyền truy cập trang này
-  //     </div>
-  //   );
-  // }
+  if (user?.mainRole === "MODERATORS" || user?.mainRole === "ADMIN") {
+    return (
+      <div className="w-screen h-[90vh] flex items-center justify-center">
+        Bạn không có quyền truy cập trang này
+      </div>
+    );
+  }
   return (
     <div>
       <Header />
