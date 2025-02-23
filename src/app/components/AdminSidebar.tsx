@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { ChartArea, HandCoins } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -47,7 +46,7 @@ export function AdminSidebar() {
         <SidebarGroup>
           <div className="mb-10 flex-1 flex-shrink-0">
             <Link href="/" className="flex items-center gap-2">
-              <Image
+              <img
                 src="/logo-large.png"
                 alt="mybox"
                 width={32}
