@@ -144,3 +144,20 @@ export type SalesData = {
   sale: Sale;
   collectionProduct: CollectionProduct;
 };
+export type OrderStatus = {
+  id: number;
+  name: string;
+};
+
+export type Order = {
+  orderId: string;
+  orderDate: string;
+  totalAmount: number;
+  paymentMethodId: number;
+  paymentMethod: string | null;
+  statusId: number;
+  orderStatus: OrderStatus;
+  note: string;
+  accountId: string;
+  account: Account;
+};

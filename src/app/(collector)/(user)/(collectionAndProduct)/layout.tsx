@@ -44,4 +44,12 @@ const SIDEBAR = [
     name: "Kho vật phẩm",
     value: "my-product",
   },
+  {
+    name: "Lịch sử đơn hàng",
+    value: "orders",
+  },
+  {
+    name: "Lịch sử giao dịch",
+    value: "transaction",
+  },
 ];
