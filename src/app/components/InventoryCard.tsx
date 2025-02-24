@@ -81,7 +81,7 @@ export default function InventoryCard({
         accountId: user?.id || "",
         sellerItems: [
           {
-            productId: id,
+            inventoryId: id,
             quantity: +data.quantity,
             price: +data.price,
           },

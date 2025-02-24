@@ -52,7 +52,7 @@ export interface ItemStatus {
 export type TSellInventory = {
   accountId: string;
   sellerItems: {
-    productId: string;
+    inventoryId: string;
     quantity: number;
     price: number;
   }[];

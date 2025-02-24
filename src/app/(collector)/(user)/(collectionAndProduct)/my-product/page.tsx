@@ -50,7 +50,7 @@ export default function Page() {
           {inventories.map((product) => (
             <InventoryCard
               key={product.product.name}
-              id={product.product.productId || ""}
+              id={product.inventories[0].inventoryId || ""}
               image={product.product.imagePath}
               title={product.product.name}
               price={product.product.price}
