@@ -14,34 +14,6 @@ import { useParams } from "next/navigation";
 import { useGetCollectionById } from "@/hooks/api/useManageCollection";
 import { Button } from "@/components/ui/button";
 
-interface RarityStatus {
-  id: number;
-  name: string;
-  dropRate: string;
-}
-
-interface Product {
-  productId: string;
-  name: string;
-  description: string;
-  price: number;
-  rarityStatus: RarityStatus;
-  imagePath: string;
-}
-
-interface Collection {
-  collectionId: string;
-  collectionName: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  totalItem: number;
-  isActived: boolean;
-  rewards: string;
-  imagePath: string;
-  blindBoxPrice: number;
-  discountBlindBoxPrice: number;
-}
 
 
 export default function Page() {
