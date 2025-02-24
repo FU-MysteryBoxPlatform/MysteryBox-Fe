@@ -1,4 +1,5 @@
-import { useApiMutation } from "./useApi";
+import { useApiMutation, useApiQuery } from "./useApi";
+import { TProductSale } from './useSale';
 
 export type TCollection = {
   collectionId: string;
@@ -30,9 +31,19 @@ export type TCollectionResponse = {
   items: TCollection[];
 };
 
+export type TCollectionDetail = {
+  collection: TCollection;
+  products: TProductSale[];
+};
 export const useGetCollections = () => {
   return useApiMutation<TCollectionResponse, TCollectionRequest>(
     `collection/get-collection-by-filter`,
     "post"
+  );
+};
+
+export const useGetCollectionById = (id:string) => {
+  return useApiQuery<TCollectionDetail>(
+    `collection/get-collection-by-id/${id}`
   );
 };
