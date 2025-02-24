@@ -1,6 +1,4 @@
 "use client";;
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -10,11 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {formatPriceVND } from "@/lib/utils";
+import {formatDate, formatPriceVND } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { Button } from "react-day-picker";
 import { useGetCollectionById } from "@/hooks/api/useManageCollection";
+import { Button } from "@/components/ui/button";
 
 interface RarityStatus {
   id: number;
@@ -101,65 +99,67 @@ if (isLoading) {
           />
         </div>
         <div>
-          <h1 className="text-3xl font-bold mb-4">
+          <h1 className="text-3xl font-bold mb-4 text-red-600 font-sans uppercase">
             {collection?.collectionName}
           </h1>
           <p className="text-gray-600 mb-4">{collection?.description}</p>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <p className="font-semibold">Start Date:</p>
-              {/* <p>{formatDate(collection?.startTime)}</p> */}
+              <p className="font-semibold">Ngày mở bán:</p>
+              <p>{collection?.startTime ? formatDate(collection.startTime) : "N/A"}</p>
             </div>
             {collection?.endTime !== "0001-01-01T00:00:00" && (
               <div>
-                <p className="font-semibold">End Date:</p>
-                {/* <p>{formatDate(collection?.endTime)}</p> */}
+                <p className="font-semibold">Ngày đóng bán:</p>
+                <p>{collection?.endTime ? formatDate(collection.endTime) : "N/A"}</p>
               </div>
             )}
             <div>
-              <p className="font-semibold">Total Items:</p>
+              <p className="font-semibold">Tổng số túi mù:</p>
               <p>{collection?.totalItem}</p>
             </div>
             <div>
-              <p className="font-semibold">Status:</p>
-              {/* <Badge variant={collection.isActived ? "success" : "destructive"}>
-                {collection.isActived ? "Active" : "Inactive"}
-              </Badge> */}
+              <p className="font-semibold">Trạng thái:</p>
+              {collection && (
+                <Badge variant={collection.isActived ? "default" : "destructive"}>
+                  {collection.isActived ? "Đang mở bán" : "Đóng bán"}
+                </Badge>
+              )}
             </div>
           </div>
           <div className="mb-6">
-            <p className="font-semibold mb-2">Rewards:</p>
+            <p className="font-semibold mb-2">Phần thưởng khi sưu tập đủ bộ sưu tập:</p>
             <p className="text-gray-600">{collection?.rewards}</p>
           </div>
           <Card>
             <CardHeader>
-              <CardTitle>Buy Túi Mù (Blind Box)</CardTitle>
+              <CardTitle>Mua Túi Mù (Blind Box)</CardTitle>
               <CardDescription>
                 Get a random product from this collection!
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* <p className="text-2xl font-bold mb-2">
+              <p className="text-2xl font-bold mb-2">
                 {formatPriceVND(
-                  collection?.discountBlindBoxPrice || collection?.blindBoxPrice
+                  collection?.blindBoxPrice ?? 0
                 )}
               </p>
-              {collection?.discountBlindBoxPrice > 0 && (
+              {(collection?.discountBlindBoxPrice ?? 0) > 0 && (
                 <p className="text-sm text-gray-500 line-through">
-                  {formatPriceVND(collection?.blindBoxPrice)}
+                  {formatPriceVND(collection?.blindBoxPrice ?? 0)}
                 </p>
-              )} */}
+              )}
             </CardContent>
             <CardFooter>
-              <Button onClick={handleBuyBlindBox} disabled={isLoading}>
-                {isLoading ? "Processing..." : "Buy Blind Box"}
+              <Button className="bg-red-600" onClick={handleBuyBlindBox} disabled={isLoading}>
+                {isLoading ? "Processing..." : "Mua túi mù"}
               </Button>
             </CardFooter>
           </Card>
         </div>
       </div>
 
-      <h2 className="text-2xl font-bold mb-6">Potential Products</h2>
+      <h2 className="text-2xl font-bold mb-6">Bộ sưu tập</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products&& products?.length > 0 &&
           products?.map((product, index) => (
@@ -169,7 +169,7 @@ if (isLoading) {
                   <img
                     src={product.imagePath || "/placeholder.svg"}
                     alt={product.name}
-                    className="rounded-t-lg"
+                    className="rounded-lg w-full h-full object-cover"
                   />
                 </div>
               </CardHeader>
