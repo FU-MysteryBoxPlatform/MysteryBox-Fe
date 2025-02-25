@@ -3,14 +3,14 @@ import { ProductCardProps } from "./ProductCard";
 import Link from "next/link";
 
 export default function CheckoutProductCard({
-  id,
+  saleId,
   image,
   title,
   price,
   quantity,
 }: ProductCardProps & { quantity: number; selected: boolean }) {
   return (
-    <Link href={`/sale-detail/${id}`}>
+    <Link href={`/sale-detail/${saleId}`}>
       <div>
         <div className="flex items-start gap-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
