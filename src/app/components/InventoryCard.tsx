@@ -1,6 +1,6 @@
 "use client";
-import * as z from "zod";
 import CartIcon from "@/components/icons/CartIcon";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,20 +14,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useSellInventory } from "@/hooks/api/useInventory";
+import { useGetCollectionDetail } from "@/hooks/api/useUnboxBlindBox";
 import { useToast } from "@/hooks/use-toast";
 import { formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
-import { Ellipsis } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useSellInventory } from "@/hooks/api/useInventory";
-import LoadingIndicator from "./LoadingIndicator";
+import { Ellipsis } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useContext, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import LoadingIndicator from "./LoadingIndicator";
 
 export type InventoryCardProps = {
   id: string;
@@ -58,12 +59,18 @@ export default function InventoryCard({
   isPersonal = false,
   collectionId,
 }: InventoryCardProps) {
+  const [openPreview, setOpenPreview] = useState(false);
   const [openSellModal, setOpenSellModal] = useState(false);
   const { user, addToCart } = useContext(GlobalContext);
   const { toast } = useToast();
-  const route = useRouter();
+  const router = useRouter();
 
+  const { data, refetch } = useGetCollectionDetail(collectionId);
   const { mutate: mutateSellInventory, isPending } = useSellInventory();
+
+  const collectionData = useMemo(() => data?.result, [data]);
+
+  console.log({ collectionData });
 
   const { handleSubmit, register, formState, setError } =
     useForm<SellInventoryForm>({
@@ -123,7 +130,12 @@ export default function InventoryCard({
                 <DropdownMenuItem>Trao đổi</DropdownMenuItem>
 
                 {collectionId && (
-                  <DropdownMenuItem onClick={() => {}}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      refetch();
+                      setOpenPreview(true);
+                    }}
+                  >
                     Mở túi mù
                   </DropdownMenuItem>
                 )}
@@ -150,7 +162,7 @@ export default function InventoryCard({
           alt={title}
           width={120}
           height={120}
-          onClick={() => route.push(`/sale-detail/${id}`)}
+          onClick={() => router.push(`/sale-detail/${id}`)}
           className="cursor-pointer w-full aspect-square object-cover border border-gray-200"
         />
       </div>
@@ -210,6 +222,51 @@ export default function InventoryCard({
             onClick={handleSubmit(onSubmit)}
           >
             {isPending ? <LoadingIndicator /> : "Xác nhận bán"}
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openPreview} onOpenChange={setOpenPreview}>
+        <DialogContent className="max-w-[70vw]">
+          <DialogHeader>
+            <DialogTitle className="text-[#E12E43] font-bold">
+              {collectionData?.collection.collectionName}
+            </DialogTitle>
+            <DialogDescription>
+              Bạn sẽ nhận được một trong số những vật phẩm dưới đây
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
+            {collectionData?.products.map((product) => (
+              <div
+                key={product.productId}
+                className="flex items-center justify-between"
+              >
+                <div className="flex flex-col space-x-2">
+                  <img
+                    src={product.imagePath}
+                    alt={product.name}
+                    loading="lazy"
+                    className="rounded-lg min-w-full aspect-square object-cover"
+                  />
+                  <p className="text-sm font-semibold line-clamp-1">
+                    {product.name}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {formatPriceVND(product.price)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            className="bg-[#E12E43] hover:bg-[#B71C32] w-full"
+            onClick={() => {
+              router.push(`/unbox/${id}`);
+            }}
+          >
+            Mở túi mù
           </Button>
         </DialogContent>
       </Dialog>
