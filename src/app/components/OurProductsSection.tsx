@@ -48,15 +48,15 @@ export default function OurProductsSection() {
       )}
       {saleData.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
-          {saleData.length > 0 &&
+          {saleData?.length > 0 &&
             saleData
               .slice(0, 8)
               ?.map((product) => (
                 <ProductCard
-                  image={product.inventory.product.imagePath}
+                  image={product.inventory?.product?.imagePath}
                   price={product.unitPrice}
                   key={product.inventoryId}
-                  title={product.inventory.product.name}
+                  title={product.inventory?.product?.name}
                   saleId={product.saleId}
 
                   
