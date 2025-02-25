@@ -132,8 +132,9 @@ export default function InventoryCard({
                 {collectionId && (
                   <DropdownMenuItem
                     onClick={() => {
-                      refetch();
-                      setOpenPreview(true);
+                      router.push(
+                        `/unbox?inventoryId=${id}&collectionId=${collectionId}`
+                      );
                     }}
                   >
                     Mở túi mù
@@ -263,7 +264,9 @@ export default function InventoryCard({
           <Button
             className="bg-[#E12E43] hover:bg-[#B71C32] w-full"
             onClick={() => {
-              router.push(`/unbox/${id}`);
+              router.push(
+                `/unbox?inventoryId=${id}&collectionId=${collectionId}`
+              );
             }}
           >
             Mở túi mù

@@ -42,7 +42,7 @@ export default function Page() {
         .map((item) => ({
           saleId: item.saleId,
         })),
-      returnUrl: `window.location.host`.includes("localhost")
+      returnUrl: `${window.location.host}`.includes("localhost")
         ? `http://${window.location.host}/payment`
         : `https://${window.location.host}/payment`,
     } as OrderRequest;
@@ -65,7 +65,6 @@ export default function Page() {
       },
     });
 
-    console.log(payload);
   };
   return (
     <div>

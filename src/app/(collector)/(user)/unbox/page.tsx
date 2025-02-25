@@ -3,70 +3,62 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Star, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import HoloImageCard from "../HoloCard";
-import { useParams, useRouter } from "next/navigation";
-import { useOpenBlindBox } from "@/hooks/api/useUnboxBlindBox";
+import HoloImageCard from "./HoloCard";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import {
+  TOpenBlindBoxResponse,
+  useGetCollectionDetail,
+  useOpenBlindBox,
+} from "@/hooks/api/useUnboxBlindBox";
 import { TProductSale } from "@/hooks/api/useSale";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-
+import { formatPriceVND } from "@/lib/utils";
 export default function Page() {
-  const { id } = useParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const [isFlipped, setIsFlipped] = useState(false);
-  const [result, setResult] = useState<TProductSale | undefined>();
+  const [result, setResult] = useState<  TOpenBlindBoxResponse | undefined>();
+  const collectionId = searchParams.get("collectionId") as string;
+  const inventoryId = searchParams.get("inventoryId") as string;
+  const { data: collectionData, refetch } =
+    useGetCollectionDetail(collectionId);
 
-  const { mutate: mutateOpenBlindBox, isPending } = useOpenBlindBox(
-    id as string
-  );
-
-  console.log({ id, result });
+  const { mutate: mutateOpenBlindBox, isPending } =
+    useOpenBlindBox(inventoryId);
 
   const handleFlipCard = () => {
     if (isFlipped) return;
-    setIsFlipped((isFlipped) => !isFlipped);
+    setIsFlipped(true);
   };
 
   useEffect(() => {
+   if(isFlipped){
     mutateOpenBlindBox(
-      {},
+      {
+        inventoryId: inventoryId,
+      },
       {
         onSuccess: (data) => {
-          console.log({ data });
-          setResult(data.result.product);
+          setResult(data.result );
         },
       }
     );
-  }, [mutateOpenBlindBox]);
+   }
+  }, [isFlipped]);
 
-  if (isPending)
-    return (
-      <div className="w-screen h-screen flex items-center justify-center">
-        <LoadingIndicator />
-      </div>
-    );
 
   return (
-    <div className="w-screen h-[calc(100vh-73px)] relative">
+    <div className="fixed inset-0 w-full h-full z-[-1] overflow-hidden">
+      {/* Background */}
       <img
         src="/images/unbox-bg.webp"
         alt="bg"
-        className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"
+        className="absolute top-0 left-0 bottom-0 right-0 w-full h-full object-cover z-[-1]"
       />
-      {!isPending && !result ? (
-        <div className="w-full h-full flex items-center justify-center flex-col">
-          <p className="text-white text-center font-bold mb-6">
-            Bạn đã mở túi mù này rồi!
-          </p>
-          <Button
-            className="bg-[#E12E43] hover:bg-[#B71C32] mt-4"
-            onClick={() => router.push("/my-product")}
-          >
-            Quay lại bộ sưu tập
-          </Button>
-        </div>
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center">
+
+      <div className="w-full h-full flex flex-col lg:flex-row">
+        <div className="w-full  flex items-center justify-center">
           <AnimatePresence>
             <motion.div
               className="relative w-64 h-96 cursor-pointer"
@@ -136,7 +128,13 @@ export default function Page() {
                   transformStyle: "preserve-3d",
                 }}
               >
-                <HoloImageCard img={result?.imagePath} />
+                {isPending ? (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <LoadingIndicator />
+                  </div>
+                ) : (
+                  <HoloImageCard img={result?.product.imagePath} />
+                )}
               </motion.div>
             </motion.div>
           </AnimatePresence>
@@ -146,7 +144,9 @@ export default function Page() {
               <p className="text-xl font-bold mb-2">Chúc mừng!</p>
               <p>
                 Bạn đã nhận được{" "}
-                <span className="text-[#E12E43] font-bold">{result?.name}</span>
+                <span className="text-[#E12E43] font-bold">
+                  {result?.product.name}
+                </span>
               </p>
               <Button
                 className="bg-[#E12E43] hover:bg-[#B71C32] mt-4"
@@ -157,7 +157,36 @@ export default function Page() {
             </div>
           )}
         </div>
-      )}
+
+        <div className="w-full flex flex-col items-center justify-center p-10">
+          <h2 className="text-white text-2xl font-bold text-center mb-4">
+            Những vật phẩm bạn có thể nhận được
+          </h2>
+          <div className="grid grid-cols-2  gap-4 text-white h-[650px] overflow-y-auto">
+            {collectionData?.result.products.map((product) => (
+              <div
+                key={product.productId}
+                className="flex items-center justify-center"
+              >
+                <div className="flex flex-col justify-center items-center space-y-2">
+                  <img
+                    src={product.imagePath}
+                    alt={product.name}
+                    loading="lazy"
+                    className="rounded-lg  w-64 h-64 aspect-square object-cover"
+                  />
+                  <p className="text-sm font-semibold line-clamp-1">
+                    {product.name}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {formatPriceVND(product.price)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {isFlipped && <Confetti numberOfPieces={500} recycle={false} />}
     </div>
