@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import * as z from "zod";
 import CartIcon from "@/components/icons/CartIcon";
 import {
@@ -115,7 +115,7 @@ export default function InventoryCard({
                 <Ellipsis className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {status === 0 && (
+                {status === 0 && !collectionId && (
                   <DropdownMenuItem onClick={() => setOpenSellModal(true)}>
                     Bán
                   </DropdownMenuItem>
@@ -124,7 +124,7 @@ export default function InventoryCard({
 
                 {collectionId && (
                   <DropdownMenuItem onClick={() => {}}>
-                   Mở túi mù
+                    Mở túi mù
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
@@ -213,8 +213,6 @@ export default function InventoryCard({
           </Button>
         </DialogContent>
       </Dialog>
-
-
     </div>
   );
 }

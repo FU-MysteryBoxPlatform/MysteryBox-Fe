@@ -179,7 +179,7 @@ export default function Page() {
                           alt="Product image"
                           className="aspect-square rounded-md object-cover w-12 h-12"
                           height="64"
-                          src={sale.inventory.product.imagePath}
+                          src={sale.inventory?.product?.imagePath}
                           width="64"
                         />
                       </TableCell>
