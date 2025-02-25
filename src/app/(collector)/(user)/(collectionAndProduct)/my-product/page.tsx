@@ -49,15 +49,25 @@ export default function Page() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
           {inventories.map((product) => (
             <InventoryCard
-              key={product.product.name}
-              id={product.inventories[0].inventoryId || ""}
-              image={product.product.imagePath}
-              title={product.product.name}
-              price={product.product.price}
-              stock={Number(product.inventories.length)}
+              key={product.product?.name}
+              id={
+                product.inventories[0].inventoryId ||
+                product.collection.collectionId
+              }
+              image={product.product?.imagePath || product.collection.imagePath}
+              title={
+                product.product
+                  ? product.product.name
+                  : `Túi mù ${product.collection.collectionName}`
+              }
+              price={product.product?.price}
+              stock={Number(
+                product.collection ? 1 : product.inventories.length
+              )}
               status={product.inventories[0].itemStatus.id}
               isPersonal
               showPrice={false}
+              collectionId={product.collection?.collectionId}
             />
           ))}
         </div>

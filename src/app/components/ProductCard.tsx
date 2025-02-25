@@ -6,17 +6,13 @@ import { useRouter } from "next/navigation";
 import { useContext } from "react";
 
 export type ProductCardProps = {
-  id: string;
+  saleId?: string;
   image: string;
   title: string;
   price: number;
+  collectionId?: string;
 };
-export default function ProductCard({
-  id,
-  image,
-  title,
-  price,
-}: ProductCardProps) {
+export default function ProductCard({ saleId, image, title, price,collectionId }: ProductCardProps) {
   const { addToCart } = useContext(GlobalContext);
   const { toast } = useToast();
   const route = useRouter();
@@ -27,7 +23,13 @@ export default function ProductCard({
           className="absolute top-2 right-2 p-2 bg-gray-200 rounded-sm flex items-center justify-center cursor-pointer"
           onClick={(e) => {
             e.stopPropagation();
-            addToCart({ id, image, title, price });
+            addToCart({
+              saleId: saleId,
+              image,
+              title,
+              price,
+              collectionId: collectionId,
+            });
             toast({
               title: "Thêm vào giỏ hàng thành công!",
             });
@@ -40,7 +42,7 @@ export default function ProductCard({
           src={image}
           alt={title}
           loading="lazy"
-          onClick={() => route.push(`/sale-detail/${id}`)}
+          onClick={() => route.push(`/sale-detail/${saleId}`)}
           className="cursor-pointer aspect-square object-cover w-full"
         />
       </div>

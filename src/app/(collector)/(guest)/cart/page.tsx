@@ -25,6 +25,7 @@ export default function Page() {
   );
 
   const handleCheckout = () => {
+    debugger
     if (isLoggedIn) {
       router.push("/checkout");
     } else {
@@ -63,7 +64,7 @@ export default function Page() {
           ) : cart?.length && cart?.length > 0 ? (
             <div className="grid gap-3">
               {cart?.map((item) => (
-                <ProductInCart key={item.id} {...item} />
+                <ProductInCart collectionId={item.collectionId}  saleId={item.saleId } key={item.collectionId} {...item} />
               ))}
             </div>
           ) : (

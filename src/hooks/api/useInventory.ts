@@ -1,4 +1,4 @@
-import { TAccount } from "@/types";
+import { Collection, TAccount } from "@/types";
 import { useApiMutation } from "./useApi";
 import { Account } from "./useManageSale";
 import { TProductSale } from "./useSale";
@@ -13,11 +13,13 @@ export interface Inventory {
   accquiredDate: string;
   itemStatusId: number;
   itemStatus: ItemStatus;
+  imagePath: string;
 }
 
 export type TInventoryItem = {
   inventories: Inventory[];
   product: TProductSale;
+  collection: Collection;
 };
 
 export interface Product {

@@ -1,7 +1,7 @@
 "use client";
 import CheckoutProductCard from "@/app/components/CheckoutProductCard";
 import { Button } from "@/components/ui/button";
-import { Order, useCheckOut } from "@/hooks/api/useCartApi";
+import { OrderRequest, useCheckOut } from "@/hooks/api/useCartApi";
 import { toast } from "@/hooks/use-toast";
 import { formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
@@ -31,18 +31,21 @@ export default function Page() {
     const payload = {
       customerId: user?.id,
       paymentMethod: isMomo ? 1 : 0,
-      note: "",
-      orderDetailDtos: cart
-        ?.filter((a) => a.selected)
+      blindBoxOrderDetails: cart
+        ?.filter((item) => item.selected && item.collectionId)
         .map((item) => ({
-          saleId: item.id,
+          collectionId: item.collectionId,
           quantity: item.quantity,
-          note: item.title,
+        })),
+      orderDetailDtos: cart
+        ?.filter((item) => item.selected && item.saleId)
+        .map((item) => ({
+          saleId: item.saleId,
         })),
       returnUrl: `window.location.host`.includes("localhost")
         ? `http://${window.location.host}/payment`
         : `https://${window.location.host}/payment`,
-    } as Order;
+    } as OrderRequest;
 
     checkout.mutate(payload, {
       onSuccess: (data) => {
@@ -109,7 +112,9 @@ export default function Page() {
                 {cart
                   ?.filter((item) => item.selected)
                   .map((item) => {
-                    return <CheckoutProductCard key={item.id} {...item} />;
+                    return (
+                      <CheckoutProductCard key={item.collectionId} {...item} />
+                    );
                   })}
               </div>
               <div className="flex justify-between items-center mt-2">

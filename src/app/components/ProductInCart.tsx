@@ -7,14 +7,15 @@ import { formatPriceVND } from "@/lib/utils";
 import Link from "next/link";
 
 export default function ProductInCart({
-  id,
+  saleId,
   image,
   title,
   price,
   quantity,
   selected,
+  collectionId,
 }: ProductCardProps & { quantity: number; selected: boolean }) {
-  const { addToCart, removeFromCart, toggleSelectProduct } =
+  const { addToCart, removeFromCart, toggleSelectProduct, removeFromCartBlindbox } =
     useContext(GlobalContext);
 
   return (
@@ -24,11 +25,13 @@ export default function ProductInCart({
           defaultChecked={selected}
           checked={selected}
           onCheckedChange={() => {
-            toggleSelectProduct(id);
+            if (saleId) {
+              toggleSelectProduct(saleId);
+            }
           }}
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <Link href={`/sale-detail/${id}`}>
+        <Link href={`/sale-detail/${saleId}`}>
           <img
             src={image}
             alt={title}
@@ -41,16 +44,31 @@ export default function ProductInCart({
           <Counter
             count={quantity}
             onIncrease={() => {
-              addToCart({ id, image, title, price });
+              debugger;
+              addToCart({
+                saleId: saleId,
+                image,
+                title,
+                price,
+                collectionId: collectionId,
+              });
             }}
             onDecrease={() => {
-              removeFromCart(id, 1);
+              if(collectionId) {
+                removeFromCartBlindbox(collectionId);
+              }else if(saleId){
+                removeFromCart(saleId);
+              }
             }}
           />
           <button
             className="underline ml-auto text-red-500 text-sm"
             onClick={() => {
-              removeFromCart(id);
+               if (collectionId) {
+                 removeFromCartBlindbox(collectionId);
+               } else if (saleId) {
+                 removeFromCart(saleId);
+               }
             }}
           >
             Xoá

@@ -36,14 +36,14 @@ export default function OurProductsSection() {
       </p>
       {isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
-          {Array(8)
+          {/* {Array(8)
             .fill("0")
             .map((product) => (
               <div key={product} className="flex flex-col items-center">
                 <Skeleton className="w-full h-[150px] mb-2" />
                 <Skeleton className="w-1/2 mx-auto h-4" />
               </div>
-            ))}
+            ))} */}
         </div>
       )}
       {saleData.length > 0 ? (
@@ -57,7 +57,9 @@ export default function OurProductsSection() {
                   price={product.unitPrice}
                   key={product.inventoryId}
                   title={product.inventory.product.name}
-                  id={product.saleId}
+                  saleId={product.saleId}
+
+                  
                 />
               ))}
         </div>

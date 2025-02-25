@@ -14,7 +14,8 @@ import dayjs from "dayjs";
 import { useContext } from "react";
 import { GlobalContext } from "@/provider/global-provider";
 import { Loader2 } from "lucide-react";
-
+import vnpay from "../../../../../../public/vnpay.png";
+import momo from "../../../../../../public/momo.png";
 export default function Page() {
   const { user } = useContext(GlobalContext);
   console.log(user);
@@ -64,12 +65,22 @@ export default function Page() {
                   {orders?.length > 0 &&
                     orders.map((order, index) => (
                       <TableRow key={order.order.orderId}>
-                        <TableCell className="sm:table-cell">{index}</TableCell>
+                        <TableCell className="sm:table-cell">
+                          {order.order.orderId.substring(0, 8)}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {order.order.account.firstName}
                         </TableCell>
                         <TableCell className="md:table-cell">
-                          {order.order.paymentMethodId == 1 ? "VNPAY" : "MOMO"}
+                          {order.order.paymentMethodId == 1 ? (
+                            <img src={vnpay.src} className="w-16" alt="VNPAY" />
+                          ) : (
+                            <img
+                              src={momo.src}
+                              className="w-14 h-14"
+                              alt="MOMO"
+                            />
+                          )}
                         </TableCell>
                         <TableCell className="md:table-cell">
                           {formatPriceVND(order.order.totalAmount ?? 0)}
