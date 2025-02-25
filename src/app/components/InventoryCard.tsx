@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import * as z from "zod";
 import CartIcon from "@/components/icons/CartIcon";
 import {
@@ -38,6 +38,7 @@ export type InventoryCardProps = {
   status: number;
   showPrice?: boolean;
   isPersonal?: boolean;
+  collectionId: string;
 };
 const SellInventorySchema = z.object({
   quantity: z.string(),
@@ -55,6 +56,7 @@ export default function InventoryCard({
   status,
   showPrice = true,
   isPersonal = false,
+  collectionId,
 }: InventoryCardProps) {
   const [openSellModal, setOpenSellModal] = useState(false);
   const { user, addToCart } = useContext(GlobalContext);
@@ -119,6 +121,12 @@ export default function InventoryCard({
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem>Trao đổi</DropdownMenuItem>
+
+                {collectionId && (
+                  <DropdownMenuItem onClick={() => {}}>
+                   Mở túi mù
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -127,7 +135,7 @@ export default function InventoryCard({
             className="absolute top-2 right-2 p-2 bg-gray-200 rounded-sm flex items-center justify-center cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
-              addToCart({ id, image, title, price });
+              addToCart({ saleId: id, image, title, price });
               toast({
                 title: "Thêm vào giỏ hàng thành công!",
               });
@@ -205,6 +213,8 @@ export default function InventoryCard({
           </Button>
         </DialogContent>
       </Dialog>
+
+
     </div>
   );
 }

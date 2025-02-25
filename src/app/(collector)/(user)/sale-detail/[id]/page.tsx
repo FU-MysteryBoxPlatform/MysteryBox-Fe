@@ -24,7 +24,7 @@ const SaleDetailsPage = () => {
 
   const handleAddToCart = () => {
     addToCart({
-      id: dataSale?.saleId || "",
+      saleId: dataSale?.saleId || "",
       image: dataSale?.inventory?.product?.imagePath || "",
       title: dataSale?.inventory?.product?.name || "",
       price: dataSale?.unitPrice || 0,

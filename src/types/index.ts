@@ -120,7 +120,7 @@ export type Sale = {
 
 export type Collection = {
   collectionId: string;
-  collecitonName: string;
+  collectionName: string;
   description: string;
   startTime: string;
   totalItem: number;

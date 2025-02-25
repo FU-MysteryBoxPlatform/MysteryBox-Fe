@@ -8,20 +8,22 @@ export type OrderDetail= {
   note: string;
 }
 
-export type Order= {
+export type OrderRequest = {
   customerId: string;
+  blindBoxOrderDetails: {
+    collectionId: string;
+    quantity: number;
+  }[];
+  orderDetailDtos: {
+    saleId: string;
+  }[];
   paymentMethod: number;
-  note: string;
-  orderDetailDtos: OrderDetail[];
   returnUrl: string;
-}
+};
 
 
 export const useCheckOut = () => {
-  return useApiMutation<string, Order>(
-    "/order/buying-item-from-collector",
-    "post"
-  );
+  return useApiMutation<string, OrderRequest>("/order/check-out", "post");
 };
 export const useUpdateTransaction = (transactionId: string, transactionStatus:number) => {
   return useApiMutation<unknown, unknown>(

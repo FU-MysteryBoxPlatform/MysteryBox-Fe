@@ -164,9 +164,10 @@ export default function Page() {
                       Ảnh
                     </TableHead>
                     <TableHead>Tên sản phẩm</TableHead>
-                    <TableHead>Số lượng</TableHead>
                     <TableHead>Người bán</TableHead>
                     <TableHead className="md:table-cell">Giá bán</TableHead>
+                    <TableHead>Trạng thái</TableHead>
+
                     <TableHead>Thao tác</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -185,9 +186,7 @@ export default function Page() {
                       <TableCell className="md:table-cell font-medium line-clamp-2">
                         {sale.inventory.product.name}
                       </TableCell>
-                      <TableCell className="md:table-cell">
-                        {sale.quantitySold}
-                      </TableCell>
+
                       <TableCell className="md:table-cell">
                         {sale.inventory.account.firstName +
                           " " +
@@ -195,6 +194,9 @@ export default function Page() {
                       </TableCell>
                       <TableCell className="md:table-cell">
                         {sale.unitPrice.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="md:table-cell">
+                        {sale.saleStatus.name}
                       </TableCell>
                       <TableCell>
                         <Button
