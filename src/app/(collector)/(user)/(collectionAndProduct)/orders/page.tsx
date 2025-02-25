@@ -63,7 +63,7 @@ export default function Page() {
                 </TableHeader>
                 <TableBody>
                   {orders?.length > 0 &&
-                    orders.map((order, index) => (
+                    orders.map((order) => (
                       <TableRow key={order.order.orderId}>
                         <TableCell className="sm:table-cell">
                           {order.order.orderId.substring(0, 8)}
