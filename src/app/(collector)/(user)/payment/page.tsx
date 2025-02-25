@@ -98,16 +98,13 @@ export default function Page() {
   useEffect(() => {
     if (!isReady || !transactionId) return;
 
-    let success = isSuccess || isVNPaySuccess;
     debugger;
     checkout.mutate(
-      { transactionId, transactionStatus: success == true ? 1 : 2 },
+      { transactionId, transactionStatus: isSuccess || isVNPaySuccess ? 1 : 2 },
       {
         onSuccess: (data) => {
-          if (success) {
             setCart([]);
             toast({ title: data.messages[0] });
-          }
         },
       }
     );
