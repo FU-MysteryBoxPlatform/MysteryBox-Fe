@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import * as z from "zod";
 import CartIcon from "@/components/icons/CartIcon";
 import {
@@ -213,6 +213,8 @@ export default function InventoryCard({
           </Button>
         </DialogContent>
       </Dialog>
+
+
     </div>
   );
 }
