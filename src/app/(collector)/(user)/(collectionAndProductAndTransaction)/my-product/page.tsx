@@ -61,9 +61,7 @@ export default function Page() {
                   : `Túi mù ${product.collection.collectionName}`
               }
               price={product.product?.price}
-              stock={Number(
-                product.collection ? 1 : product.inventories.length
-              )}
+              stock={Number(product.inventories.length)}
               status={product.inventories[0].itemStatus.id}
               isPersonal
               showPrice={false}
