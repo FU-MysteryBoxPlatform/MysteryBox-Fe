@@ -27,7 +27,7 @@ export default function Page() {
   );
   // setTotalPages(data?.result.totalPages || 0);
   const orders = data?.result.items || [];
- let totalPages = data?.result.totalPages || 0;
+  const totalPages = data?.result.totalPages || 0;
   const { data: detail, isLoading: isLoading2 } = useGetOrderDetail(id);
   if (isLoading) {
     return (
@@ -71,7 +71,6 @@ export default function Page() {
   const fetchDetail = (id: string) => {
     setId(id);
   };
-
 
   console.log(orders);
   return (
