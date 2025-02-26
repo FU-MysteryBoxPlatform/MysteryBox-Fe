@@ -139,7 +139,7 @@ export default function Page() {
                   transformStyle: "preserve-3d",
                 }}
               >
-                {isPending ? (
+                {isPending &&!result ? (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <LoadingIndicator />
                   </div>
@@ -150,13 +150,13 @@ export default function Page() {
             </motion.div>
           </AnimatePresence>
 
-          {isFlipped && !isPending && (
+          {isFlipped && !isPending && result && (
             <div className="ml-10 text-white text-center mt-6 animate-zoom-in">
               <p className="text-xl font-bold mb-2">Chúc mừng!</p>
               <p>
                 Bạn đã nhận được{" "}
                 <span className="text-[#E12E43] font-bold animate-pulse">
-                  {result?.product.name}
+                  {result?.product?.name}
                 </span>
               </p>
               <Button
