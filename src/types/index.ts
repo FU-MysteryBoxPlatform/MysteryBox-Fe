@@ -180,3 +180,41 @@ export type OrderDetail = {
   orderDetailStatusId: number;
   orderDetailStatus: OrderDetailStatus;
 };
+export type PaymentMethod = {
+  id: number;
+  name: string;
+};
+
+export type TransactionStatus = {
+  id: number;
+  name: string;
+};
+
+export type TransactionType = {
+  id: number;
+  name: string;
+};
+
+export type OrderType = {
+  id: number;
+  name: string;
+};
+
+export type PaymentHistory = {
+  paymentHistoryId: string;
+  amount: number;
+  date: string;
+  paidDate: string | null;
+  paymentMethodId: number;
+  paymentMethod: PaymentMethod;
+  transactionStatusId: number;
+  transationStatus: TransactionStatus; // Note: keeping the typo from original data
+  transactionTypeId: number;
+  transactionType: TransactionType;
+  orderId: string;
+  order: Order;
+  accountId: string;
+  account: any;
+  walletTransactionId: string | null;
+  walletTransaction: any | null;
+};

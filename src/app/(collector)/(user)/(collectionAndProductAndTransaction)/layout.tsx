@@ -50,6 +50,6 @@ const SIDEBAR = [
   },
   {
     name: "Lịch sử giao dịch",
-    value: "transaction",
+    value: "my-transaction",
   },
 ];
