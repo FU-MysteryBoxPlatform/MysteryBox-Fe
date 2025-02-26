@@ -5,7 +5,7 @@ import {
   useGetOrderDetail,
 } from "@/hooks/api/useOrder";
 import { formatDate, formatPriceVND } from "@/lib/utils";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { GlobalContext } from "@/provider/global-provider";
 import { Loader2 } from "lucide-react";
 import Paginator from "@/app/components/Paginator";
