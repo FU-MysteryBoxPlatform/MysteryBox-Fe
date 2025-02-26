@@ -20,7 +20,7 @@ export default function Page() {
   const [result, setResult] = useState<  TOpenBlindBoxResponse | undefined>();
   const collectionId = searchParams.get("collectionId") as string;
   const inventoryId = searchParams.get("inventoryId") as string;
-  const { data: collectionData, refetch } =
+  const { data: collectionData } =
     useGetCollectionDetail(collectionId);
 
   const { mutate: mutateOpenBlindBox, isPending } =
