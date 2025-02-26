@@ -144,7 +144,7 @@ export default function Page() {
                     <LoadingIndicator />
                   </div>
                 ) : (
-                  <HoloImageCard img={result?.product.imagePath} />
+                  <HoloImageCard img={result?.product?.imagePath} />
                 )}
               </motion.div>
             </motion.div>

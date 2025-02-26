@@ -28,7 +28,7 @@ export default function HoloImageCard({ img }: { img?: string }) {
         }}
       >
         <Image
-          src={img ?? "/images/card.png"}
+          src={img || "/images/card.png"}
           alt="Holo card image"
           width={256}
           height={384}
