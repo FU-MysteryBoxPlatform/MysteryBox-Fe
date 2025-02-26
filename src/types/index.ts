@@ -214,7 +214,7 @@ export type PaymentHistory = {
   orderId: string;
   order: Order;
   accountId: string;
-  account: any;
+  account: TAccount;
   walletTransactionId: string | null;
-  walletTransaction: any | null;
+  walletTransaction: unknown | null;
 };
