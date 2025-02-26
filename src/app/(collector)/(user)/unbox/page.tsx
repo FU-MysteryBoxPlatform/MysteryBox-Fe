@@ -1,7 +1,7 @@
-"use client";;
+"use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { Star, Trophy } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Confetti from "react-confetti";
 import HoloImageCard from "./HoloCard";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,11 +17,11 @@ export default function Page() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isFlipped, setIsFlipped] = useState(false);
-  const [result, setResult] = useState<  TOpenBlindBoxResponse | undefined>();
+  const [result, setResult] = useState<TOpenBlindBoxResponse | undefined>();
   const collectionId = searchParams.get("collectionId") as string;
   const inventoryId = searchParams.get("inventoryId") as string;
-  const { data: collectionData } =
-    useGetCollectionDetail(collectionId);
+  const { data: collectionData } = useGetCollectionDetail(collectionId);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const { mutate: mutateOpenBlindBox, isPending } =
     useOpenBlindBox(inventoryId);
@@ -30,22 +30,34 @@ export default function Page() {
     if (isFlipped) return;
     setIsFlipped(true);
   };
+  useEffect(() => {
+    // Tạo và phát âm thanh
+    audioRef.current = new Audio("/audio/soundblindbox.mp3");
+    audioRef.current.play();
+
+    return () => {
+      // Dừng nhạc khi rời khỏi trang
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0; // Reset về đầu
+      }
+    };
+  }, []);
 
   useEffect(() => {
-   if(isFlipped){
-    mutateOpenBlindBox(
-      {
-        inventoryId: inventoryId,
-      },
-      {
-        onSuccess: (data) => {
-          setResult(data.result );
+    if (isFlipped) {
+      mutateOpenBlindBox(
+        {
+          inventoryId: inventoryId,
         },
-      }
-    );
-   }
+        {
+          onSuccess: (data) => {
+            setResult(data.result);
+          },
+        }
+      );
+    }
   }, [isFlipped]);
-
 
   return (
     <div className="fixed inset-0 w-full h-full z-[-1] overflow-hidden">
@@ -138,12 +150,12 @@ export default function Page() {
             </motion.div>
           </AnimatePresence>
 
-          {isFlipped && (
-            <div className="text-white text-center mt-6 animate-zoom-in">
+          {isFlipped && !isPending && (
+            <div className="ml-10 text-white text-center mt-6 animate-zoom-in">
               <p className="text-xl font-bold mb-2">Chúc mừng!</p>
               <p>
                 Bạn đã nhận được{" "}
-                <span className="text-[#E12E43] font-bold">
+                <span className="text-[#E12E43] font-bold animate-pulse">
                   {result?.product.name}
                 </span>
               </p>
