@@ -161,3 +161,22 @@ export type Order = {
   accountId: string;
   account: Account;
 };
+export type OrderDetailStatus = {
+  id: number;
+  name: string;
+};
+
+export type OrderDetail = {
+  orderDetailId: string;
+  inventoryId: string;
+  inventory: Inventory | null;
+  collectionId: string | null;
+  collection: Collection | null;
+  orderId: string;
+  order: Order;
+  quantity: number;
+  unitPrice: number;
+  note: string;
+  orderDetailStatusId: number;
+  orderDetailStatus: OrderDetailStatus;
+};
