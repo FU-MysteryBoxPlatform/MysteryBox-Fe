@@ -6,6 +6,7 @@ export type OrderEntity = {
 };
 export type TOrderResponse = {
   items: OrderEntity[];
+  totalPages: number;
 };
 
 export type TOrderDetailResponse = {

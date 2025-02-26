@@ -174,7 +174,7 @@ export default function Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {collections.map((collection) => (
+                  {collections.length> 0 && collections?.map((collection) => (
                     <TableRow key={collection.collectionId}>
                       <TableCell className="sm:table-cell">
                         <img

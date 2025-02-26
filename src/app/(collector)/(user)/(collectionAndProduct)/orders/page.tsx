@@ -1,21 +1,34 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetAllOrderByAccount, useGetOrderDetail } from "@/hooks/api/useOrder";
+import {
+  useGetAllOrderByAccount,
+  useGetOrderDetail,
+} from "@/hooks/api/useOrder";
 import { formatDate, formatPriceVND } from "@/lib/utils";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "@/provider/global-provider";
 import { Loader2 } from "lucide-react";
+import Paginator from "@/app/components/Paginator";
+import queryString from "query-string";
+import { useRouter, useSearchParams } from "next/navigation";
 export default function Page() {
   const { user } = useContext(GlobalContext);
   const [id, setId] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const params = queryString.parse(searchParams.toString());
+  const page = params["page"] || 1;
   console.log(user);
+
   const { data: data, isLoading } = useGetAllOrderByAccount(
     user?.id ?? "",
-    1,
-    10
+    +page,
+    6
   );
-  const { data: detail, isLoading: isLoading2 } = useGetOrderDetail(id);
+  // setTotalPages(data?.result.totalPages || 0);
   const orders = data?.result.items || [];
+ let totalPages = data?.result.totalPages || 0;
+  const { data: detail, isLoading: isLoading2 } = useGetOrderDetail(id);
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
@@ -58,6 +71,8 @@ export default function Page() {
   const fetchDetail = (id: string) => {
     setId(id);
   };
+
+
   console.log(orders);
   return (
     <div className="  rounded-lg flex-1 max-md:w-full">
@@ -170,6 +185,21 @@ export default function Page() {
                   </div>
                 )}
               </div>
+              {orders.length > 0 ? (
+                <Paginator
+                  currentPage={+(page as string)}
+                  totalPages={totalPages}
+                  onPageChange={(pageNumber) => {
+                    params["page"] = pageNumber.toString();
+                    router.push(`?${queryString.stringify(params)}`);
+                  }}
+                  showPreviousNext
+                />
+              ) : (
+                <div className="w-full text-center mt-10">
+                  Không có bộ sưu tập nào
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
