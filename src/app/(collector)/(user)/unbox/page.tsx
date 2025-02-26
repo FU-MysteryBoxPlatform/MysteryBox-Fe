@@ -1,16 +1,15 @@
-"use client";
+"use client";;
 import { AnimatePresence, motion } from "framer-motion";
 import { Star, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import HoloImageCard from "./HoloCard";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   TOpenBlindBoxResponse,
   useGetCollectionDetail,
   useOpenBlindBox,
 } from "@/hooks/api/useUnboxBlindBox";
-import { TProductSale } from "@/hooks/api/useSale";
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { formatPriceVND } from "@/lib/utils";
