@@ -65,7 +65,7 @@ export default function InventoryCard({
   const { toast } = useToast();
   const router = useRouter();
 
-  const { data, refetch } = useGetCollectionDetail(collectionId);
+  const { data } = useGetCollectionDetail(collectionId);
   const { mutate: mutateSellInventory, isPending } = useSellInventory();
 
   const collectionData = useMemo(() => data?.result, [data]);
