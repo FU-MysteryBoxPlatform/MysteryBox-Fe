@@ -169,9 +169,9 @@ export type OrderDetailStatus = {
 export type OrderDetail = {
   orderDetailId: string;
   inventoryId: string;
-  inventory: any | null;
+  inventory: Inventory | null;
   collectionId: string | null;
-  collection: any | null;
+  collection: Collection | null;
   orderId: string;
   order: Order;
   quantity: number;
