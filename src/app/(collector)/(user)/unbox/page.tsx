@@ -139,7 +139,7 @@ export default function Page() {
                   transformStyle: "preserve-3d",
                 }}
               >
-                {isPending &&!result ? (
+                {isPending && result ? (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <LoadingIndicator />
                   </div>
