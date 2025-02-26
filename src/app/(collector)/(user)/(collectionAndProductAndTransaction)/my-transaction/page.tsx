@@ -21,6 +21,7 @@ import { Calendar } from "lucide-react";
 import { useGetAllTransactionByAccountId } from "@/hooks/api/useTransactions";
 import { GlobalContext } from "@/provider/global-provider";
 import { formatDate } from "@/lib/utils";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 const PaymentHistoryDashboard: React.FC = () => {
   const { user } = useContext(GlobalContext);
@@ -86,6 +87,11 @@ const PaymentHistoryDashboard: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
+          {isPending && (
+            <div className="w-full flex items-center justify-center mb-10">
+              <LoadingIndicator />
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow>
