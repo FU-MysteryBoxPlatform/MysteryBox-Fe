@@ -127,7 +127,7 @@ export default function InventoryCard({
                     Bán
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem>Trao đổi</DropdownMenuItem>
+                {!collectionId && <DropdownMenuItem>Trao đổi</DropdownMenuItem>}
 
                 {collectionId && (
                   <DropdownMenuItem
