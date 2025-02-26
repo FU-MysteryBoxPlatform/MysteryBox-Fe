@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  console.log(user);
+
   // if (user?.mainRole !== "COLLECTOR") {
   //   return (
   //     <div className="w-screen h-[90vh] flex items-center justify-center">

@@ -15,6 +15,8 @@ export default function Page() {
     useContext(GlobalContext);
   const isLoggedIn = !!user;
 
+  console.log({ cart });
+
   const totalPrice = useMemo(
     () =>
       cart?.reduce(
@@ -25,7 +27,6 @@ export default function Page() {
   );
 
   const handleCheckout = () => {
-    debugger
     if (isLoggedIn) {
       router.push("/checkout");
     } else {
@@ -64,7 +65,12 @@ export default function Page() {
           ) : cart?.length && cart?.length > 0 ? (
             <div className="grid gap-3">
               {cart?.map((item) => (
-                <ProductInCart collectionId={item.collectionId}  saleId={item.saleId } key={item.collectionId} {...item} />
+                <ProductInCart
+                  collectionId={item.collectionId}
+                  saleId={item.saleId}
+                  key={item.collectionId}
+                  {...item}
+                />
               ))}
             </div>
           ) : (

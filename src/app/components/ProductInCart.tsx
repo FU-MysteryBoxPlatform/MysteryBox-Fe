@@ -15,8 +15,12 @@ export default function ProductInCart({
   selected,
   collectionId,
 }: ProductCardProps & { quantity: number; selected: boolean }) {
-  const { addToCart, removeFromCart, toggleSelectProduct, removeFromCartBlindbox } =
-    useContext(GlobalContext);
+  const {
+    addToCart,
+    removeFromCart,
+    toggleSelectProduct,
+    removeFromCartBlindbox,
+  } = useContext(GlobalContext);
 
   return (
     <div>
@@ -25,9 +29,7 @@ export default function ProductInCart({
           defaultChecked={selected}
           checked={selected}
           onCheckedChange={() => {
-            if (saleId) {
-              toggleSelectProduct(saleId);
-            }
+            toggleSelectProduct(saleId || collectionId || "");
           }}
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -54,9 +56,9 @@ export default function ProductInCart({
               });
             }}
             onDecrease={() => {
-              if(collectionId) {
+              if (collectionId) {
                 removeFromCartBlindbox(collectionId);
-              }else if(saleId){
+              } else if (saleId) {
                 removeFromCart(saleId);
               }
             }}
@@ -64,11 +66,11 @@ export default function ProductInCart({
           <button
             className="underline ml-auto text-red-500 text-sm"
             onClick={() => {
-               if (collectionId) {
-                 removeFromCartBlindbox(collectionId);
-               } else if (saleId) {
-                 removeFromCart(saleId);
-               }
+              if (collectionId) {
+                removeFromCartBlindbox(collectionId);
+              } else if (saleId) {
+                removeFromCart(saleId);
+              }
             }}
           >
             Xoá
