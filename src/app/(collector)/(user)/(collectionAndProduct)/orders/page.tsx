@@ -1,10 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  TOrderResponse,
-  useGetAllOrderByAccount,
-  useGetOrderDetail,
-} from "@/hooks/api/useOrder";
+import { useGetAllOrderByAccount, useGetOrderDetail } from "@/hooks/api/useOrder";
 import { formatDate, formatPriceVND } from "@/lib/utils";
 import { useContext, useState } from "react";
 import { GlobalContext } from "@/provider/global-provider";
@@ -19,7 +15,7 @@ export default function Page() {
     10
   );
   const { data: detail, isLoading: isLoading2 } = useGetOrderDetail(id);
-  const orders = data?.result as TOrderResponse[];
+  const orders = data?.result.items || [];
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50">
@@ -62,6 +58,7 @@ export default function Page() {
   const fetchDetail = (id: string) => {
     setId(id);
   };
+  console.log(orders);
   return (
     <div className="  rounded-lg flex-1 max-md:w-full">
       <div>
@@ -75,11 +72,12 @@ export default function Page() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-12">
-                <div className="col-span-7 p-4">
-                  {orders?.length > 0 &&
-                    orders.map((order) => (
+                <div className="col-span-6 p-4">
+                  {orders.length > 0 &&
+                    orders?.map((order) => (
                       <div
-                        className="bg-white shadow-lg p-4 rounded-lg my-1 text-sm font-sans"
+                        key={order.order.orderId}
+                        className="bg-white shadow-lg p-4 rounded-lg my-1 text-sm font-sans cursor-pointer"
                         onClick={() => fetchDetail(order.order.orderId)}
                       >
                         <div className="flex justify-between">
@@ -118,51 +116,59 @@ export default function Page() {
                       </div>
                     ))}
                 </div>
-                <div className="col-span-5 p-4">
-                  <div className="bg-white shadow-lg p-4 rounded-lg my-1 text-base font-sans">
-                    <div className="flex justify-center">
-                      <span className="inline-block">
-                        <strong className="">Chi tiết đơn hàng</strong>
-                      </span>
-                    </div>
-                    {isLoading2 ? (
-                      <div className="flex items-center justify-center">
-                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                {id != "" && (
+                  <div className="col-span-6 p-4">
+                    <div className="bg-white shadow-lg p-4 rounded-lg my-1 text-base font-sans">
+                      <div className="flex justify-center">
+                        <span className="inline-block">
+                          <strong className="">Chi tiết đơn hàng</strong>
+                        </span>
                       </div>
-                    ) : (
-                      <div>
-                        {detail?.result.map((item ) => (
-                          <div>
-                            <div className="flex justify-between my-2">
-                              <span className="inline-block">
-                                <strong className="text-gray-600">
-                                  {item.collection ? "Túi mù" : "Vật phẩm"}
-                                </strong>
-                              </span>
-
-                              <span className="inline-block text-gray-500 text-sm">
-                                Số lượng:{" "}
-                                <strong className="ml-1 text-blue-700 ">
-                                  {item.quantity}
-                                </strong>
-                              </span>
-                            </div>
-                            <div className="flex justify-center my-2">
-                              <span className="inline-block">
-                                <strong className="text-gray-600 mr-2 my-2">
-                                  Đơn giá
-                                </strong>
-                                <span className="text-blue-700">
-                                  {formatPriceVND(item.unitPrice)}
+                      {isLoading2 ? (
+                        <div className="flex items-center justify-center">
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        </div>
+                      ) : (
+                        <div>
+                          {detail?.result.items.map((item) => (
+                            <div key={item.orderDetailId}>
+                              <div className="flex justify-between my-2 border border-gray-200 p-2 rounded-lg my-2">
+                                <span className=" flex items-center">
+                                  <img
+                                    src={
+                                      item.collection
+                                        ? item.collection.imagePath
+                                        : item.inventory?.product.imagePath
+                                    }
+                                    alt=""
+                                    className="w-20 h-20 aspect-square"
+                                  />
+                                  <div className="flex flex-col ml-2">
+                                    <strong className="text-gray-600 text-sm">
+                                      {item.collection
+                                        ? `Túi mù ${item.collection.collectionName}`
+                                        : `${item.inventory?.product.name}`}
+                                    </strong>
+                                    <span className="text-blue-700 text-sm  font-semibold">
+                                      Đơn giá: {formatPriceVND(item.unitPrice)}
+                                    </span>
+                                  </div>
                                 </span>
-                              </span>
+
+                                <span className="flex items-center text-gray-500 text-sm">
+                                  Số lượng:{" "}
+                                  <strong className="ml-1 text-blue-700 ">
+                                    {item.quantity}
+                                  </strong>
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -24,7 +24,7 @@ export default function Page() {
       {
         accountId: user?.id || "",
         pageNumber: +page,
-        pageSize: 100,
+        pageSize: 12,
       },
       {
         onSuccess: (data) => {
