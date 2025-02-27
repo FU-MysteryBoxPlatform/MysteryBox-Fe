@@ -28,24 +28,31 @@ import Link from "next/link";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 const SaleStatusBadge = ({ status }: { status: string }) => {
-  const statusMap: Record<string, { color: string; icon: React.ReactNode }> = {
-    Available: {
+  const statusMap: Record<
+    string,
+    { color: string; icon: React.ReactNode; name: string }
+  > = {
+    OutOfStock: {
       color: "bg-green-100 text-green-800 border-green-200",
       icon: <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />,
+      name: "Đã  bán",
     },
-    OutOfStock: {
+    WaitingForApprove: {
       color: "bg-yellow-100 text-yellow-800 border-yellow-200",
       icon: <div className="w-2 h-2 rounded-full bg-yellow-400 mr-1" />,
+      name: "Chờ duyệt",
     },
-    "Đã Hủy": {
-      color: "bg-red-100 text-red-800 border-red-200",
-      icon: <div className="w-2 h-2 rounded-full bg-red-500 mr-1" />,
+    Available: {
+      color: "bg-blue-100 text-blue-800 border-blue-200",
+      icon: <div className="w-2 h-2 rounded-full bg-blue-500 mr-1" />,
+      name: "Đã duyệt ",
     },
   };
 
-  const { color, icon } = statusMap[status] || {
+  const { color, icon, name } = statusMap[status] || {
     color: "bg-gray-100 text-gray-800",
     icon: null,
+    name: "Không xác định",
   };
 
   return (
@@ -53,7 +60,7 @@ const SaleStatusBadge = ({ status }: { status: string }) => {
       className={`flex items-center px-2 py-1 rounded-full text-xs font-medium border ${color}`}
     >
       {icon}
-      {status}
+      {name}
     </span>
   );
 };
@@ -91,13 +98,13 @@ export default function Page() {
                   <TableHead className="w-[80px]">ID</TableHead>
                   <TableHead>Vật Phẩm</TableHead>
                   <TableHead>Giá</TableHead>
-                  <TableHead>Trạng Thái</TableHead>
                   <TableHead className="hidden md:table-cell">
                     Duyệt bởi
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
                     Ngày duyệt
                   </TableHead>
+                  <TableHead>Trạng Thái</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -110,14 +117,15 @@ export default function Page() {
                     </TableCell>
                     <TableCell>{item.inventory.product.name}</TableCell>
                     <TableCell>{formatPriceVND(item.unitPrice)} </TableCell>
-                    <TableCell>
-                      <SaleStatusBadge status={item.saleStatus.name} />
-                    </TableCell>
+
                     <TableCell className="hidden md:table-cell">
                       {item.updateByAccount?.firstName || "-"}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       {formatDate(item.updateDate) || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <SaleStatusBadge status={item.saleStatus.name} />
                     </TableCell>
                   </TableRow>
                 ))}

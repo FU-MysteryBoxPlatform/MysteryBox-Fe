@@ -9,7 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import { formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
-import { Loader2, Package, SquareArrowOutUpRight } from "lucide-react";
+import { Loader2, ShoppingCart, StarIcon, Tag, User, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useContext } from "react";
@@ -31,15 +31,18 @@ const SaleDetailsPage = () => {
     });
     toast({
       title: "Thêm vào giỏ hàng thành công!",
+      description: "Sản phẩm đã được thêm vào giỏ hàng của bạn",
     });
   };
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex items-center gap-2 bg-white p-4 rounded-lg shadow-md">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span className="text-lg font-medium text-gray-700">Loading ...</span>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex items-center gap-3 bg-white p-6 rounded-xl shadow-lg">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="text-xl font-medium text-gray-700">
+            Đang tải dữ liệu...
+          </span>
         </div>
       </div>
     );
@@ -47,158 +50,202 @@ const SaleDetailsPage = () => {
 
   if (!sale?.result) {
     return (
-      <div className="max-w-4xl mx-auto p-4 mt-8">
-        <Alert className="border border-yellow-200 shadow-sm">
-          <AlertTitle className="text-lg font-semibold">Not Found</AlertTitle>
-          <AlertDescription className="text-sm">
-            This sale could not be found.
+      <div className="max-w-4xl mx-auto p-8 mt-12">
+        <Alert className="border-2 border-yellow-300 shadow-md bg-yellow-50">
+          <AlertTitle className="text-xl font-bold text-yellow-800">
+            Không tìm thấy
+          </AlertTitle>
+          <AlertDescription className="text-base text-yellow-700 mt-2">
+            Không thể tìm thấy sản phẩm này. Có thể sản phẩm đã bị xóa hoặc
+            không tồn tại.
           </AlertDescription>
+          <Button className="mt-4 bg-primary hover:bg-primary/90" asChild>
+            <Link href="/collections">Xem các bộ sưu tập khác</Link>
+          </Button>
         </Alert>
       </div>
     );
   }
 
+  const discountedPrice = dataSale?.unitPrice || 0;
+
   return (
-    <div className="max-w-6xl mx-auto p-4 bg-gray-50 min-h-screen">
-      <Card className="shadow-lg border-none bg-white rounded-xl overflow-hidden">
-        <CardHeader className=" text-black p-6">
-          <CardTitle className="text-3xl font-bold uppercase">
-            Chi tiết bộ sưu tập: {dataSale?.inventory?.product?.name}
-          </CardTitle>
-          {/* <Badge
-            variant={
-              sale?.saleStatus?.name === "OutOfStock"
-                ? "destructive"
-                : "secondary"
-            }
-            className="text-sm mt-2"
-          >
-            {sale?.saleStatus.name}
-          </Badge> */}
+    <div className="max-w-6xl mx-auto p-6 min-h-screen">
+      {/* Breadcrumb navigation */}
+      <nav className="flex items-center text-sm text-gray-500 mb-6">
+        <Link href="/" className="hover:text-primary transition-colors">
+          Trang chủ
+        </Link>
+        <span className="mx-2">/</span>
+        <Link
+          href="/collections"
+          className="hover:text-primary transition-colors"
+        >
+          Bộ sưu tập
+        </Link>
+        <span className="mx-2">/</span>
+        <span className="text-primary font-medium">
+          {dataSale?.inventory?.product?.name}
+        </span>
+      </nav>
+
+      <Card className="shadow-xl border-none bg-white rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 text-black p-8 border-b">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-3xl font-bold">
+                {dataSale?.inventory?.product?.name}
+              </CardTitle>
+              <p className="text-gray-600 mt-2">
+                Bộ sưu tập độc đáo từ VeriCollect
+              </p>
+            </div>
+            <Badge
+              variant="outline"
+              className="text-primary border-primary px-4 py-1.5 text-sm font-medium rounded-full self-start"
+            >
+              {dataSale?.inventory?.product?.rarityStatus.name}
+            </Badge>
+          </div>
         </CardHeader>
 
-        <CardContent className="p-6">
-          <div className="grid md:grid-cols-2 gap-8">
+        <CardContent className="p-8">
+          <div className="grid md:grid-cols-2 gap-10">
             {/* Product Information */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold flex items-center gap-2 text-primary">
-                <Package className="w-6 h-6" />
-                Hình ảnh sản phẩm
-              </h3>
-
-              <div className="aspect-square w-full relative rounded-lg overflow-hidden shadow-md">
+            <div className="space-y-8">
+              <div className="aspect-square w-full relative rounded-2xl overflow-hidden shadow-lg border-4 border-white">
                 <img
                   src={
                     dataSale?.inventory?.product?.imagePath ||
                     "/placeholder.svg"
                   }
                   alt={dataSale?.inventory?.product?.name}
-                  className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+                  className="object-cover w-full h-full transition-all duration-500 hover:scale-110"
                 />
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-primary/90 hover:bg-primary text-white px-3 py-1.5 rounded-full">
+                    <StarIcon className="w-4 h-4 mr-1" />
+                    {dataSale?.inventory?.product?.rarityStatus?.dropRate}%
+                    rarity
+                  </Badge>
+                </div>
               </div>
 
-              <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-lg text-primary">
-                  {dataSale?.inventory?.product?.name}
-                </h4>
-                <p className="text-sm text-gray-600">
-                  {dataSale?.inventory?.product?.description}
+              <div className="space-y-4 bg-gray-50 p-6 rounded-xl border border-gray-100">
+                <h3 className="font-semibold text-xl text-gray-800 flex items-center gap-2">
+                  <Tag className="w-5 h-5 text-primary" />
+                  Chi tiết sản phẩm
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {dataSale?.inventory?.product?.description ||
+                    "Không có mô tả cho sản phẩm này."}
                 </p>
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className="text-primary border-primary"
-                  >
-                    {dataSale?.inventory?.product?.rarityStatus.name}
-                  </Badge>
-                  <span className="text-sm text-gray-500">
-                    Độ hiếm:{" "}
-                    {dataSale?.inventory?.product?.rarityStatus?.dropRate}%
-                  </span>
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-center flex-wrap gap-3">
+                    <Badge
+                      variant="outline"
+                      className="text-primary border-primary"
+                    >
+                      {dataSale?.inventory?.product?.rarityStatus.name}
+                    </Badge>
+                    <span className="text-sm px-3 py-1 bg-gray-200 rounded-full text-gray-700">
+                      Độ hiếm:{" "}
+                      {dataSale?.inventory?.product?.rarityStatus?.dropRate}%
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Sale Information */}
             <div className="space-y-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Thông tin sản phẩm</CardTitle>
+              <Card className="shadow-md border-gray-100">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl text-primary">
+                    Thông tin giá
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-2">
-                  <div className="flex justify-between items-center">
+                <CardContent className="space-y-5">
+                  <div className="flex justify-between items-center pb-4 border-b border-gray-100">
                     <span className="text-gray-600">Giá gốc:</span>
-                    <span className="font-medium text-lg">
-                      {formatPriceVND(dataSale?.inventory?.product?.price || 0)}
+                    <span className={`font-medium text-lg `}>
+                      {formatPriceVND(discountedPrice)}
                     </span>
                   </div>
-                  {dataSale?.inventory?.product?.discount && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Giảm:</span>
-                      <span className="font-medium text-green-600">
-                        {Math.floor(
-                          Number(dataSale?.inventory?.product?.discount) *
-                            100 || 0
-                        )}
-                        %
-                      </span>
-                    </div>
-                  )}
+
+                  <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <span className="text-gray-600">Giá cuối:</span>
+                    <span className="font-bold text-2xl text-primary">
+                      {formatPriceVND(discountedPrice)}
+                    </span>
+                  </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Giá sau khi giảm:</span>
-                    <span className="font-bold text-xl text-primary">
-                      {formatPriceVND(dataSale?.unitPrice || 0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Số lượng đã bán:</span>
-                    <span className="font-medium text-lg">
-                      {dataSale?.quantitySold}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Ngày đăng sản phẩm:</span>
-                    <span className="font-medium text-lg">
+                    <span className="text-gray-600">Ngày đăng bán:</span>
+                    <span className="font-medium text-gray-800">
                       {dayjs(dataSale?.saleDate).format("DD/MM/YYYY")}
                     </span>
                   </div>
+
                   <Button
-                    className="bg-[#E12E43] text-white w-full hover:bg-[#B71C32]"
+                    size="lg"
+                    className="bg-red-700 text-white w-full hover:bg-primary/90 mt-4 text-lg h-14 rounded-xl transition-all duration-300 shadow-md hover:shadow-xl"
                     onClick={handleAddToCart}
                   >
+                    <ShoppingCart className="w-5 h-5 mr-2" />
                     Thêm vào giỏ hàng
                   </Button>
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <p>Thông tin người bán</p>
-                    <Link href={`/profile`}>
-                      <SquareArrowOutUpRight className="w-4 h-4" />
-                    </Link>
+              <Card className="shadow-md border-gray-100">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl text-primary flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Thông tin người bán
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Tên người bán:</span>
-                    <span className="font-medium font-semibold">
-                      {`${dataSale?.inventory?.account?.firstName} ${dataSale?.inventory?.account?.lastName}`}
-                    </span>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center p-3 rounded-lg bg-gray-50">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3 text-primary">
+                      <User className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800">
+                        {`${dataSale?.inventory?.account?.firstName || ""} ${
+                          dataSale?.inventory?.account?.lastName || ""
+                        }`}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Nhà cung cấp sản phẩm
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Email:</span>
-                    <span className="font-medium font-semibold">
-                      {dataSale?.inventory?.account?.email}
-                    </span>
+
+                  <div className="flex items-center p-3 rounded-lg bg-gray-50">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3 text-primary">
+                      <Mail className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800 break-all">
+                        {dataSale?.inventory?.account?.email || "N/A"}
+                      </div>
+                      <div className="text-sm text-gray-500">Email liên hệ</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Phone:</span>
-                    <span className="font-medium font-semibold">
-                      0{dataSale?.inventory?.account?.phoneNumber}
-                    </span>
+
+                  <div className="flex items-center p-3 rounded-lg bg-gray-50">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3 text-primary">
+                      <Phone className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800">
+                        {dataSale?.inventory?.account?.phoneNumber
+                          ? `0${dataSale?.inventory?.account?.phoneNumber}`
+                          : "N/A"}
+                      </div>
+                      <div className="text-sm text-gray-500">Số điện thoại</div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
