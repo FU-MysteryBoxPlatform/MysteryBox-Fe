@@ -114,7 +114,7 @@ export default function Page() {
                       <SaleStatusBadge status={item.saleStatus.name} />
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {item.updateByAccount.firstName || "-"}
+                      {item.updateByAccount?.firstName || "-"}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       {formatDate(item.updateDate) || "-"}
