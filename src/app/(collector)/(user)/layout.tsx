@@ -4,7 +4,7 @@ import { GlobalContext } from "@/provider/global-provider";
 import { Suspense, useContext } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { user, isFetchingUser } = useContext(GlobalContext);
+  const {  isFetchingUser } = useContext(GlobalContext);
 
   if (isFetchingUser) {
     return (
