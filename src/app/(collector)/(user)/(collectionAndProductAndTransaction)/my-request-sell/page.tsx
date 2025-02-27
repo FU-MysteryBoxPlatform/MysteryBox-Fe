@@ -25,6 +25,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import Paginator from "@/app/components/Paginator";
 import Link from "next/link";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 const SaleStatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { color: string; icon: React.ReactNode }> = {
@@ -78,6 +79,11 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {isPending && (
+            <div className="w-full flex items-center justify-center mb-10">
+              <LoadingIndicator />
+            </div>
+          )}
           <div className="rounded-md border overflow-hidden">
             <Table>
               <TableHeader className="bg-muted/50">
