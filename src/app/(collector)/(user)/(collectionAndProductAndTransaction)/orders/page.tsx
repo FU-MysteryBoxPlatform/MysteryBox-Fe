@@ -31,7 +31,7 @@ export default function Page() {
   const { data: detail, isLoading: isLoading2 } = useGetOrderDetail(id);
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex w-full items-center justify-center bg-gray-50">
         <div className="flex items-center gap-2 bg-white p-4 rounded-lg shadow-md">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
           <span className="text-lg font-medium text-gray-700">Loading ...</span>

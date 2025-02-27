@@ -22,20 +22,27 @@ import { useGetAllTransactionByAccountId } from "@/hooks/api/useTransactions";
 import { GlobalContext } from "@/provider/global-provider";
 import { formatDate } from "@/lib/utils";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
+import Paginator from "@/app/components/Paginator";
+import { useRouter, useSearchParams } from "next/navigation";
+import queryString from "query-string";
 
 const PaymentHistoryDashboard: React.FC = () => {
   const { user } = useContext(GlobalContext);
   const [statusFilter, setStatusFilter] = useState<string>("0");
-
+ const searchParams = useSearchParams();
+  const router = useRouter();
+  const params = queryString.parse(searchParams.toString());
+  const page = params["page"] || 1;
   // Call API with explicit status values
   const { data: initialData, isPending } = useGetAllTransactionByAccountId(
     user?.id ?? "",
     Number(statusFilter) || 0, // Status (0, 1, 2, 3)
-    1,
+    +page,
     10 // Limit
   );
 
   const paymentData = initialData?.result.items || [];
+  const totalPages = initialData?.result.totalPages || 0;
 
   // Function to format currency
   const formatCurrency = (amount: number): string => {
@@ -134,6 +141,21 @@ const PaymentHistoryDashboard: React.FC = () => {
               )}
             </TableBody>
           </Table>
+          {paymentData.length > 0 ? (
+            <Paginator
+              currentPage={+(page as string)}
+              totalPages={totalPages}
+              onPageChange={(pageNumber) => {
+                params["page"] = pageNumber.toString();
+                router.push(`?${queryString.stringify(params)}`);
+              }}
+              showPreviousNext
+            />
+          ) : (
+            <div className="w-full text-center mt-10">
+              Không có bộ sưu tập nào
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
