@@ -110,7 +110,7 @@ export default function Page() {
                 <TableRow>
                   <TableHead className="w-[80px]">ID</TableHead>
                   <TableHead>Vật Phẩm</TableHead>
-                  <TableHead>Ngày Đăng</TableHead>
+                  <TableHead>Ngày đăng</TableHead>
                   <TableHead>Giá</TableHead>
                   <TableHead>Trạng Thái</TableHead>
                   <TableHead className="hidden md:table-cell">

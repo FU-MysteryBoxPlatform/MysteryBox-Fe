@@ -158,7 +158,7 @@ export default function TradeTabs() {
             className="flex items-center justify-center gap-2 data-[state=active]:bg-red-700 data-[state=active]:text-primary-foreground"
           >
             <Tag className="h-4 w-4" />
-            <span>Vật Phẩm Rao Đổi</span>
+            <span>Vật Phẩm Trao Đổi</span>
           </TabsTrigger>
           <TabsTrigger
             value="responses"
@@ -174,10 +174,10 @@ export default function TradeTabs() {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-primary" />
-                Vật Phẩm Rao Đổi
+                Vật Phẩm Trao Đổi
               </CardTitle>
               <CardDescription>
-                Những vật phẩm bạn đã đăng để trao đổi. Người chơi khác có thể
+                Những vật phẩm bạn đã đăng để tTrao đổi. Người chơi khác có thể
                 đưa ra đề nghị cho những vật phẩm này.
               </CardDescription>
             </CardHeader>
@@ -257,7 +257,7 @@ export default function TradeTabs() {
                 Đề Nghị Trao Đổi
               </CardTitle>
               <CardDescription>
-                Đề nghị từ người chơi khác muốn trao đổi với vật phẩm bạn đã
+                Đề nghị từ người chơi khác muốn Trao đổi với vật phẩm bạn đã
                 đăng.
               </CardDescription>
             </CardHeader>
@@ -267,10 +267,10 @@ export default function TradeTabs() {
                   <TableHeader className="bg-muted/50">
                     <TableRow>
                       <TableHead className="w-[80px]">ID</TableHead>
-                      <TableHead>Họ Muốn</TableHead>
-                      <TableHead>Họ Đề Nghị</TableHead>
+                      <TableHead>Item cần đổi</TableHead>
+                      <TableHead>Đề nghị</TableHead>
                       <TableHead className="hidden md:table-cell">Từ</TableHead>
-                      <TableHead>Trạng Thái</TableHead>
+                      <TableHead>Trạng thái</TableHead>
                       <TableHead className="text-right">Thao Tác</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -298,7 +298,7 @@ export default function TradeTabs() {
                           <StatusBadge status={response.status} />
                         </TableCell>
                         <TableCell className="text-right">
-                          {response.status === "Đang Chờ" ? (
+                          {response.status === "Pending" ? (
                             <div className="flex gap-2 justify-end">
                               <Button
                                 variant="outline"
