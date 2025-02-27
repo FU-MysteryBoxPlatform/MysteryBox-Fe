@@ -17,55 +17,22 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { History } from "lucide-react";
+import { useAllSaleByAccountId } from "@/hooks/api/useSale";
+import { useContext } from "react";
+import { GlobalContext } from "@/provider/global-provider";
+import { formatDate, formatPriceVND } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import queryString from "query-string";
+import Paginator from "@/app/components/Paginator";
+import Link from "next/link";
 
-// ... (previous sample data remains unchanged)
-
-// New sample data for sale history
-const saleHistory = [
-  {
-    id: 1,
-    item: "Excalibur",
-    listedDate: "2023-11-15",
-    status: "Đã Bán",
-    price: 5000,
-    buyer: "KingArthur",
-    soldDate: "2023-11-20",
-  },
-  {
-    id: 2,
-    item: "Mana Potion",
-    listedDate: "2023-11-10",
-    status: "Hết Hạn",
-    price: 100,
-    buyer: null,
-    soldDate: null,
-  },
-  {
-    id: 3,
-    item: "Dragon Scale Armor",
-    listedDate: "2023-11-05",
-    status: "Đã Bán",
-    price: 3000,
-    buyer: "DragonSlayer99",
-    soldDate: "2023-11-12",
-  },
-  {
-    id: 4,
-    item: "Magic Wand",
-    listedDate: "2023-11-01",
-    status: "Đã Hủy",
-    price: 1500,
-    buyer: null,
-    soldDate: null,
-  },
-];
 const SaleStatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { color: string; icon: React.ReactNode }> = {
-    "Đã Bán": {
+    Available: {
       color: "bg-green-100 text-green-800 border-green-200",
       icon: <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />,
     },
-    "Hết Hạn": {
+    OutOfStock: {
       color: "bg-yellow-100 text-yellow-800 border-yellow-200",
       icon: <div className="w-2 h-2 rounded-full bg-yellow-400 mr-1" />,
     },
@@ -91,6 +58,13 @@ const SaleStatusBadge = ({ status }: { status: string }) => {
 };
 
 export default function Page() {
+  const { user } = useContext(GlobalContext);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = queryString.parse(searchParams.toString());
+  const page = params["page"] || 1;
+  const { data, isPending } = useAllSaleByAccountId(user?.id ?? "", +page, 10);
+  const totalPages = data?.result.totalPages ?? 0;
   return (
     <div className="p-6  rounded-lg flex-1 max-md:w-full">
       <Card className="border shadow-sm">
@@ -110,32 +84,34 @@ export default function Page() {
                 <TableRow>
                   <TableHead className="w-[80px]">ID</TableHead>
                   <TableHead>Vật Phẩm</TableHead>
-                  <TableHead>Ngày đăng</TableHead>
                   <TableHead>Giá</TableHead>
                   <TableHead>Trạng Thái</TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Người Mua
+                    Duyệt bởi
                   </TableHead>
                   <TableHead className="hidden md:table-cell">
-                    Ngày Bán
+                    Ngày duyệt
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {saleHistory.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">{item.id}</TableCell>
-                    <TableCell>{item.item}</TableCell>
-                    <TableCell>{item.listedDate}</TableCell>
-                    <TableCell>{item.price.toLocaleString()} G</TableCell>
+                {data?.result.items.map((item) => (
+                  <TableRow key={item.saleId} className="hover:bg-muted/50">
+                    <TableCell className="font-medium">
+                      <Link href={`/sale-detail/${item.saleId}`}>
+                        {item.saleId.substring(0, 8)}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{item.inventory.product.name}</TableCell>
+                    <TableCell>{formatPriceVND(item.unitPrice)} </TableCell>
                     <TableCell>
-                      <SaleStatusBadge status={item.status} />
+                      <SaleStatusBadge status={item.saleStatus.name} />
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {item.buyer || "-"}
+                      {item.updateByAccount.firstName || "-"}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {item.soldDate || "-"}
+                      {formatDate(item.updateDate) || "-"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -143,6 +119,21 @@ export default function Page() {
             </Table>
           </div>
         </CardContent>
+        {data && data?.result?.items?.length > 0 ? (
+          <Paginator
+            currentPage={+(page as string)}
+            totalPages={totalPages}
+            onPageChange={(pageNumber) => {
+              params["page"] = pageNumber.toString();
+              router.push(`?${queryString.stringify(params)}`);
+            }}
+            showPreviousNext
+          />
+        ) : (
+          <div className="w-full text-center mt-10">
+            Không có lịch sử rao bán nào
+          </div>
+        )}
       </Card>
     </div>
   );
