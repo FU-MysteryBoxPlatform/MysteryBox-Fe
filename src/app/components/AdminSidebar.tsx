@@ -51,7 +51,7 @@ export function AdminSidebar() {
                 <SidebarMenuItem
                   key={item.title}
                   className={cn(
-                    pathname === item.url && "bg-gray-200 font-semibold",
+                    pathname.includes(item.url) && "bg-gray-200 font-semibold",
                     "rounded-md"
                   )}
                 >

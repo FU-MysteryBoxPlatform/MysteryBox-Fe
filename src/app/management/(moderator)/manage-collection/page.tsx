@@ -1,5 +1,4 @@
 "use client";
-import FormCreateCollection from "@/app/components/FormCreateCollection";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
 import { Button } from "@/components/ui/button";
@@ -10,12 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,9 +44,6 @@ export default function Page() {
   const page = params["page"];
   const minPrice = params["minPrice"];
   const maxPrice = params["maxPrice"];
-
-  const [openCreateCollectionModal, setOpenCreateCollectionModal] =
-    useState(false);
 
   const [collections, setCollections] = useState<TCollection[]>([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -123,7 +113,9 @@ export default function Page() {
             Bộ sưu tập
             <Button
               className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
-              onClick={() => setOpenCreateCollectionModal(true)}
+              onClick={() =>
+                router.push("/management/manage-collection/create")
+              }
             >
               <PlusIcon className="h-4 w-4" />
               Tạo bộ sưu tập
@@ -174,54 +166,57 @@ export default function Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {collections.length> 0 && collections?.map((collection) => (
-                    <TableRow key={collection.collectionId}>
-                      <TableCell className="sm:table-cell">
-                        <img
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover w-12 h-12"
-                          height="64"
-                          src={collection.imagePath}
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="md:table-cell font-medium line-clamp-2">
-                        {collection.collectionName}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {collection.isActived ? "Đã bắt đầu" : "Chưa bắt đầu"}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {collection.totalItem}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {dayjs(collection.startTime).format(
-                          "YYYY-MM-DD HH:mm A"
-                        )}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {dayjs(collection.endTime).format("YYYY-MM-DD HH:mm A")}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Sửa</DropdownMenuItem>
-                            <DropdownMenuItem>Xóa</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {collections.length > 0 &&
+                    collections?.map((collection) => (
+                      <TableRow key={collection.collectionId}>
+                        <TableCell className="sm:table-cell">
+                          <img
+                            alt="Product image"
+                            className="aspect-square rounded-md object-cover w-12 h-12"
+                            height="64"
+                            src={collection.imagePath}
+                            width="64"
+                          />
+                        </TableCell>
+                        <TableCell className="md:table-cell font-medium line-clamp-2">
+                          {collection.collectionName}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {collection.isActived ? "Đã bắt đầu" : "Chưa bắt đầu"}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {collection.totalItem}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {dayjs(collection.startTime).format(
+                            "YYYY-MM-DD HH:mm A"
+                          )}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {dayjs(collection.endTime).format(
+                            "YYYY-MM-DD HH:mm A"
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                aria-haspopup="true"
+                                size="icon"
+                                variant="ghost"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>Sửa</DropdownMenuItem>
+                              <DropdownMenuItem>Xóa</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
               {collections.length > 0 ? (
@@ -243,18 +238,6 @@ export default function Page() {
           )}
         </CardContent>
       </Card>
-
-      <Dialog
-        open={openCreateCollectionModal}
-        onOpenChange={setOpenCreateCollectionModal}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tạo bộ sưu tập</DialogTitle>
-          </DialogHeader>
-          <FormCreateCollection />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

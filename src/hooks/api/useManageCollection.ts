@@ -1,5 +1,5 @@
 import { useApiMutation, useApiQuery } from "./useApi";
-import { TProductSale } from './useSale';
+import { TProductSale } from "./useSale";
 
 export type TCollection = {
   collectionId: string;
@@ -35,6 +35,28 @@ export type TCollectionDetail = {
   collection: TCollection;
   products: TProductSale[];
 };
+
+export type TCreateCollection = {
+  collectionName: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  rewards: string;
+  blindBoxPrice: number;
+  totalItem: number;
+  discountBlindBoxPrice: number;
+  productDtos: {
+    name: string;
+    description: string;
+    price: number;
+    discount: number;
+    rarityStatusId: number;
+    productStatusId: number;
+    imagePath: string;
+  }[];
+  listImage: string[];
+};
+
 export const useGetCollections = () => {
   return useApiMutation<TCollectionResponse, TCollectionRequest>(
     `collection/get-collection-by-filter`,
@@ -42,8 +64,15 @@ export const useGetCollections = () => {
   );
 };
 
-export const useGetCollectionById = (id:string) => {
+export const useGetCollectionById = (id: string) => {
   return useApiQuery<TCollectionDetail>(
     `collection/get-collection-by-id/${id}`
+  );
+};
+
+export const useCreateCollection = () => {
+  return useApiMutation<TCollection, TCreateCollection>(
+    `collection/create-new-collection`,
+    "post"
   );
 };
