@@ -33,11 +33,20 @@ export default function Page() {
     //   alert("Blind box purchased successfully!");
     // }, 2000);
     if (!collection) return;
+    if(collection.totalItem === 0) {
+      toast({
+        title: "Túi mù đã hết hàng!",
+      });
+      return;
+    }
     addToCart({
-      price: collection.discountBlindBoxPrice ?0 : collection.blindBoxPrice,
+      price:
+        collection.discountBlindBoxPrice != 0
+          ? collection.discountBlindBoxPrice
+          : collection.blindBoxPrice,
       collectionId: collection.collectionId,
       image: collection.imagePath,
-      title:  `Túi mù ${collection.collectionName}`,
+      title: `Túi mù ${collection.collectionName}`,
     });
     toast({
       title: "Túi mù đã được thêm vào giỏ hàng!",
