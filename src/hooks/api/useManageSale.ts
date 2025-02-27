@@ -11,6 +11,8 @@ export interface Sale {
   inventory: Inventory;
   quantitySold: number;
   unitPrice: number;
+  totalAmount: number;
+  totalFee: number;
   saleDate: string;
   saleStatusId: number;
   saleStatus: SaleStatus;

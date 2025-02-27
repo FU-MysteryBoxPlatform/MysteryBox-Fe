@@ -161,10 +161,6 @@ export type Order = {
   accountId: string;
   account: Account;
 };
-export type OrderDetailStatus = {
-  id: number;
-  name: string;
-};
 
 export type OrderDetail = {
   orderDetailId: string;
@@ -178,7 +174,6 @@ export type OrderDetail = {
   unitPrice: number;
   note: string;
   orderDetailStatusId: number;
-  orderDetailStatus: OrderDetailStatus;
 };
 export type PaymentMethod = {
   id: number;

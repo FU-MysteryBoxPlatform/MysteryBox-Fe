@@ -27,7 +27,7 @@ const SaleDetailsPage = () => {
       saleId: dataSale?.saleId || "",
       image: dataSale?.inventory?.product?.imagePath || "",
       title: dataSale?.inventory?.product?.name || "",
-      price: dataSale?.unitPrice || 0,
+      price: dataSale?.totalAmount || 0,
     });
     toast({
       title: "Thêm vào giỏ hàng thành công!",
@@ -67,7 +67,7 @@ const SaleDetailsPage = () => {
     );
   }
 
-  const discountedPrice = dataSale?.unitPrice || 0;
+  const discountedPrice = dataSale?.totalAmount || 0;
 
   return (
     <div className="max-w-6xl mx-auto p-6 min-h-screen">

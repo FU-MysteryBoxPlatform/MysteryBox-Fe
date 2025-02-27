@@ -34,7 +34,7 @@ export default function Page() {
     // }, 2000);
     if (!collection) return;
     addToCart({
-      price: collection.blindBoxPrice,
+      price: collection.discountBlindBoxPrice ?0 : collection.blindBoxPrice,
       collectionId: collection.collectionId,
       image: collection.imagePath,
       title:  `Túi mù ${collection.collectionName}`,
@@ -133,7 +133,7 @@ export default function Page() {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold mb-2">
-                {formatPriceVND(collection?.blindBoxPrice ?? 0)}
+                {formatPriceVND(collection?.discountBlindBoxPrice ?? 0)}
               </p>
               {(collection?.discountBlindBoxPrice ?? 0) > 0 && (
                 <p className="text-sm text-gray-500 line-through">

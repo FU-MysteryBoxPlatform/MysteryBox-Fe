@@ -35,6 +35,8 @@ export type TSaleDetailData = {
   inventory: TSaleInventory;
   quantitySold: number;
   unitPrice: number;
+  totalAmount: number;
+  totalFee: number;
   saleDate: string;
   saleStatus: {
     name: string;

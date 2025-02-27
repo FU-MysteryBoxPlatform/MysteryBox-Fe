@@ -54,7 +54,7 @@ export default function OurProductsSection() {
               ?.map((product) => (
                 <ProductCard
                   image={product.inventory?.product?.imagePath}
-                  price={product.unitPrice}
+                  price={product.totalAmount}
                   key={product.inventoryId}
                   title={product.inventory?.product?.name}
                   saleId={product.saleId}

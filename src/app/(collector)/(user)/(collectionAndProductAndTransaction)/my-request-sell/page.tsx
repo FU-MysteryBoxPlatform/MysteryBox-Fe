@@ -98,6 +98,8 @@ export default function Page() {
                   <TableHead className="w-[80px]">ID</TableHead>
                   <TableHead>Vật Phẩm</TableHead>
                   <TableHead>Giá</TableHead>
+                  <TableHead>Phí sàn</TableHead>
+                  <TableHead>Gía list sàn</TableHead>
                   <TableHead className="hidden md:table-cell">
                     Duyệt bởi
                   </TableHead>
@@ -117,6 +119,8 @@ export default function Page() {
                     </TableCell>
                     <TableCell>{item.inventory.product.name}</TableCell>
                     <TableCell>{formatPriceVND(item.unitPrice)} </TableCell>
+                    <TableCell>{formatPriceVND(item.totalFee)} </TableCell>
+                    <TableCell>{formatPriceVND(item.totalAmount)} </TableCell>
 
                     <TableCell className="hidden md:table-cell">
                       {item.updateByAccount?.firstName || "-"}

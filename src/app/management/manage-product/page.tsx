@@ -166,6 +166,9 @@ export default function Page() {
                     <TableHead>Tên sản phẩm</TableHead>
                     <TableHead>Người bán</TableHead>
                     <TableHead className="md:table-cell">Giá bán</TableHead>
+                    <TableHead className="md:table-cell">Phí sàn</TableHead>
+                    <TableHead className="md:table-cell">Tổng cộng</TableHead>
+
                     <TableHead>Trạng thái</TableHead>
 
                     <TableHead>Thao tác</TableHead>
@@ -194,6 +197,12 @@ export default function Page() {
                       </TableCell>
                       <TableCell className="md:table-cell">
                         {sale.unitPrice.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="md:table-cell">
+                        {sale.totalFee.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="md:table-cell">
+                        {sale.totalAmount.toLocaleString()}
                       </TableCell>
                       <TableCell className="md:table-cell">
                         {sale.saleStatus.name}

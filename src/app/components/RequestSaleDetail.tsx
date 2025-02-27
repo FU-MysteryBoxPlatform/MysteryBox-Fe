@@ -41,7 +41,7 @@ export default function RequestSaleDetail({
         </p>
         <p className="text-sm">
           <span className="font-semibold">Giá bán:</span>{" "}
-          {sale?.unitPrice.toLocaleString()}
+          {sale?.totalAmount.toLocaleString()}
         </p>
         <p className="text-sm">
           <span className="font-semibold">Số lượng bán:</span>{" "}
