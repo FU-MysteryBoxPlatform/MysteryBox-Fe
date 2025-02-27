@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import OurProductsSection from "../components/OurProductsSection";
 
 export default function Home() {
   return (
