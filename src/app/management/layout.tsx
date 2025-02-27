@@ -1,17 +1,17 @@
 "use client";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { GlobalContext } from "@/provider/global-provider";
-import { useContext } from "react";
-import { AdminSidebar } from "../components/AdminSidebar";
+import UserIcon from "@/components/icons/UserIcon";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import UserIcon from "@/components/icons/UserIcon";
-import { useRouter } from "next/navigation";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { GlobalContext } from "@/provider/global-provider";
 import cookie from "@/utils/cookie";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AdminSidebar } from "../components/AdminSidebar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();

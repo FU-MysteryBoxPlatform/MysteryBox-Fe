@@ -34,23 +34,25 @@ const SaleStatusBadge = ({ status }: { status: string }) => {
   > = {
     OutOfStock: {
       color: "bg-green-100 text-green-800 border-green-200",
-      icon: <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />,
+      icon: <div className="w-2 h-2 rounded-full bg-green-500 mr-1 shrink-0" />,
       name: "Đã  bán",
     },
     WaitingForApprove: {
       color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      icon: <div className="w-2 h-2 rounded-full bg-yellow-400 mr-1" />,
+      icon: (
+        <div className="w-2 h-2 rounded-full bg-yellow-400 mr-1 shrink-0" />
+      ),
       name: "Chờ duyệt",
     },
     Available: {
       color: "bg-blue-100 text-blue-800 border-blue-200",
-      icon: <div className="w-2 h-2 rounded-full bg-blue-500 mr-1" />,
+      icon: <div className="w-2 h-2 rounded-full bg-blue-500 mr-1 shrink-0" />,
       name: "Đã duyệt ",
     },
   };
 
   const { color, icon, name } = statusMap[status] || {
-    color: "bg-gray-100 text-gray-800",
+    color: "bg-gray-100 text-gray-800 shrink-0",
     icon: null,
     name: "Không xác định",
   };
@@ -75,7 +77,7 @@ export default function Page() {
   const totalPages = data?.result.totalPages ?? 0;
   return (
     <div className="p-6  rounded-lg flex-1 max-md:w-full">
-      <Card className="border shadow-sm">
+      <Card className="border shadow-sm pb-6">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />

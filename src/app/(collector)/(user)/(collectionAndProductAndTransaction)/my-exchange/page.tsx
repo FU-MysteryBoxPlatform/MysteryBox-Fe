@@ -112,20 +112,22 @@ const StatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<string, { color: string; icon: React.ReactNode }> = {
     Pending: {
       color: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      icon: <div className="w-2 h-2 rounded-full bg-yellow-400 mr-1" />,
+      icon: (
+        <div className="w-2 h-2 rounded-full bg-yellow-400 mr-1 shrink-0" />
+      ),
     },
     Accepted: {
       color: "bg-green-100 text-green-800 border-green-200",
-      icon: <div className="w-2 h-2 rounded-full bg-green-500 mr-1" />,
+      icon: <div className="w-2 h-2 rounded-full bg-green-500 mr-1 shrink-0" />,
     },
     Rejected: {
       color: "bg-red-100 text-red-800 border-red-200",
-      icon: <div className="w-2 h-2 rounded-full bg-red-500 mr-1" />,
+      icon: <div className="w-2 h-2 rounded-full bg-red-500 mr-1 shrink-0" />,
     },
   };
 
   const { color, icon } = statusMap[status] || {
-    color: "bg-gray-100 text-gray-800",
+    color: "bg-gray-100 text-gray-800 shrink-0",
     icon: null,
   };
 

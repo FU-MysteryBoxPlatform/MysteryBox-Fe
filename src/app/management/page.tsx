@@ -1,3 +1,14 @@
+"use client";
+
+import { GlobalContext } from "@/provider/global-provider";
+import { redirect } from "next/navigation";
+import { useContext } from "react";
+
 export default function Page() {
-  return <div className="p-10">Dashboard hoặc gì đó ở đây</div>;
+  const { user } = useContext(GlobalContext);
+  return redirect(
+    user?.mainRole === "ADMIN"
+      ? "/management/manage-account"
+      : "/management/manage-collection"
+  );
 }
