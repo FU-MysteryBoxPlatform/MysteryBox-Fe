@@ -123,6 +123,8 @@ export default function Page() {
     );
   }, [keyword, maxPrice, minPrice, mutateManageSale, page]);
 
+  console.log({ saleData });
+
   return (
     <div className="w-full p-6">
       <Card>
