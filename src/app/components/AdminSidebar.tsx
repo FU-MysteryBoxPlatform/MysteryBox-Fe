@@ -9,12 +9,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { ChartArea, HandCoins } from "lucide-react";
+import { GlobalContext } from "@/provider/global-provider";
+import { ChartArea, HandCoins, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useContext } from "react";
 
 // Menu items.
-const items = [
+const MOD_ITEMS = [
   {
     title: "Quản lý bộ sưu tập",
     url: "/management/manage-collection",
@@ -27,8 +29,22 @@ const items = [
   },
 ];
 
+const ADMIN_ITEMS = [
+  {
+    title: "Cài đặt hệ thống",
+    url: "/management/system-setting",
+    icon: Settings,
+  },
+  {
+    title: "Quản lý tài khoản",
+    url: "/management/manage-account",
+    icon: User,
+  },
+];
+
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { user } = useContext(GlobalContext);
 
   return (
     <Sidebar>
@@ -46,26 +62,51 @@ export function AdminSidebar() {
             </Link>
           </div>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem
-                  key={item.title}
-                  className={cn(
-                    pathname.includes(item.url) && "bg-gray-200 font-semibold",
-                    "rounded-md"
-                  )}
-                >
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon
-                        strokeWidth={pathname === item.url ? 2.5 : 1}
-                      />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            {user?.mainRole === "MODERATORS" ? (
+              <SidebarMenu>
+                {MOD_ITEMS.map((item) => (
+                  <SidebarMenuItem
+                    key={item.title}
+                    className={cn(
+                      pathname.includes(item.url) &&
+                        "bg-gray-200 font-semibold",
+                      "rounded-md"
+                    )}
+                  >
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url}>
+                        <item.icon
+                          strokeWidth={pathname === item.url ? 2.5 : 1}
+                        />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            ) : (
+              <SidebarMenu>
+                {ADMIN_ITEMS.map((item) => (
+                  <SidebarMenuItem
+                    key={item.title}
+                    className={cn(
+                      pathname.includes(item.url) &&
+                        "bg-gray-200 font-semibold",
+                      "rounded-md"
+                    )}
+                  >
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url}>
+                        <item.icon
+                          strokeWidth={pathname === item.url ? 2.5 : 1}
+                        />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
