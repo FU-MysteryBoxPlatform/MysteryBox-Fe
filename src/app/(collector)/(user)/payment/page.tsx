@@ -40,7 +40,7 @@ export type VnPayQueryParams = {
 export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setCart } = useContext(GlobalContext);
+  const { setCart, cart } = useContext(GlobalContext);
   const { toast } = useToast();
 
   // State lưu dữ liệu thanh toán
@@ -104,7 +104,7 @@ export default function Page() {
       {
         onSuccess: (data) => {
             if(data.isSuccess) {
-              setCart([]);
+              setCart((cart || []).filter((item) => item.selected === false));
             }
             toast({ title: data.messages[0] });
         },
