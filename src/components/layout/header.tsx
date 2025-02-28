@@ -199,7 +199,7 @@ const NAV_ITEMS = [
   },
   {
     name: "Trao đổi",
-    href: "/exchange",
+    href: "/marketplace",
   },
   {
     name: "Đấu giá",
