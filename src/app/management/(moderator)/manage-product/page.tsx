@@ -1,8 +1,8 @@
 "use client";
 
-import { SaleStatusBadge } from "@/app/(collector)/(user)/(collectionAndProductAndTransaction)/my-request-sell/page";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import RequestSaleDetail from "@/app/components/RequestSaleDetail";
+import SaleStatusBadge from "@/app/components/SaleStatusBadge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
