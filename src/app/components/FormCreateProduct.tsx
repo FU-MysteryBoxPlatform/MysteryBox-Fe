@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export type TProduct = {
+  productId?: string;
   name: string;
   description: string;
   price: number;
@@ -26,6 +27,8 @@ export type TProduct = {
 };
 
 type TCreateProduct = {
+  defaultProduct?: TProduct;
+  onSaveProduct: (product: TProduct) => void;
   onCreateProduct: (product: TProduct) => void;
 };
 
@@ -40,26 +43,44 @@ const CreateProductSchema = z.object({
 
 type CreateProductForm = z.infer<typeof CreateProductSchema>;
 
-export default function FormCreateProduct({ onCreateProduct }: TCreateProduct) {
-  const [image, setImage] = useState("");
+export default function FormCreateProduct({
+  defaultProduct,
+  onSaveProduct,
+  onCreateProduct,
+}: TCreateProduct) {
+  const [image, setImage] = useState(defaultProduct?.imagePath || "");
   const { handleSubmit, register, setValue, getValues, formState } =
     useForm<CreateProductForm>({
       resolver: zodResolver(CreateProductSchema),
       defaultValues: {
-        rarityStatusId: "0",
-        productStatusId: "0",
+        name: defaultProduct?.name || "",
+        description: defaultProduct?.description || "",
+        price: defaultProduct?.price?.toString() || "",
+        discount: defaultProduct?.discount?.toString() || "",
+        rarityStatusId: defaultProduct?.rarityStatusId.toString() || "0",
+        productStatusId: defaultProduct?.productStatusId.toString() || "0",
       },
     });
 
   const onsubmit = (data: CreateProductForm) => {
-    onCreateProduct({
-      ...data,
-      price: +data.price,
-      discount: +data.discount,
-      rarityStatusId: +(data.rarityStatusId || 0),
-      productStatusId: +(data.productStatusId || 0),
-      imagePath: image,
-    });
+    if (!defaultProduct)
+      onCreateProduct({
+        ...data,
+        price: +data.price,
+        discount: +data.discount,
+        rarityStatusId: +(data.rarityStatusId || 0),
+        productStatusId: +(data.productStatusId || 0),
+        imagePath: image,
+      });
+    else
+      onSaveProduct({
+        ...data,
+        price: +data.price,
+        discount: +data.discount,
+        rarityStatusId: +(data.rarityStatusId || 0),
+        productStatusId: +(data.productStatusId || 0),
+        imagePath: image,
+      });
   };
 
   return (
@@ -157,7 +178,7 @@ export default function FormCreateProduct({ onCreateProduct }: TCreateProduct) {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="0">Có sẵn</SelectItem>
-              <SelectItem value="1">Khống có sẵn</SelectItem>
+              <SelectItem value="1">Không có sẵn</SelectItem>
               <SelectItem value="2">Còn hàng</SelectItem>
               <SelectItem value="3">Hết hàng</SelectItem>
             </SelectContent>
@@ -183,7 +204,7 @@ export default function FormCreateProduct({ onCreateProduct }: TCreateProduct) {
         disabled={!image}
         onClick={handleSubmit(onsubmit)}
       >
-        Tạo vật phẩm
+        {!defaultProduct ? "Tạo vật phẩm" : "Lưu vật phẩm"}
       </Button>
     </div>
   );

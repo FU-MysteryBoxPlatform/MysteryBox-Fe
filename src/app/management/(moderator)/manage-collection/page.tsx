@@ -210,7 +210,16 @@ export default function Page() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>Sửa</DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() =>
+                                  router.push(
+                                    `/management/manage-collection/${collection.collectionId}`
+                                  )
+                                }
+                              >
+                                Sửa
+                              </DropdownMenuItem>
                               <DropdownMenuItem>Xóa</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

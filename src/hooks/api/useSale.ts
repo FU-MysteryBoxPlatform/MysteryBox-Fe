@@ -7,10 +7,12 @@ export type TProductSale = {
   price: number;
   discount: number;
   rarityStatus: {
+    id?: number;
     name: string;
     dropRate: string;
   };
   productStatus: {
+    id?: number;
     name: string;
   };
   imagePath: string;
