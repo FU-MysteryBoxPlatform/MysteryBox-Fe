@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { formatPriceVND } from "@/lib/utils";
+import RarityColorBadge from "@/app/components/RarityColorBadge";
 export default function Page() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -173,13 +174,19 @@ export default function Page() {
           <h2 className="text-white text-2xl font-bold text-center mb-4">
             Những vật phẩm bạn có thể nhận được
           </h2>
-          <div className="grid grid-cols-2  gap-4 text-white h-[650px] overflow-y-auto">
+          <div className="grid grid-cols-2  gap-4 text-white h-[650px] overflow-y-auto px-4">
             {collectionData?.result.products.map((product) => (
               <div
                 key={product.productId}
                 className="flex items-center justify-center"
               >
-                <div className="flex flex-col justify-center items-center space-y-2">
+                <div className="flex flex-col justify-center items-center space-y-2 relative">
+                  <div className=" absolute top-[10px] right-[5px]">
+                    <RarityColorBadge
+                      dropRate={product.rarityStatus.dropRate}
+                      rarityName={product.rarityStatus.name}
+                    />
+                  </div>
                   <img
                     src={product.imagePath}
                     alt={product.name}
@@ -189,7 +196,7 @@ export default function Page() {
                   <p className="text-sm font-semibold line-clamp-1">
                     {product.name}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-white-500">
                     {formatPriceVND(product.price)}
                   </p>
                 </div>

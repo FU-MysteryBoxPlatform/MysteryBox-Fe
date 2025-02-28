@@ -103,7 +103,9 @@ export default function Page() {
       { transactionId, transactionStatus: isSuccess || isVNPaySuccess ? 1 : 2 },
       {
         onSuccess: (data) => {
-            setCart([]);
+            if(data.isSuccess) {
+              setCart([]);
+            }
             toast({ title: data.messages[0] });
         },
       }

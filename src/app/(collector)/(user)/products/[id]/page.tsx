@@ -33,7 +33,7 @@ export default function Page() {
     //   alert("Blind box purchased successfully!");
     // }, 2000);
     if (!collection) return;
-    if(collection.totalItem === 0) {
+    if (collection.totalItem === 0) {
       toast({
         title: "Túi mù đã hết hàng!",
       });
