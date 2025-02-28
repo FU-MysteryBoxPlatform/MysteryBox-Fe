@@ -42,13 +42,13 @@ export default function Page() {
 
   const renderOrderStatus = (status: number) => {
     switch (status) {
+      case 0:
+        return "Chờ xác nhận";
       case 1:
-        return "Đã xác nhận";
-      case 2:
         return "Đang xử lý";
-      case 3:
+      case 2:
         return "Hoàn thành";
-      case 4:
+      case 3:
         return "Đã hủy";
       default:
         return "Không xác định";
@@ -56,13 +56,13 @@ export default function Page() {
   };
   const renderColorOrderStatus = (status: number) => {
     switch (status) {
-      case 1:
+      case 0:
         return "text-orange-400";
-      case 2:
+      case 1:
         return "text-blue-700";
-      case 3:
+      case 2:
         return "text-green-500";
-      case 4:
+      case 3:
         return "text-red-500";
       default:
         return "text-gray-500";
