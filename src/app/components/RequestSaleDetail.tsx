@@ -2,6 +2,8 @@ import axiosClient from "@/axios-client";
 import { Button } from "@/components/ui/button";
 import { Sale } from "@/hooks/api/useManageSale";
 import { toast } from "@/hooks/use-toast";
+import { GlobalContext } from "@/provider/global-provider";
+import { useContext } from "react";
 
 export default function RequestSaleDetail({
   sale,
@@ -10,10 +12,11 @@ export default function RequestSaleDetail({
   sale: Sale;
   onApprove: () => void;
 }) {
+  const { user } = useContext(GlobalContext);
   const handleApproveSale = async () => {
     try {
       const response = await axiosClient.put(
-        `/sale/approved-sale?saleId=${sale.saleId}`
+        `/sale/approved-sale?saleId=${sale.saleId}&accountId=${user?.id}`
       );
 
       if (response.data.isSuccess) {
