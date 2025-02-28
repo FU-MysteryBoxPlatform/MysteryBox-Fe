@@ -1,5 +1,6 @@
 "use client";
 
+import { SaleStatusBadge } from "@/app/(collector)/(user)/(collectionAndProductAndTransaction)/my-request-sell/page";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import RequestSaleDetail from "@/app/components/RequestSaleDetail";
 import { Button } from "@/components/ui/button";
@@ -204,8 +205,8 @@ export default function Page() {
                       <TableCell className="md:table-cell">
                         {sale.totalAmount.toLocaleString()}
                       </TableCell>
-                      <TableCell className="md:table-cell">
-                        {sale.saleStatus.name}
+                      <TableCell className="">
+                        <SaleStatusBadge status={sale.saleStatus.name} />
                       </TableCell>
                       <TableCell>
                         <Button

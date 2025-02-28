@@ -27,7 +27,7 @@ import Paginator from "@/app/components/Paginator";
 import Link from "next/link";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 
-const SaleStatusBadge = ({ status }: { status: string }) => {
+export const SaleStatusBadge = ({ status }: { status: string }) => {
   const statusMap: Record<
     string,
     { color: string; icon: React.ReactNode; name: string }
@@ -59,7 +59,7 @@ const SaleStatusBadge = ({ status }: { status: string }) => {
 
   return (
     <span
-      className={`flex items-center px-2 py-1 rounded-full text-xs font-medium border ${color}`}
+      className={`flex w-fit items-center px-2 py-1 rounded-full text-xs font-medium border ${color}`}
     >
       {icon}
       {name}
