@@ -33,7 +33,7 @@ export default function Page() {
     //   alert("Blind box purchased successfully!");
     // }, 2000);
     if (!collection) return;
-    if (collection.totalItem === 0) {
+    if (collection.totalItem === 0 || !collection.isActived) {
       toast({
         title: "Túi mù đã hết hàng!",
       });
@@ -154,7 +154,11 @@ export default function Page() {
               <Button
                 className="bg-red-600"
                 onClick={handleBuyBlindBox}
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  collection?.totalItem === 0 ||
+                  !collection?.isActived
+                }
               >
                 {isLoading ? "Processing..." : "Mua túi mù"}
               </Button>
