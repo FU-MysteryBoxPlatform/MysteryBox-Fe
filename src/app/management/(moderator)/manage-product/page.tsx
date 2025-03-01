@@ -96,7 +96,7 @@ export default function Page() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setSaleData(data.result);
+            setSaleData(data.result.items);
           }
         },
       }
@@ -116,7 +116,7 @@ export default function Page() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setSaleData(data.result);
+            setSaleData(data.result.items);
           }
         },
       }
