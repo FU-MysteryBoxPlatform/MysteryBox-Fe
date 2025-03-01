@@ -56,7 +56,6 @@ export default function TradePage({ params }: { params: { id: string } }) {
 
   const handleSubmitTrade = () => {
     setTradeSubmitted(true);
-    // In a real app, you would submit the trade to your backend here
   };
 
   const getRarityColor = (item: {
