@@ -247,7 +247,7 @@ export default function InventoryCard({
             disabled={isPending}
             onClick={handleSubmit(onSubmit)}
           >
-            {isPending ? <LoadingIndicator /> : "Xác nhận bán"}
+            {isPending || isLoading ? <LoadingIndicator /> : "Xác nhận bán"}
           </Button>
         </DialogContent>
       </Dialog>
