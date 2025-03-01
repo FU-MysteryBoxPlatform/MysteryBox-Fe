@@ -1,5 +1,5 @@
 import { TAccount } from "@/types";
-import { useApiMutation } from "./useApi";
+import { useApiMutation, useApiQuery } from "./useApi";
 
 export type TRegisterData = {
   email: string;
@@ -70,4 +70,8 @@ export const useResetPassword = () => {
     "/account/forgot-password",
     "put"
   );
+};
+
+export const useGetAccountById = (id: string) => {
+  return useApiQuery<TAccount>(`/account/get-account-by-user-id/${id}`);
 };
