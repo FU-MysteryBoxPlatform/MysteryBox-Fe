@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16">
         <div className="my-10">
           <div className="flex max-md:flex-col items-start gap-6">
-            <div className="w-[200px]  p-4 border border-gray-300 rounded-lg grid gap-2">
+            <div className="md:w-[200px] w-full  p-4 border border-gray-300 rounded-lg grid gap-2">
               <div className="flex flex-col items-center gap-2">
                 <img
                   src={user?.avatar}

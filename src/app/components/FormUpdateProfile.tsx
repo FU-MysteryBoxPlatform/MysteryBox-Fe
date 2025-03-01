@@ -56,7 +56,9 @@ export default function FormUpdateProfile() {
         firstName: data.firstName,
         lastName: data.lastName,
         gender: data.gender === "1" ? true : false,
-        dob: dob?.toISOString() || dayjs().toISOString(),
+        dob: dob
+          ? dayjs(dob).startOf("day").toISOString()
+          : dayjs().startOf("day").toISOString(),
         image: image,
       },
       {
@@ -69,12 +71,11 @@ export default function FormUpdateProfile() {
       }
     );
   };
-
   useEffect(() => {
     setValue("firstName", user?.firstName || "");
     setValue("lastName", user?.lastName || "");
     setValue("gender", user?.gender ? "1" : "0");
-    setDob(new Date(user?.dob || ""));
+    setDob(user?.dob ? new Date(user.dob) : undefined);
     setImage(user?.avatar || "");
   }, [setValue, user]);
 
@@ -131,22 +132,21 @@ export default function FormUpdateProfile() {
         </Select>
       </div>
       <div className="flex flex-col space-y-1.5">
-        <Label htmlFor="name">Ngày sinh</Label>
-        <Popover>
-          <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-            <p>{dayjs(dob).format("DD/MM/YYYY")}</p>
-            <CalendarIcon />
-          </PopoverTrigger>
-          <PopoverContent>
-            <Calendar
-              mode="single"
-              selected={dob}
-              onSelect={setDob}
-              className="rounded-md border w-fit"
-            />
-          </PopoverContent>
-        </Popover>
+        <Label htmlFor="dob">Ngày sinh</Label>
+        <div className="relative">
+          <Input
+            id="dob"
+            type="date"
+            value={dob ? dayjs(dob).format("YYYY-MM-DD") : ""}
+            onChange={(e) =>
+              setDob(e.target.value ? new Date(e.target.value) : undefined)
+            }
+            className="w-full"
+          />
+         
+        </div>
       </div>
+
       <Button
         type="submit"
         className="col-span-2 bg-[#E12E43] text-white hover:bg-[#B71C32]"
