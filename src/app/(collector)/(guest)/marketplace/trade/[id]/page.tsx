@@ -34,16 +34,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import RarityColorBadge from "@/app/components/RarityColorBadge";
 import { useGetExchangeRequestById } from "@/hooks/api/useExchange";
+import { useSearchParams } from "next/navigation";
+import queryString from "query-string";
 
-export default function TradePage({ params }: { params: { id: string } }) {
-  const tradeItem =
-    tradeItems.find((item) => item.id === params.id) || tradeItems[0];
+export default function TradePage() {
+  const searchParams = useSearchParams();
+  const params = queryString.parse(searchParams.toString());
+  const id = params["id"] as string;
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [tradeSubmitted, setTradeSubmitted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemHover, setItemHover] = useState<string | null>(null);
-  const { data } = useGetExchangeRequestById(params.id);
-  console.log(data);
+  const { data } = useGetExchangeRequestById(id);
   const tradeItemDetail = data?.result;
   const toggleItemSelection = (itemId: string) => {
     if (selectedItems.includes(itemId)) {
@@ -207,9 +209,7 @@ export default function TradePage({ params }: { params: { id: string } }) {
                     </DialogTitle>
                     <DialogDescription className="text-red-100">
                       Chọn vật phẩm từ kho đồ của bạn để đổi lấy{" "}
-                      <span className="font-semibold text-white">
-                        {tradeItem.name}
-                      </span>
+                      <span className="font-semibold text-white"></span>
                     </DialogDescription>
                   </DialogHeader>
                   {tradeSubmitted ? (
@@ -222,10 +222,8 @@ export default function TradePage({ params }: { params: { id: string } }) {
                       </h3>
                       <p className="text-center text-gray-600 max-w-md">
                         Đề nghị giao dịch của bạn đã được gửi đến{" "}
-                        <span className="font-semibold text-red-700">
-                          {tradeItem.owner}
-                        </span>
-                        . Bạn sẽ nhận được thông báo khi họ phản hồi.
+                        <span className="font-semibold text-red-700"></span>.
+                        Bạn sẽ nhận được thông báo khi họ phản hồi.
                       </p>
                       <Button
                         className="mt-6 bg-gray-200 hover:bg-gray-300 text-gray-800"
