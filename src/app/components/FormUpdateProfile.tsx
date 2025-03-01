@@ -13,17 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { ImageUploader } from "./ImageUpload";
 import { useUpdateAccount } from "@/hooks/api/useAccount";
 import dayjs from "dayjs";
 import { toast } from "@/hooks/use-toast";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
 
 const UpdateProfileSchema = z.object({
   firstName: z.string().min(1, "Vui lòng nhập tên"),
