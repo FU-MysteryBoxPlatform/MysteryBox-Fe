@@ -157,9 +157,7 @@ const TradeDetailsModal = ({
   offers,
   confirm,
 }: TradeDetailsModalProps) => {
-  const [selectedOffer, setSelectedOffer] = useState<OfferExchange | null>(
-    null
-  );
+
   const [activeTab, setActiveTab] = useState("offers");
 
   const requestItem = exchangeRequest.requestInventoryItem;
@@ -282,7 +280,6 @@ const TradeDetailsModal = ({
 };
 
 export default function Page() {
-  const [tab, setTab] = useState("requests");
   const { user } = useContext(GlobalContext);
   const [selectedExchange, setSelectedExchange] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
