@@ -223,26 +223,9 @@ export type InventoryItem = {
   collection: Collection | null;
   accquiredDate: string;
   itemStatusId: number;
-  itemStatus: any | null;
+  itemStatus: unknown | null;
 };
 
-export type ExchangeRequest = {
-  exchangeRequest: any;
-  offerExchangeId: any;
-  exchangeRequestId: string;
-  requestInventoryItemId: string;
-  requestInventoryItem: InventoryItem;
-  offeredInventoryItemId: string | null;
-  offeredInventoryItem: any | null;
-  statusId: number;
-  status: any | null;
-  createDate: string;
-  updateDate: string;
-  createBy: string;
-  createByAccount: Account;
-  updateBy: string | null;
-  updateByAccount: any | null;
-};
 
 export interface ExchangeRequest {
   exchangeRequestId: string;
@@ -251,14 +234,14 @@ export interface ExchangeRequest {
   offeredInventoryItemId: string | null;
   offeredInventoryItem: InventoryItem | null;
   statusId: number;
-  status: any | null;
+  status: unknown | null;
   content: string | null;
   createDate: string;
   updateDate: string;
   createBy: string;
   createByAccount: Account;
   updateBy: string | null;
-  updateByAccount: any | null;
+  updateByAccount: unknown | null;
 }
 
 export interface OfferExchange {
@@ -268,13 +251,13 @@ export interface OfferExchange {
   offeredInventoryItemId: string;
   offeredInventoryItem: InventoryItem;
   offerExchangeStatusId: number;
-  offerExchangeStatus: any | null;
+  offerExchangeStatus: unknown | null;
   content: string;
   createDate: string;
   updateDate: string;
   createBy: string;
   createByAccount: Account;
   updateBy: string | null;
-  updateByAccount: any | null;
+  updateByAccount: unknown | null;
 }
 

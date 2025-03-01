@@ -71,7 +71,7 @@ export default function TradePage({ params }: { params: { id: string } }) {
       Common: "bg-gray-200 text-gray-800",
       Uncommon: "bg-green-100 text-green-800",
       Rare: "bg-blue-100 text-blue-800",
-      Epic: "bg-purple-100 text-purple-800",
+      Epic: "bg-purple-100 text-purple-80 0",
       Legendary: "bg-orange-100 text-orange-800",
     };
 
