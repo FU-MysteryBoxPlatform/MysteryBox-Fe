@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useGetAllExchangeRequest } from "@/hooks/api/useExchange";
@@ -6,7 +6,7 @@ import RarityColorBadge from "@/app/components/RarityColorBadge";
 
 export default function Home() {
   const { data, isPending } = useGetAllExchangeRequest(1, 10);
-
+  if (isPending) return <div>Loading...</div>;
   return (
     <div className="max-w-6xl mx-auto p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">

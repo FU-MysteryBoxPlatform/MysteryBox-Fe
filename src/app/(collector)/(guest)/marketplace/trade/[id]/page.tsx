@@ -9,7 +9,6 @@ import {
   Sword,
   Star,
   Clock,
-  AlertTriangle,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,7 @@ export default function TradePage({ params }: { params: { id: string } }) {
   };
 
   const getRarityColor = (item: {
-    id: any;
+    id: string;
     name?: string;
     description?: string;
     category?: string;

@@ -2,7 +2,7 @@
 
 import { useGetAccountById } from "@/hooks/api/useAuth";
 import { GlobalContext } from "@/provider/global-provider";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useContext, useEffect } from "react";
 
@@ -10,6 +10,7 @@ export default function Page() {
   const { setUser } = useContext(GlobalContext);
   const searchParams = useSearchParams();
   const params = queryString.parse(searchParams.toString());
+  const route = useRouter();
   const authen = params["authen"];
   const page = params["page"];
 
@@ -19,7 +20,9 @@ export default function Page() {
     if (data) {
       setUser(data.result);
     }
+    route.push(`/${page}`);
   }, [data, setUser]);
 
+  if (isLoading) return <div>Loading...</div>;
   return <div>Authentication</div>;
 }
