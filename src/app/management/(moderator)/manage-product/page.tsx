@@ -178,7 +178,7 @@ export default function Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {saleData?.map((sale) => (
+                  {saleData?.length> 0 &&  saleData?.map((sale) => (
                     <TableRow key={sale.saleId}>
                       <TableCell className="sm:table-cell">
                         <img

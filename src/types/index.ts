@@ -213,3 +213,31 @@ export type PaymentHistory = {
   walletTransactionId: string | null;
   walletTransaction: unknown | null;
 };
+export type InventoryItem = {
+  inventoryId: string;
+  productId: string;
+  product: Product;
+  accountId: string;
+  account: Account;
+  collectionId: string | null;
+  collection: Collection | null;
+  accquiredDate: string;
+  itemStatusId: number;
+  itemStatus: any | null;
+};
+
+export type ExchangeRequest = {
+  exchangeRequestId: string;
+  requestInventoryItemId: string;
+  requestInventoryItem: InventoryItem;
+  offeredInventoryItemId: string | null;
+  offeredInventoryItem: any | null;
+  statusId: number;
+  status: any | null;
+  createDate: string;
+  updateDate: string;
+  createBy: string;
+  createByAccount: Account;
+  updateBy: string | null;
+  updateByAccount: any | null;
+};

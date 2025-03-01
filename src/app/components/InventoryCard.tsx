@@ -29,6 +29,7 @@ import { useContext, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import LoadingIndicator from "./LoadingIndicator";
+import { useCreateExchangeRequest } from "@/hooks/api/useExchange";
 
 export type InventoryCardProps = {
   id: string;
@@ -67,7 +68,8 @@ export default function InventoryCard({
 
   const { data } = useGetCollectionDetail(collectionId);
   const { mutate: mutateSellInventory, isPending } = useSellInventory();
-
+  const { mutate: mutateCreateExchange, isPending: isLoading } =
+    useCreateExchangeRequest(id);
   const collectionData = useMemo(() => data?.result, [data]);
 
   console.log({ collectionData });
@@ -127,7 +129,30 @@ export default function InventoryCard({
                     Bán
                   </DropdownMenuItem>
                 )}
-                {!collectionId && <DropdownMenuItem>Trao đổi</DropdownMenuItem>}
+                {!collectionId && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      mutateCreateExchange(
+                        {},
+                        {
+                          onSuccess: (data) => {
+                            if (data.isSuccess) {
+                              toast({
+                                title: "Tạo yêu cầu trao đổi thành công!",
+                              });
+                            } else {
+                              toast({
+                                title: "Tạo yêu cầu trao đổi thất bại!",
+                              });
+                            }
+                          },
+                        }
+                      );
+                    }}
+                  >
+                    Trao đổi
+                  </DropdownMenuItem>
+                )}
 
                 {collectionId && (
                   <DropdownMenuItem

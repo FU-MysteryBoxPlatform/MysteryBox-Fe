@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -33,6 +33,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import RarityColorBadge from "@/app/components/RarityColorBadge";
+import { useGetExchangeRequestById } from "@/hooks/api/useExchange";
 
 export default function TradePage({ params }: { params: { id: string } }) {
   const tradeItem =
@@ -41,7 +43,9 @@ export default function TradePage({ params }: { params: { id: string } }) {
   const [tradeSubmitted, setTradeSubmitted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [itemHover, setItemHover] = useState<string | null>(null);
-
+  const { data } = useGetExchangeRequestById(params.id);
+  console.log(data);
+  const tradeItemDetail = data?.result;
   const toggleItemSelection = (itemId: string) => {
     if (selectedItems.includes(itemId)) {
       setSelectedItems(selectedItems.filter((id) => id !== itemId));
@@ -55,7 +59,15 @@ export default function TradePage({ params }: { params: { id: string } }) {
     // In a real app, you would submit the trade to your backend here
   };
 
-  const getRarityColor = (item: { id: any; name?: string; description?: string; category?: string; image?: string; owner?: string; trades?: number; }) => {
+  const getRarityColor = (item: {
+    id: any;
+    name?: string;
+    description?: string;
+    category?: string;
+    image?: string;
+    owner?: string;
+    trades?: number;
+  }) => {
     const rarityMap = {
       Common: "bg-gray-200 text-gray-800",
       Uncommon: "bg-green-100 text-green-800",
@@ -67,7 +79,9 @@ export default function TradePage({ params }: { params: { id: string } }) {
     // Assign rarity based on item id for demo purposes
     const itemId = parseInt(item.id.replace("inv", "")) || parseInt(item.id);
     const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
-    const rarity: keyof typeof rarityMap = rarities[itemId % 5] as keyof typeof rarityMap;
+    const rarity: keyof typeof rarityMap = rarities[
+      itemId % 5
+    ] as keyof typeof rarityMap;
 
     return {
       rarity,
@@ -79,29 +93,34 @@ export default function TradePage({ params }: { params: { id: string } }) {
     <div className="max-w-6xl mx-auto p-6 min-h-screen ">
       <div className="mb-6">
         <Link
-          href="/"
+          href="/marketplace"
           className="flex items-center text-sm text-red-700 hover:text-red-900 mb-4 transition-colors duration-200"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Quay Lại Thị Trường
         </Link>
         <h1 className="text-3xl font-bold text-red-900 flex items-center">
-          {tradeItem.name}
+          {tradeItemDetail?.requestInventoryItem.product.name}
           <Badge className="ml-3 bg-red-700 hover:bg-red-800 text-white">
-            {tradeItem.category}
+            {tradeItemDetail?.requestInventoryItem.collection?.collectionName}
           </Badge>
         </h1>
         <div className="flex items-center mt-2">
-          <p className="text-gray-600">Đăng bởi {tradeItem.owner}</p>
-          <div className="ml-4 flex items-center text-yellow-600">
-            <Star className="h-4 w-4 fill-yellow-500 stroke-yellow-500 mr-1" />
-            <span className="text-sm font-medium">
-              Giao dịch thành công: {tradeItem.trades}
-            </span>
-          </div>
+          <p className="text-gray-600">
+            Đăng bởi {tradeItemDetail?.createByAccount.firstName}
+          </p>
+
           <div className="ml-4 flex items-center text-gray-500">
             <Clock className="h-4 w-4 mr-1" />
-            <span className="text-sm">Đăng 2 giờ trước</span>
+            <span className="text-sm">
+              {tradeItemDetail?.createDate
+                ? `${Math.floor(
+                    (new Date().getTime() -
+                      new Date(tradeItemDetail.createDate).getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )} days ago`
+                : "Unknown date"}
+            </span>
           </div>
         </div>
       </div>
@@ -110,21 +129,24 @@ export default function TradePage({ params }: { params: { id: string } }) {
         <div className="rounded-lg overflow-hidden shadow-lg relative group">
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <img
-            src={tradeItem.image || "/mock-images/image2.png"}
-            alt={tradeItem.name}
+            src={
+              tradeItemDetail?.requestInventoryItem.product.imagePath ||
+              "/mock-images/image2.png"
+            }
+            alt={tradeItemDetail?.requestInventoryItem.product.name}
             className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute top-4 right-4 px-3 py-1 rounded-full">
-            <Badge
-              className={`${getRarityColor(tradeItem).classes} font-semibold`}
-            >
-              {getRarityColor(tradeItem).rarity}
-            </Badge>
-          </div>
-          <div className="absolute bottom-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Badge className="bg-black/70 text-white hover:bg-black/60">
-              Nhấp để phóng to
-            </Badge>
+            <RarityColorBadge
+              dropRate={
+                tradeItemDetail?.requestInventoryItem.product.rarityStatus
+                  .dropRate || "Unknown"
+              }
+              rarityName={
+                tradeItemDetail?.requestInventoryItem.product.rarityStatus
+                  .name || "Unknown"
+              }
+            />
           </div>
         </div>
 
@@ -146,104 +168,8 @@ export default function TradePage({ params }: { params: { id: string } }) {
                   Mô Tả
                 </h3>
                 <p className="text-gray-600 bg-red-50 p-3 rounded-md border-l-2 border-red-700">
-                  {tradeItem.description}
+                  {tradeItemDetail?.requestInventoryItem.product.description}
                 </p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-red-900 text-lg mb-2 flex items-center">
-                  <Shield className="mr-2 h-4 w-4 text-red-700" />
-                  Chỉ Số
-                </h3>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  {tradeItem.category === "Weapon" && (
-                    <>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <Sword className="h-5 w-5 mr-3 text-red-700" />
-                        <div>
-                          <div className="text-sm text-gray-500">
-                            Sát thương
-                          </div>
-                          <div className="font-semibold">45-60</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <Shield className="h-5 w-5 mr-3 text-red-700" />
-                        <div>
-                          <div className="text-sm text-gray-500">Độ bền</div>
-                          <div className="font-semibold">120/120</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <div>
-                          <div className="text-sm text-gray-500">Hiệu ứng</div>
-                          <div className="font-semibold">+15% vs Undead</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <AlertTriangle className="h-5 w-5 mr-3 text-yellow-500" />
-                        <div>
-                          <div className="text-sm text-gray-500">Yêu cầu</div>
-                          <div className="font-semibold">Cấp độ 12+</div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  {tradeItem.category === "Armor" && (
-                    <>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <Shield className="h-5 w-5 mr-3 text-red-700" />
-                        <div>
-                          <div className="text-sm text-gray-500">Phòng thủ</div>
-                          <div className="font-semibold">35</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <Shield className="h-5 w-5 mr-3 text-red-700" />
-                        <div>
-                          <div className="text-sm text-gray-500">Độ bền</div>
-                          <div className="font-semibold">85/85</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md col-span-2">
-                        <div>
-                          <div className="text-sm text-gray-500">
-                            Kháng hiệu ứng
-                          </div>
-                          <div className="font-semibold">
-                            +20% Fire Resistance
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  {tradeItem.category === "Consumable" && (
-                    <>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md col-span-2">
-                        <div>
-                          <div className="text-sm text-gray-500">Hiệu ứng</div>
-                          <div className="font-semibold">
-                            {tradeItem.description.split(".")[0]}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <Clock className="h-5 w-5 mr-3 text-red-700" />
-                        <div>
-                          <div className="text-sm text-gray-500">Thời gian</div>
-                          <div className="font-semibold">30 giây</div>
-                        </div>
-                      </div>
-                      <div className="flex items-center bg-gray-50 p-3 rounded-md">
-                        <AlertTriangle className="h-5 w-5 mr-3 text-yellow-500" />
-                        <div>
-                          <div className="text-sm text-gray-500">Làm mát</div>
-                          <div className="font-semibold">60 giây</div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
               </div>
 
               <Separator className="my-2" />
@@ -256,7 +182,7 @@ export default function TradePage({ params }: { params: { id: string } }) {
                 <div className="bg-red-50 p-4 rounded-lg border border-red-100">
                   <p className="text-gray-700">
                     <span className="font-semibold text-red-900">
-                      {tradeItem.owner}
+                      {tradeItemDetail?.createByAccount.firstName}
                     </span>{" "}
                     đang muốn giao dịch vật phẩm này. Hãy đưa ra đề nghị bằng
                     cách chọn vật phẩm từ kho đồ của bạn.
@@ -577,7 +503,7 @@ export default function TradePage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <div className="mb-8">
+      {/* <div className="mb-8">
         <Card className="shadow-lg border-none overflow-hidden">
           <CardHeader className=" text-white">
             <CardTitle className="text-lg">Gợi Ý Vật Phẩm Tương Tự</CardTitle>
@@ -621,7 +547,7 @@ export default function TradePage({ params }: { params: { id: string } }) {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }
