@@ -40,11 +40,18 @@ export default function Header() {
         <img src="/logo.png" alt="logo" className="w-[134px]" />
 
         <div className="hidden lg:flex items-center gap-8">
-          {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.map((item, i) => (
             <Link
               key={item.name}
               href={item.href}
-              className="text-gray-700 font-semibold hover:text-[#E12E43] transition-all"
+              className={cn(
+                "text-gray-700 font-semibold hover:text-[#E12E43] transition-all",
+                pathname === "/" && i === 0 && "text-[#E12E43]",
+                pathname !== "/" &&
+                  i !== 0 &&
+                  pathname.includes(item.href) &&
+                  "text-[#E12E43]"
+              )}
             >
               {item.name}
             </Link>

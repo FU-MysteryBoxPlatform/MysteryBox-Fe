@@ -149,8 +149,13 @@ export type TManageSaleRequest = {
   endTime?: string;
 };
 
+export type TSaleResponse = {
+  totalPages: number;
+  items: Sale[];
+};
+
 export const useManageSale = () => {
-  return useApiMutation<Sale[], TManageSaleRequest>(
+  return useApiMutation<TSaleResponse, TManageSaleRequest>(
     `sale/get-sale-by-filter`,
     "post"
   );

@@ -18,7 +18,7 @@ export default function OurProductsSection() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setSaleData(data.result);
+            setSaleData(data.result.items);
             setIsLoading(false);
           }
         },
@@ -58,8 +58,6 @@ export default function OurProductsSection() {
                   key={product.inventoryId}
                   title={product.inventory?.product?.name}
                   saleId={product.saleId}
-
-                  
                 />
               ))}
         </div>
