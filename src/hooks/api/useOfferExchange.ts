@@ -24,3 +24,14 @@ export const useGetAllOfferByExchangeId = (
 export const useConfirmAcceptedOfffer = () => {
   return useApiMutation(`/offer/confirm-accepted-offer`, "post");
 };
+
+export const useCreateOfferExchange = () => {
+  return useApiMutation<
+    {
+      exchangeId: string;
+      inventoryId: string;
+      content?: string;
+    },
+    unknown
+  >("/offer/create-offer-exchange", "post");
+};

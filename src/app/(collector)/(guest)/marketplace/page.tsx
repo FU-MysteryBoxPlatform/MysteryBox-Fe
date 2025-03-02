@@ -18,7 +18,7 @@ export default function Home() {
             href={`/marketplace/trade/${item.exchangeRequestId}`}
             key={item.exchangeRequestId}
           >
-            <Card className="overflow-hidden transition-all hover:shadow-md">
+            <Card className="overflow-hidden transition-all hover:shadow-md h-full">
               <div className="aspect-square relative">
                 <img
                   src={
@@ -26,7 +26,7 @@ export default function Home() {
                     "/mock-images/image2.png"
                   }
                   alt={item.requestInventoryItem.product.name}
-                  className="object-cover w-full h-full"
+                  className="object-cover w-full h-[250px]"
                 />
                 <div className="absolute top-2 right-2">
                   <RarityColorBadge
@@ -47,7 +47,7 @@ export default function Home() {
                   {item.requestInventoryItem.product.description}
                 </p>
               </CardContent>
-              <CardFooter className="p-4 pt-0 flex justify-between bg-white">
+              <CardFooter className="p-4 pt-0 flex justify-between bg-white mt-auto">
                 <div className="text-sm">
                   <span className="text-gray-500">Người đăng: </span>
                   {item.createByAccount.firstName}

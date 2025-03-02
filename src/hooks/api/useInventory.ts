@@ -82,6 +82,11 @@ export type TInventoryResponse = {
   };
 };
 
+export type TGetAllInventoryResponse = {
+  items: Inventory[];
+  totalPages: number;
+};
+
 export const useSellInventory = () => {
   return useApiMutation<string, TSellInventory>("/order/sell-item", "post");
 };
@@ -89,6 +94,13 @@ export const useSellInventory = () => {
 export const useGetInventory = () => {
   return useApiMutation<TInventoryResponse, TGetInventory>(
     "/inventory/get-list-product-in-inventory",
+    "post"
+  );
+};
+
+export const useGetAllInventory = () => {
+  return useApiMutation<TGetAllInventoryResponse, TGetInventory>(
+    "/inventory/get-all-item-in-inventory",
     "post"
   );
 };
