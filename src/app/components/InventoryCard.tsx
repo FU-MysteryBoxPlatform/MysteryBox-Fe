@@ -69,7 +69,7 @@ export default function InventoryCard({
   const { data } = useGetCollectionDetail(collectionId);
   const { mutate: mutateSellInventory, isPending } = useSellInventory();
   const { mutate: mutateCreateExchange, isPending: isLoading } =
-    useCreateExchangeRequest(id);
+    useCreateExchangeRequest();
   const collectionData = useMemo(() => data?.result, [data]);
 
   console.log({ collectionData });
@@ -133,7 +133,10 @@ export default function InventoryCard({
                   <DropdownMenuItem
                     onClick={() => {
                       mutateCreateExchange(
-                        {},
+                        {
+                          inventoryId: id,
+                          content: "Yêu cầu trao đổi vật phẩm",
+                        },
                         {
                           onSuccess: (data) => {
                             if (data.isSuccess) {

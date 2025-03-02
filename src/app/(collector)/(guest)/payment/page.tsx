@@ -49,12 +49,17 @@ export default function Page() {
   const [isReady, setIsReady] = useState(false);
 
   // Kiểm tra trạng thái thanh toán thành công
-  const isSuccess = searchParams.get("resultCode") === "0";
+  const isSuccess =
+    searchParams.get("resultCode") === "0" ||
+    searchParams.get("resultCode") === "7002";
   const isVNPaySuccess = searchParams.get("vnp_ResponseCode") === "00";
-
+  const isMomo = searchParams.get("partnerCode") === "MOMO";
   // Lấy ID giao dịch
   const transactionId = data.extraData || dataVNPay.vnp_TxnRef || "";
-  const checkout = useUpdateTransaction(transactionId, isSuccess || isVNPaySuccess ? 1 : 2);
+  const checkout = useUpdateTransaction(
+    transactionId,
+    isSuccess || isVNPaySuccess ? 1 : 2
+  );
 
   // Lấy dữ liệu từ URL
   useEffect(() => {
@@ -103,10 +108,10 @@ export default function Page() {
       { transactionId, transactionStatus: isSuccess || isVNPaySuccess ? 1 : 2 },
       {
         onSuccess: (data) => {
-            if(data.isSuccess) {
-              setCart((cart || []).filter((item) => item.selected === false));
-            }
-            toast({ title: data.messages[0] });
+          if (data.isSuccess) {
+            setCart((cart || []).filter((item) => item.selected === false));
+          }
+          toast({ title: data.messages[0] });
         },
       }
     );
@@ -141,7 +146,7 @@ export default function Page() {
               <p>
                 Phương thức thanh toán:{" "}
                 <span className="font-semibold">
-                  {data.partnerCode || dataVNPay ? "VNPAY" : "N/A"}
+                  {isMomo ? "MOMO" : "VNPAY"}
                 </span>
               </p>
             </div>

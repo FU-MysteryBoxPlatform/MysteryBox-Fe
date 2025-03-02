@@ -5,9 +5,14 @@ export type ExchangeResponse = {
   items: ExchangeRequest[];
   totalPages: number;
 };
-export const useCreateExchangeRequest = (inventoryId: string) => {
-  return useApiMutation<ExchangeRequest, unknown>(
-    "/exchange/create-exchange-request?inventoryId=" + inventoryId,
+export type ExchangeRequestApi = {
+  inventoryId: string;
+  content: string;
+};
+
+export const useCreateExchangeRequest = () => {
+  return useApiMutation<ExchangeRequest, ExchangeRequestApi>(
+    "/exchange/create-exchange-request",
     "post"
   );
 };
