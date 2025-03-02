@@ -28,18 +28,15 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetExchangeRequestById } from "@/hooks/api/useExchange";
 import { Inventory, useGetAllInventory } from "@/hooks/api/useInventory";
-import { cn } from "@/lib/utils";
-import { GlobalContext } from "@/provider/global-provider";
-import { useSearchParams } from "next/navigation";
-import queryString from "query-string";
 import { useCreateOfferExchange } from "@/hooks/api/useOfferExchange";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
+import { useParams } from "next/navigation";
 
 export default function TradePage() {
   const { user } = useContext(GlobalContext);
-  const searchParams = useSearchParams();
-  const params = queryString.parse(searchParams.toString());
-  const id = params["id"] as string;
+  const { id } = useParams();
 
   const [selectedItem, setSelectedItem] = useState<string>();
   const [tradeSubmitted, setTradeSubmitted] = useState(false);
@@ -51,7 +48,7 @@ export default function TradePage() {
 
   const { mutate: mutateGetAllInventory } = useGetAllInventory();
   const { mutate: mutateCreateOfferExchange } = useCreateOfferExchange();
-  const { data } = useGetExchangeRequestById(id);
+  const { data } = useGetExchangeRequestById(id as string);
   const tradeItemDetail = data?.result;
   const toggleItemSelection = (itemId: string) => {
     setSelectedItem(itemId);
