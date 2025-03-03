@@ -46,6 +46,7 @@ import {
 import { Tabs as TabsComponent } from "@/components/ui/tabs";
 import { ExchangeRequest, OfferExchange } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 interface TradeDetailsModalProps {
   exchangeRequest: ExchangeRequest;
@@ -64,7 +65,30 @@ const OfferCard = ({
 }) => {
   const offeredItem = offer.offeredInventoryItem;
   const offerer = offer.createByAccount;
+  const getStatusBadge = (status: 0 | 1 | 2) => {
+    const statusMap = {
+      0: {
+        text: "Đang Chờ",
+        className: "bg-yellow-50 text-yellow-700",
+      },
+      1: {
+        text: "Đã Chấp Nhận",
+        className: "bg-green-50 text-green-700",
+      },
+      2: {
+        text: "Đã Từ Chối",
+        className: "bg-red-50 text-red-700",
+      },
+    };
 
+    const { text, className } = statusMap[status] || statusMap[0];
+
+    return (
+      <Badge variant="outline" className={`ml-auto ${className}`}>
+        {text}
+      </Badge>
+    );
+  };
   return (
     <Card className="mb-4 overflow-hidden border-2 border-emerald-50 hover:border-emerald-100 transition-all">
       <CardHeader className="p-4 pb-2 flex flex-row items-center gap-3">
@@ -81,12 +105,7 @@ const OfferCard = ({
           </h3>
           <p className="text-xs text-muted-foreground">{offerer.email}</p>
         </div>
-        <Badge
-          variant="outline"
-          className="ml-auto bg-yellow-50 text-yellow-700"
-        >
-          Đang Chờ
-        </Badge>
+        {getStatusBadge((offer?.offerExchangeStatusId as 0 | 1 | 2) || 0)}
       </CardHeader>
 
       <CardContent className="p-4 pt-2">
@@ -129,21 +148,25 @@ const OfferCard = ({
             )}
 
             <div className="flex gap-2 mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                onClick={() => onReject(offer.offerExchangeId)}
-              >
-                <X className="h-4 w-4 mr-1" /> Từ Chối
-              </Button>
-              <Button
-                size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700"
-                onClick={() => onAccept(offer.offerExchangeId)}
-              >
-                <Check className="h-4 w-4 mr-1" /> Chấp Nhận
-              </Button>
+              {offer?.offerExchangeStatusId === 0 && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                    onClick={() => onReject(offer.offerExchangeId)}
+                  >
+                    <X className="h-4 w-4 mr-1" /> Từ Chối
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => onAccept(offer.offerExchangeId)}
+                  >
+                    <Check className="h-4 w-4 mr-1" /> Chấp Nhận
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -157,7 +180,6 @@ const TradeDetailsModal = ({
   offers,
   confirm,
 }: TradeDetailsModalProps) => {
-
   const [activeTab, setActiveTab] = useState("offers");
 
   const requestItem = exchangeRequest.requestInventoryItem;
@@ -290,11 +312,11 @@ export default function Page() {
     10
   );
 
-  const { data: offerData, refetch } = useGetAllOfferByExchangeId(
-    selectedExchange ?? "",
-    1,
-    10
-  );
+  const {
+    data: offerData,
+    refetch,
+    isPending,
+  } = useGetAllOfferByExchangeId(selectedExchange ?? "", 1, 10);
   const { toast } = useToast();
   useEffect(() => {
     if (selectedExchange) {
@@ -332,6 +354,21 @@ export default function Page() {
     );
   };
 
+  if (isPending) {
+    return (
+      <div className="w-full max-w-4xl mx-auto p-6 bg-background">
+        <h1 className="text-3xl font-bold text-center mb-6 text-red-700">
+          Trung Tâm Giao Dịch
+        </h1>
+        <p className="text-center text-muted-foreground mb-8">
+          Trao đổi vật phẩm với người chơi khác trong chợ giao dịch
+        </p>
+        <div className="w-full flex items-center justify-center">
+          <LoadingIndicator />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-background">
       <h1 className="text-3xl font-bold text-center mb-6 text-red-700">
