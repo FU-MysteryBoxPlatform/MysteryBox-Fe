@@ -10,6 +10,14 @@ export type ExchangeRequestApi = {
   content: string;
 };
 
+export type ExchangeFilterRequest = {
+  exchangeStatus?: number;
+  pageNumber?: number;
+  pageSize?: number;
+  keyword?: string;
+  rarityStatus?: number
+};
+
 export const useCreateExchangeRequest = () => {
   return useApiMutation<ExchangeRequest, ExchangeRequestApi>(
     "/exchange/create-exchange-request",
@@ -22,12 +30,9 @@ export const useGetExchangeRequestById = (exchangeRequestId: string) => {
   );
 };
 
-export const useGetAllExchangeRequest = (
-  pageNumber: number,
-  pageSize: number
-) => {
-  return useApiQuery<ExchangeResponse>(
-    `/exchange/get-all-exchange-request/${pageNumber}/${pageSize}`
+export const useGetAllExchangeRequest = () => {
+  return useApiMutation<ExchangeResponse, ExchangeFilterRequest>(
+    `/exchange/get-all-exchange-request`, "post"
   );
 };
 

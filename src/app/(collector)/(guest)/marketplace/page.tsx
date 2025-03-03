@@ -1,19 +1,57 @@
 "use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useGetAllExchangeRequest } from "@/hooks/api/useExchange";
 import RarityColorBadge from "@/app/components/RarityColorBadge";
+import { ExchangeRequest } from "@/types";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 export default function Home() {
-  const { data, isPending } = useGetAllExchangeRequest(1, 10);
-  if (isPending) return <div>Loading...</div>;
+  const getAllExchange = useGetAllExchangeRequest();
+  const [data, setData] = useState<ExchangeRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchExchanges = async () => {
+      try {
+        const response = await getAllExchange.mutateAsync({
+          pageNumber: 1,
+          pageSize: 10,
+          exchangeStatus: 0,
+        });
+        setData(response.result.items);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExchanges();
+  }, []);
+
+  if (loading)
+    return (
+        <div className="w-screen h-[90vh] flex items-center justify-center">
+          <LoadingIndicator />
+        </div>
+      );
+  if (error)
+    return <div className="text-center text-red-500">Failed to load data.</div>;
+
   return (
     <div className="max-w-6xl mx-auto p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-red-900">Thị Trường</h1>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {data?.result.items.map((item) => (
+        {data?.map((item) => (
           <Link
             href={`/marketplace/trade/${item.exchangeRequestId}`}
             key={item.exchangeRequestId}
