@@ -16,6 +16,7 @@ export default function Page() {
   useEffect(() => {
     mutateManageSale(
       {
+        saleStatus: 1,
         pageNumber: pageNumber,
         pageSize: 6,
       },

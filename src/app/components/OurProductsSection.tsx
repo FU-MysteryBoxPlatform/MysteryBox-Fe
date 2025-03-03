@@ -12,6 +12,7 @@ export default function OurProductsSection() {
   useEffect(() => {
     mutateManageSale(
       {
+        saleStatus: 1,
         pageNumber: 1,
         pageSize: 8,
       },
