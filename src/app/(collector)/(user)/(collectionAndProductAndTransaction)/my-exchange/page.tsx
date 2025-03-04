@@ -318,10 +318,9 @@ export default function Page() {
     data: offerData,
     refetch,
     isPending,
-  } = useGetAllOfferByExchangeId(selectedExchange ?? "", 0,0);
+  } = useGetAllOfferByExchangeId(selectedExchange ?? "", 0, 0);
 
-  const { data: offerItems } =
-    useGetAllOfferByAccountId(user?.id ?? "", 0,0);
+  const { data: offerItems } = useGetAllOfferByAccountId(user?.id ?? "", 0, 0);
 
   const { toast } = useToast();
   useEffect(() => {
@@ -506,16 +505,18 @@ export default function Page() {
                 <Table className="w-full border border-gray-300 shadow-sm rounded-lg overflow-hidden">
                   <TableHeader className="bg-gray-100 text-gray-700 uppercase text-sm">
                     <TableRow className="border-b border-gray-300">
-                      <TableHead className="px-4 py-3 w-20">
-                        Request ID
-                      </TableHead>
-                      <TableHead className="px-4 py-3">Requester</TableHead>
+                      <TableHead className="px-4 py-3 w-20">ID</TableHead>
+                      <TableHead className="px-4 py-3">Người yêu cầu</TableHead>
                       <TableHead className="px-4 py-3">
                         Requested Item
                       </TableHead>
-                      <TableHead className="px-4 py-3">Offered Item</TableHead>
-                      <TableHead className="px-4 py-3">Offerer</TableHead>
-                      <TableHead className="px-4 py-3">Status</TableHead>
+                      <TableHead className="px-4 py-3">
+                        Vật phẩm offer
+                      </TableHead>
+                      <TableHead className="px-4 py-3">
+                        Người được offer
+                      </TableHead>
+                      <TableHead className="px-4 py-3">Trạng thái</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
