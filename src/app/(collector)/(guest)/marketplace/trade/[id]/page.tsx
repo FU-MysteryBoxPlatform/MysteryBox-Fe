@@ -165,17 +165,17 @@ export default function TradePage() {
               tradeItemDetail?.requestInventoryItem.product?.imagePath ||
               "/mock-images/image2.png"
             }
-            alt={tradeItemDetail?.requestInventoryItem.product.name}
+            alt={tradeItemDetail?.requestInventoryItem?.product?.name}
             className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute top-4 right-4 px-3 py-1 rounded-full">
             <RarityColorBadge
               dropRate={
-                tradeItemDetail?.requestInventoryItem.product.rarityStatus
+                tradeItemDetail?.requestInventoryItem?.product?.rarityStatus
                   .dropRate || "Unknown"
               }
               rarityName={
-                tradeItemDetail?.requestInventoryItem.product.rarityStatus
+                tradeItemDetail?.requestInventoryItem?.product?.rarityStatus
                   .name || "Unknown"
               }
             />
@@ -200,7 +200,7 @@ export default function TradePage() {
                   Mô Tả
                 </h3>
                 <p className="text-gray-600 bg-red-50 p-3 rounded-md border-l-2 border-red-700">
-                  {tradeItemDetail?.requestInventoryItem.product.description}
+                  {tradeItemDetail?.requestInventoryItem?.product?.description}
                 </p>
               </div>
 
@@ -214,7 +214,7 @@ export default function TradePage() {
                 <div className="bg-red-50 p-4 rounded-lg border border-red-100">
                   <p className="text-gray-700">
                     <span className="font-semibold text-red-900">
-                      {tradeItemDetail?.createByAccount.firstName}
+                      {tradeItemDetail?.createByAccount?.firstName}
                     </span>{" "}
                     đang muốn giao dịch vật phẩm này. Hãy đưa ra đề nghị bằng
                     cách chọn vật phẩm từ kho đồ của bạn.
