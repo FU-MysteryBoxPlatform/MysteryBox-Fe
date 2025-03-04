@@ -41,12 +41,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   useConfirmAcceptedOfffer,
+  useGetAllOfferByAccountId,
   useGetAllOfferByExchangeId,
 } from "@/hooks/api/useOfferExchange";
 import { Tabs as TabsComponent } from "@/components/ui/tabs";
 import { ExchangeRequest, OfferExchange } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 
 interface TradeDetailsModalProps {
   exchangeRequest: ExchangeRequest;
@@ -206,7 +208,7 @@ const TradeDetailsModal = ({
         </DialogHeader>
 
         {/* Requested Item Section */}
-        <div className="px-6 py-4 bg-gray-50 border-y">
+        <div className="px-6 py-4 bg-gray-50 border-y ">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="relative w-24 h-24 overflow-hidden rounded-md bg-white border">
               <img
@@ -283,7 +285,7 @@ const TradeDetailsModal = ({
                 Chưa có đề nghị trao đổi nào cho vật phẩm này
               </div>
             ) : (
-              <div>
+              <div className="overflow-y-scroll max-h-[70vh]">
                 {offers.map((offer) => (
                   <OfferCard
                     key={offer.offerExchangeId}
@@ -316,7 +318,11 @@ export default function Page() {
     data: offerData,
     refetch,
     isPending,
-  } = useGetAllOfferByExchangeId(selectedExchange ?? "", 1, 10);
+  } = useGetAllOfferByExchangeId(selectedExchange ?? "", 0,0);
+
+  const { data: offerItems, refetch: refetchOfferAccount } =
+    useGetAllOfferByAccountId(user?.id ?? "", 0,0);
+
   const { toast } = useToast();
   useEffect(() => {
     if (selectedExchange) {
@@ -390,92 +396,228 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-2xl border shadow-lg border-black-100 overflow-hidden">
-            <Table>
-              <TableHeader className="bg-muted/50 border border-black-100 shadow-md rounded-lg">
-                <TableRow>
-                  <TableHead className="w-[80px]">ID</TableHead>
-                  <TableHead>Vật Phẩm - Mã ID</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Độ Hiếm
-                  </TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Đã Đăng
-                  </TableHead>
-                  <TableHead className="text-right">Thao Tác</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {exchangeRequests?.result.items.map((request) => (
-                  <TableRow
-                    key={request.exchangeRequestId}
-                    className="hover:bg-muted/50"
-                  >
-                    <TableCell className="font-medium">
-                      {request.exchangeRequestId.substring(0, 8)}
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">
-                          {request.requestInventoryItem.product.name} -{" "}
-                          {request.requestInventoryItem.inventoryId.substring(
-                            0,
-                            8
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
+          <div>
+            <Tabs defaultValue="tab1" className="w-full">
+              <TabsList className="flex justify-start gap-4 border-b border-gray-300">
+                <TabsTrigger
+                  value="tab1"
+                  className="px-4 py-2 rounded-t-lg text-gray-600 hover:text-black transition-all duration-300 data-[state=active]:text-black data-[state=active]:border-b-2 data-[state=active]:border-blue-500"
+                >
+                  Yêu cầu trao đổi
+                </TabsTrigger>
+                <TabsTrigger
+                  value="tab2"
+                  className="px-4 py-2 rounded-t-lg text-gray-600 hover:text-black transition-all duration-300 data-[state=active]:text-black data-[state=active]:border-b-2 data-[state=active]:border-blue-500"
+                >
+                  Offer với người khác
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="tab1">
+                <div className="rounded-2xl border shadow-lg border-black-100 overflow-hidden p-4">
+                  <Table>
+                    <TableHeader className="bg-muted/50 border border-black-100 shadow-md rounded-lg">
+                      <TableRow>
+                        <TableHead className="w-[80px]">ID</TableHead>
+                        <TableHead>Vật Phẩm - Mã ID</TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          Độ Hiếm
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          Đã Đăng
+                        </TableHead>
+                        <TableHead className="text-right">Thao Tác</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {exchangeRequests?.result.items.map((request) => (
+                        <TableRow
+                          key={request.exchangeRequestId}
+                          className="hover:bg-muted/50"
+                        >
+                          <TableCell className="font-medium">
+                            {request.exchangeRequestId.substring(0, 8)}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">
+                                {request.requestInventoryItem.product.name} -{" "}
+                                {request.requestInventoryItem.inventoryId.substring(
+                                  0,
+                                  8
+                                )}
+                              </div>
+                            </div>
+                          </TableCell>
 
-                    <TableCell>
-                      <div className="max-w-[200px] truncate">
-                        <RarityColorBadge
-                          rarityName={
-                            request.requestInventoryItem.product.rarityStatus
-                              .name || "Common"
-                          }
-                          dropRate={
-                            request.requestInventoryItem.product.rarityStatus
-                              .dropRate
-                          }
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
-                      {formatDate(request.createDate)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Dialog
-                        open={
-                          isModalOpen &&
-                          selectedExchange === request.exchangeRequestId
-                        }
-                        onOpenChange={setIsModalOpen}
+                          <TableCell>
+                            <div className="max-w-[200px] truncate">
+                              <RarityColorBadge
+                                rarityName={
+                                  request.requestInventoryItem.product
+                                    .rarityStatus.name || "Common"
+                                }
+                                dropRate={
+                                  request.requestInventoryItem.product
+                                    .rarityStatus.dropRate
+                                }
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+                            {formatDate(request.createDate)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Dialog
+                              open={
+                                isModalOpen &&
+                                selectedExchange === request.exchangeRequestId
+                              }
+                              onOpenChange={setIsModalOpen}
+                            >
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleOpenModal(request.exchangeRequestId)
+                                  }
+                                >
+                                  Chi tiết
+                                </Button>
+                              </DialogTrigger>
+                              {selectedExchangeRequest &&
+                                offerData?.result?.items && (
+                                  <TradeDetailsModal
+                                    exchangeRequest={selectedExchangeRequest}
+                                    offers={offerData.result.items}
+                                    confirm={handleConfirm}
+                                  />
+                                )}
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="tab2">
+                <Table className="w-full border border-gray-300 shadow-sm rounded-lg overflow-hidden">
+                  <TableHeader className="bg-gray-100 text-gray-700 uppercase text-sm">
+                    <TableRow className="border-b border-gray-300">
+                      <TableHead className="px-4 py-3 w-20">
+                        Request ID
+                      </TableHead>
+                      <TableHead className="px-4 py-3">Requester</TableHead>
+                      <TableHead className="px-4 py-3">
+                        Requested Item
+                      </TableHead>
+                      <TableHead className="px-4 py-3">Offered Item</TableHead>
+                      <TableHead className="px-4 py-3">Offerer</TableHead>
+                      <TableHead className="px-4 py-3">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {offerItems?.result.items.map((item, index) => (
+                      <TableRow
+                        key={item.offerExchangeId}
+                        className={`border-b border-gray-200 ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        } hover:bg-gray-100 transition-colors`}
                       >
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              handleOpenModal(request.exchangeRequestId)
+                        <TableCell className="px-4 py-3 font-mono text-sm text-gray-600">
+                          {item.exchangeRequestId.substring(0, 8)}
+                        </TableCell>
+                        <TableCell className="px-4 py-3">
+                          <div className="flex items-center gap-2 text-gray-800 font-medium">
+                            {
+                              item.exchangeRequest.requestInventoryItem.account
+                                .firstName
+                            }{" "}
+                            {
+                              item.exchangeRequest.requestInventoryItem.account
+                                .lastName
                             }
-                          >
-                            Chi tiết
-                          </Button>
-                        </DialogTrigger>
-                        {selectedExchangeRequest &&
-                          offerData?.result?.items && (
-                            <TradeDetailsModal
-                              exchangeRequest={selectedExchangeRequest}
-                              offers={offerData.result.items}
-                              confirm={handleConfirm}
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={
+                                item.exchangeRequest.requestInventoryItem
+                                  .product.imagePath
+                              }
+                              alt={
+                                item.exchangeRequest.requestInventoryItem
+                                  .product.name
+                              }
+                              className="w-12 h-12 rounded-md shadow"
                             />
-                          )}
-                      </Dialog>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                            <span className="text-gray-700 font-medium">
+                              {
+                                item.exchangeRequest.requestInventoryItem
+                                  .product.name
+                              }
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={
+                                item.exchangeRequest.offeredInventoryItem
+                                  ?.product.imagePath
+                              }
+                              alt={
+                                item.exchangeRequest.offeredInventoryItem
+                                  ?.product.name
+                              }
+                              className="w-12 h-12 rounded-md shadow"
+                            />
+                            <span className="text-gray-700 font-medium">
+                              {
+                                item.exchangeRequest.offeredInventoryItem
+                                  ?.product.name
+                              }
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3">
+                          <div className="flex items-center gap-2 text-gray-800 font-medium">
+                            {
+                              item.exchangeRequest.offeredInventoryItem?.account
+                                .firstName
+                            }{" "}
+                            {
+                              item.exchangeRequest.offeredInventoryItem?.account
+                                .lastName
+                            }
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 font-semibold">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold text-nowrap ${
+                              item.offerExchangeStatusId === 0
+                                ? "bg-yellow-100 text-yellow-700"
+                                : item.offerExchangeStatusId === 1
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {item.offerExchangeStatusId === 0
+                              ? "Đang Chờ"
+                              : item.offerExchangeStatusId === 1
+                              ? "Đã Chấp Nhận"
+                              : "Đã Từ Chối"}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TabsContent>
+            </Tabs>
           </div>
         </CardContent>
       </Card>

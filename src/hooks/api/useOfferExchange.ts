@@ -35,3 +35,13 @@ export const useCreateOfferExchange = () => {
     unknown
   >("/offer/create-offer-exchange", "post");
 };
+
+export const useGetAllOfferByAccountId = (
+  id: string,
+  pageNumber: number,
+  pageSize: number
+) => {
+  return useApiQuery<OfferExchangeResponse>(
+    `/offer/get-all-offer-by-account-id/${id}?pageNumber=${pageNumber}&pageSize=${pageSize}`
+  );
+};

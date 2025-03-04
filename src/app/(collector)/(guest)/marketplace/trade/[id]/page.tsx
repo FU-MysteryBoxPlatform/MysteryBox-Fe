@@ -162,7 +162,7 @@ export default function TradePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <img
             src={
-              tradeItemDetail?.requestInventoryItem.product.imagePath ||
+              tradeItemDetail?.requestInventoryItem.product?.imagePath ||
               "/mock-images/image2.png"
             }
             alt={tradeItemDetail?.requestInventoryItem.product.name}
@@ -284,7 +284,7 @@ export default function TradePage() {
                                 <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
                                   <img
                                     src={
-                                      item.product.imagePath ||
+                                      item.product?.imagePath ||
                                       "/mock-images/image2.png"
                                     }
                                     alt={item.product.name}
