@@ -287,14 +287,14 @@ export default function TradePage() {
                                       item.product?.imagePath ||
                                       "/mock-images/image2.png"
                                     }
-                                    alt={item.product.name}
+                                    alt={item.product?.name}
                                     className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
                                   />
                                 </div>
                                 <div>
                                   <div className="flex items-center">
                                     <h4 className="font-medium text-red-900">
-                                      {item.product.name}
+                                      {item.product?.name}
                                     </h4>
                                     <Badge
                                       className={`ml-2 text-xs ${
@@ -305,7 +305,7 @@ export default function TradePage() {
                                     </Badge>
                                   </div>
                                   <p className="text-xs text-gray-600 line-clamp-2 mt-1">
-                                    {item.product.description}
+                                    {item.product?.description}
                                   </p>
                                   {selectedItem === item.inventoryId && (
                                     <div className="mt-1 text-xs text-green-600 flex items-center">
