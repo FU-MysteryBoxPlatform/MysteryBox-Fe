@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import { ArrowLeft, Check, Clock, Package, Star } from "lucide-react";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
@@ -33,7 +33,6 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import { useParams } from "next/navigation";
-import { DialogClose } from "@radix-ui/react-dialog";
 
 export default function TradePage() {
   const { user } = useContext(GlobalContext);
