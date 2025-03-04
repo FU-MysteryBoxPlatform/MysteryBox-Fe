@@ -132,14 +132,14 @@ export default function TradePage() {
           Quay Lại Thị Trường
         </Link>
         <h1 className="text-3xl font-bold text-red-900 flex items-center">
-          {tradeItemDetail?.requestInventoryItem.product.name}
+          {tradeItemDetail?.requestInventoryItem?.product?.name}
           <Badge className="ml-3 bg-red-700 hover:bg-red-800 text-white">
             {tradeItemDetail?.requestInventoryItem.collection?.collectionName}
           </Badge>
         </h1>
         <div className="flex items-center mt-2">
           <p className="text-gray-600">
-            Đăng bởi {tradeItemDetail?.createByAccount.firstName}
+            Đăng bởi {tradeItemDetail?.createByAccount?.firstName}
           </p>
 
           <div className="ml-4 flex items-center text-gray-500">
