@@ -320,7 +320,7 @@ export default function Page() {
     isPending,
   } = useGetAllOfferByExchangeId(selectedExchange ?? "", 0,0);
 
-  const { data: offerItems, refetch: refetchOfferAccount } =
+  const { data: offerItems } =
     useGetAllOfferByAccountId(user?.id ?? "", 0,0);
 
   const { toast } = useToast();
