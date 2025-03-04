@@ -33,6 +33,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import { useParams } from "next/navigation";
+import { DialogClose } from "@radix-ui/react-dialog";
 
 export default function TradePage() {
   const { user } = useContext(GlobalContext);
@@ -111,7 +112,7 @@ export default function TradePage() {
             if (data.isSuccess) {
               setInventories((inventories) => [
                 ...inventories,
-                ...data.result.items,
+                ...data.result.items.filter((item) => item.product),
               ]);
               setTotalPage(data.result.totalPages);
             }
@@ -227,13 +228,13 @@ export default function TradePage() {
               </div>
             </CardContent>
             <CardFooter className="bg-white px-6 pb-6">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog  open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 shadow-md text-lg py-6">
                     Đề Xuất Giao Dịch
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+                <DialogContent className="sm:max-w-[600px] max-[70vh] p-0 overflow-y-hidden">
                   <DialogHeader className="bg-gradient-to-r from-red-700 to-red-800 text-white p-6 rounded-t-lg">
                     <DialogTitle className="text-xl flex items-center">
                       <Package className="mr-2 h-5 w-5" />
@@ -268,55 +269,60 @@ export default function TradePage() {
                     <div className="bg-white px-4">
                       <div className="max-h-[500px] overflow-auto">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {inventories?.map((item) => (
-                            <div
-                              key={item.inventoryId}
-                              className={cn(
-                                "border rounded-lg overflow-hidden cursor-pointer transition-all transform hover:translate-y-[-2px] hover:shadow-md hover:border-red-500",
-                                selectedItem === item.inventoryId &&
-                                  "border-2 border-red-700 bg-red-50 shadow-md"
-                              )}
-                              onClick={() =>
-                                toggleItemSelection(item.inventoryId)
-                              }
-                            >
-                              <div className="flex gap-3 p-3">
-                                <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
-                                  <img
-                                    src={
-                                      item.product?.imagePath ||
-                                      "/mock-images/image2.png"
-                                    }
-                                    alt={item.product?.name}
-                                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
-                                  />
-                                </div>
-                                <div>
-                                  <div className="flex items-center">
-                                    <h4 className="font-medium text-red-900">
-                                      {item.product?.name}
-                                    </h4>
-                                    <Badge
-                                      className={`ml-2 text-xs ${
-                                        getRarityColor(item.inventoryId).classes
-                                      }`}
-                                    >
-                                      {getRarityColor(item.inventoryId).rarity}
-                                    </Badge>
+                          {inventories?.length > 0 &&
+                            inventories?.map((item) => (
+                              <div
+                                key={item.inventoryId}
+                                className={cn(
+                                  "border rounded-lg overflow-hidden cursor-pointer transition-all transform hover:translate-y-[-2px] hover:shadow-md hover:border-red-500",
+                                  selectedItem === item.inventoryId &&
+                                    "border-2 border-red-700 bg-red-50 shadow-md"
+                                )}
+                                onClick={() =>
+                                  toggleItemSelection(item.inventoryId)
+                                }
+                              >
+                                <div className="flex gap-3 p-3">
+                                  <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
+                                    <img
+                                      src={
+                                        item.product?.imagePath ||
+                                        "/mock-images/image2.png"
+                                      }
+                                      alt={item.product?.name}
+                                      className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
+                                    />
                                   </div>
-                                  <p className="text-xs text-gray-600 line-clamp-2 mt-1">
-                                    {item.product?.description}
-                                  </p>
-                                  {selectedItem === item.inventoryId && (
-                                    <div className="mt-1 text-xs text-green-600 flex items-center">
-                                      <Check className="h-3 w-3 mr-1" />
-                                      Đã chọn
+                                  <div>
+                                    <div className="flex items-center">
+                                      <h4 className="font-medium text-red-900">
+                                        {item.product?.name}
+                                      </h4>
+                                      <Badge
+                                        className={`ml-2 text-xs ${
+                                          getRarityColor(item.inventoryId)
+                                            .classes
+                                        }`}
+                                      >
+                                        {
+                                          getRarityColor(item.inventoryId)
+                                            .rarity
+                                        }
+                                      </Badge>
                                     </div>
-                                  )}
+                                    <p className="text-xs text-gray-600 line-clamp-2 mt-1">
+                                      {item.product?.description}
+                                    </p>
+                                    {selectedItem === item.inventoryId && (
+                                      <div className="mt-1 text-xs text-green-600 flex items-center">
+                                        <Check className="h-3 w-3 mr-1" />
+                                        Đã chọn
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                         </div>
                       </div>
                       {page < totalPage && (
