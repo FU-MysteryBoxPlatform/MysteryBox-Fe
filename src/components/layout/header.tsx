@@ -17,6 +17,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import cookie from "@/utils/cookie";
 import { Button } from "../ui/button";
+import Notification from "@/app/components/Notification";
 
 export default function Header() {
   const pathname = usePathname();
@@ -60,7 +61,7 @@ export default function Header() {
 
         <div className="hidden items-center gap-8 lg:flex">
           <SearchIcon />
-          <BellIcon />
+          <Notification />
           {!isFetchingUser && user?.mainRole !== "MODERATORS" && (
             <Link href="/cart">
               <div className="relative">
