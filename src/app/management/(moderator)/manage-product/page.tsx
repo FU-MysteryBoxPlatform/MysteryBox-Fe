@@ -27,6 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Sale, useManageSale } from "@/hooks/api/useManageSale";
+import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useEffect, useRef, useState } from "react";
@@ -37,6 +38,7 @@ export default function Page() {
   const params = queryString.parse(searchParams.toString());
   const ref = useRef<NodeJS.Timeout>(null);
 
+  const currTab = params["tab"] || "1";
   const keyword = params["keyword"];
   const page = params["page"];
   const minPrice = params["minPrice"];
@@ -89,7 +91,7 @@ export default function Page() {
         keyword: keyword as string,
         pageNumber: +(page || 1),
         pageSize: 10,
-        saleStatus: 0,
+        saleStatus: +(currTab as string),
         minimumPrice: minPrice ? +minPrice : undefined,
         maximumPrice: maxPrice ? +maxPrice : undefined,
       },
@@ -109,7 +111,7 @@ export default function Page() {
         keyword: keyword as string,
         pageNumber: +(page || 1),
         pageSize: 10,
-        saleStatus: 0,
+        saleStatus: +currTab,
         minimumPrice: minPrice ? +minPrice : undefined,
         maximumPrice: maxPrice ? +maxPrice : undefined,
       },
@@ -121,9 +123,7 @@ export default function Page() {
         },
       }
     );
-  }, [keyword, maxPrice, minPrice, mutateManageSale, page]);
-
-  console.log({ saleData });
+  }, [currTab, keyword, maxPrice, minPrice, mutateManageSale, page]);
 
   return (
     <div className="w-full p-6">
@@ -137,6 +137,25 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Tabs */}
+          <div className="p-2 flex items-center gap-2 [&>*]:flex-1 bg-gray-100 rounded-md mb-4">
+            {TABS.map((tab, idx) => (
+              <div
+                key={idx}
+                className={cn(
+                  tab.value === currTab && "bg-[#E12E43] text-white",
+                  "text-center rounded-lg cursor-pointer"
+                )}
+                onClick={() => {
+                  params["tab"] = tab.value;
+                  router.push(`?${queryString.stringify(params)}`);
+                }}
+              >
+                {tab.title}
+              </div>
+            ))}
+          </div>
+
           <div className="mb-4 flex items-center gap-4">
             <Input
               placeholder="Tìm kiếm sản phẩm"
@@ -178,51 +197,52 @@ export default function Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {saleData?.length> 0 &&  saleData?.map((sale) => (
-                    <TableRow key={sale.saleId}>
-                      <TableCell className="sm:table-cell">
-                        <img
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover w-12 h-12"
-                          height="64"
-                          src={sale.inventory?.product?.imagePath}
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="md:table-cell font-medium line-clamp-2">
-                        {sale.inventory.product.name}
-                      </TableCell>
+                  {saleData?.length > 0 &&
+                    saleData?.map((sale) => (
+                      <TableRow key={sale.saleId}>
+                        <TableCell className="sm:table-cell">
+                          <img
+                            alt="Product image"
+                            className="aspect-square rounded-md object-cover w-12 h-12"
+                            height="64"
+                            src={sale.inventory?.product?.imagePath}
+                            width="64"
+                          />
+                        </TableCell>
+                        <TableCell className="md:table-cell font-medium line-clamp-2">
+                          {sale.inventory.product.name}
+                        </TableCell>
 
-                      <TableCell className="md:table-cell">
-                        {sale.inventory.account.firstName +
-                          " " +
-                          sale.inventory.account.lastName}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {sale.unitPrice.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {sale.totalFee.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="md:table-cell">
-                        {sale.totalAmount.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="">
-                        <SaleStatusBadge status={sale.saleStatus.name} />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
-                          onClick={() => {
-                            setOpenDetailModal(true);
-                            setProductSale(sale);
-                          }}
-                        >
-                          Xem chi tiết
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell className="md:table-cell">
+                          {sale.inventory.account.firstName +
+                            " " +
+                            sale.inventory.account.lastName}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {sale.unitPrice.toLocaleString()}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {sale.totalFee.toLocaleString()}
+                        </TableCell>
+                        <TableCell className="md:table-cell">
+                          {sale.totalAmount.toLocaleString()}
+                        </TableCell>
+                        <TableCell className="">
+                          <SaleStatusBadge status={sale.saleStatus.name} />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
+                            onClick={() => {
+                              setOpenDetailModal(true);
+                              setProductSale(sale);
+                            }}
+                          >
+                            Xem chi tiết
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
               {saleData?.length === 0 && (
@@ -247,3 +267,26 @@ export default function Page() {
     </div>
   );
 }
+
+const TABS = [
+  {
+    title: "Có sẵn",
+    value: "1",
+  },
+  {
+    title: "Chờ duyệt",
+    value: "0",
+  },
+  {
+    title: "Hết hàng",
+    value: "2",
+  },
+  {
+    title: "Đã ngưng",
+    value: "3",
+  },
+  {
+    title: "Đã huỷ",
+    value: "4",
+  },
+];

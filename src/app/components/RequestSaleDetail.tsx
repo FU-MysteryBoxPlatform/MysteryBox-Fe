@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Sale } from "@/hooks/api/useManageSale";
 import { toast } from "@/hooks/use-toast";
 import { GlobalContext } from "@/provider/global-provider";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import LoadingIndicator from "./LoadingIndicator";
 
 export default function RequestSaleDetail({
   sale,
@@ -13,11 +14,15 @@ export default function RequestSaleDetail({
   onApprove: () => void;
 }) {
   const { user } = useContext(GlobalContext);
+  const [isLoading, setIsLoading] = useState(false);
   const handleApproveSale = async () => {
     try {
+      setIsLoading(true);
       const response = await axiosClient.put(
         `/sale/approved-sale?saleId=${sale.saleId}&accountId=${user?.id}`
       );
+
+      setIsLoading(false);
 
       if (response.data.isSuccess) {
         onApprove();
@@ -65,7 +70,7 @@ export default function RequestSaleDetail({
             className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
             onClick={handleApproveSale}
           >
-            Duyệt
+            {isLoading ? <LoadingIndicator /> : "Duyệt"}
           </Button>
         </div>
       </div>

@@ -23,6 +23,7 @@ const generatePaginationLinks = (
           <PaginationLink
             onClick={() => onPageChange(i)}
             isActive={i === currentPage}
+            className="cursor-pointer"
           >
             {i}
           </PaginationLink>
@@ -36,6 +37,7 @@ const generatePaginationLinks = (
           <PaginationLink
             onClick={() => onPageChange(i)}
             isActive={i === currentPage}
+            className="cursor-pointer"
           >
             {i}
           </PaginationLink>
@@ -49,6 +51,7 @@ const generatePaginationLinks = (
           <PaginationLink
             onClick={() => onPageChange(currentPage)}
             isActive={true}
+            className="cursor-pointer"
           >
             {currentPage}
           </PaginationLink>
@@ -62,6 +65,7 @@ const generatePaginationLinks = (
           <PaginationLink
             onClick={() => onPageChange(i)}
             isActive={i === currentPage}
+            className="cursor-pointer"
           >
             {i}
           </PaginationLink>
@@ -96,7 +100,9 @@ export default function Paginator({
                 else onPageChange(currentPage - 1);
               }}
               className={cn(
-                currentPage - 1 < 1 && "cursor-not-allowed select-none"
+                currentPage - 1 < 1
+                  ? "cursor-not-allowed select-none"
+                  : "cursor-pointer"
               )}
             />
           </PaginationItem>
@@ -110,7 +116,9 @@ export default function Paginator({
                 else onPageChange(currentPage + 1);
               }}
               className={cn(
-                currentPage > totalPages - 1 && "cursor-not-allowed select-none"
+                currentPage > totalPages - 1
+                  ? "cursor-not-allowed select-none"
+                  : "cursor-pointer"
               )}
             />
           </PaginationItem>

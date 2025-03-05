@@ -1,5 +1,41 @@
-import { PaymentHistory } from "@/types";
+import { PaymentHistory, TAccount } from "@/types";
 import { useApiQuery } from "./useApi";
+
+export type TTransaction = {
+  paymentHistoryId: string;
+  amount: number;
+  date: string;
+  paidDate: string;
+  paymentMethodId: number;
+  paymentMethod: PaymentMethod;
+  transactionStatusId: number;
+  transationStatus: TransationStatus;
+  transactionTypeId: number;
+  transactionType: TransactionType;
+  orderId: string;
+  exchangeRequestId: string;
+  auctionId: string;
+  auctionHistoryId: string;
+  auctionParticipateRequestId: string;
+  accountId: string;
+  account: TAccount;
+  walletTransactionId: string;
+};
+
+export interface PaymentMethod {
+  id: number;
+  name: string;
+}
+
+export interface TransationStatus {
+  id: number;
+  name: string;
+}
+
+export interface TransactionType {
+  id: number;
+  name: string;
+}
 
 export type TransactionResponse = {
   items: PaymentHistory[];
@@ -7,11 +43,14 @@ export type TransactionResponse = {
 };
 
 export const useGetAllTransaction = (
-  status: number,
   pageNumber: number,
-  pageSize: number
+  pageSize: number,
+  status?: number
 ) => {
-  return useApiQuery<unknown[]>(
+  return useApiQuery<{
+    items: TTransaction[];
+    totalPages: number;
+  }>(
     `/transaction/get-all-transaction/${pageNumber}/${pageSize}?status=${status}`
   );
 };

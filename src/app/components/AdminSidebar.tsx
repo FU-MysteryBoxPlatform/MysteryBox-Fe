@@ -10,7 +10,14 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
-import { ChartArea, HandCoins, Settings, User } from "lucide-react";
+import {
+  ArrowLeftRight,
+  ChartArea,
+  HandCoins,
+  Settings,
+  ShoppingBasket,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useContext } from "react";
@@ -26,6 +33,16 @@ const MOD_ITEMS = [
     title: "Quản lý vật phẩm",
     url: "/management/manage-product",
     icon: HandCoins,
+  },
+  {
+    title: "Quản lý đơn hàng",
+    url: "/management/manage-order",
+    icon: ShoppingBasket,
+  },
+  {
+    title: "Quản lý giao dịch",
+    url: "/management/manage-transaction",
+    icon: ArrowLeftRight,
   },
 ];
 

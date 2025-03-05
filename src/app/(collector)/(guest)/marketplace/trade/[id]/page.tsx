@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { ArrowLeft, Check, Clock, Package, Star } from "lucide-react";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
@@ -33,6 +33,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import { useParams } from "next/navigation";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 export default function TradePage() {
   const { user } = useContext(GlobalContext);
@@ -47,7 +48,8 @@ export default function TradePage() {
   const [content, setContent] = useState<string>("");
 
   const { mutate: mutateGetAllInventory } = useGetAllInventory();
-  const { mutate: mutateCreateOfferExchange } = useCreateOfferExchange();
+  const { mutate: mutateCreateOfferExchange, isPending } =
+    useCreateOfferExchange();
   const { data } = useGetExchangeRequestById(id as string);
   const tradeItemDetail = data?.result;
   const toggleItemSelection = (itemId: string) => {
@@ -227,7 +229,7 @@ export default function TradePage() {
               </div>
             </CardContent>
             <CardFooter className="bg-white px-6 pb-6">
-              <Dialog  open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 shadow-md text-lg py-6">
                     Đề Xuất Giao Dịch
@@ -344,10 +346,14 @@ export default function TradePage() {
                       <DialogFooter className="px-6 pb-6 pt-2">
                         <Button
                           className="w-full"
-                          disabled={!selectedItem}
+                          disabled={!selectedItem || isPending}
                           onClick={handleSubmitTrade}
                         >
-                          Đề xuất giao dịch
+                          {isPending ? (
+                            <LoadingIndicator />
+                          ) : (
+                            "Đề xuất giao dịch"
+                          )}
                         </Button>
                       </DialogFooter>
                     </div>

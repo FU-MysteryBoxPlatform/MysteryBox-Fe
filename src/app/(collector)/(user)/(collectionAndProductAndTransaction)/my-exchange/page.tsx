@@ -52,6 +52,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 
 interface TradeDetailsModalProps {
   exchangeRequest: ExchangeRequest;
+  isLoading: boolean;
   offers: OfferExchange[];
   confirm: (offerId: string, isSucces: boolean) => void;
 }
@@ -179,6 +180,7 @@ const OfferCard = ({
 
 const TradeDetailsModal = ({
   exchangeRequest,
+  isLoading,
   offers,
   confirm,
 }: TradeDetailsModalProps) => {
@@ -307,7 +309,8 @@ export default function Page() {
   const { user } = useContext(GlobalContext);
   const [selectedExchange, setSelectedExchange] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { mutate: confirm } = useConfirmAcceptedOfffer();
+  const { mutate: confirm, isPending: isPendingConfirm } =
+    useConfirmAcceptedOfffer();
   const { data: exchangeRequests } = useGetAllExchangeRequestByUserId(
     user?.id ?? "",
     1,
@@ -397,7 +400,7 @@ export default function Page() {
         <CardContent>
           <div>
             <Tabs defaultValue="tab1" className="w-full">
-              <TabsList className="flex justify-start gap-4 border-b border-gray-300">
+              <TabsList className="flex justify-start gap-4 border-b border-gray-300 mb-4">
                 <TabsTrigger
                   value="tab1"
                   className="px-4 py-2 rounded-t-lg text-gray-600 hover:text-black transition-all duration-300 data-[state=active]:text-black data-[state=active]:border-b-2 data-[state=active]:border-blue-500"
@@ -489,6 +492,7 @@ export default function Page() {
                                   <TradeDetailsModal
                                     exchangeRequest={selectedExchangeRequest}
                                     offers={offerData.result.items}
+                                    isLoading={isPendingConfirm}
                                     confirm={handleConfirm}
                                   />
                                 )}
