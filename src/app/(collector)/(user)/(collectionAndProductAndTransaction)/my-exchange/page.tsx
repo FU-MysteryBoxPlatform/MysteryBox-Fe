@@ -196,6 +196,7 @@ const TradeDetailsModal = ({
   const handleRejectOffer = (offerId: string) => {
     confirm(offerId, true);
   };
+  console.log(isLoading);
 
   return (
     <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
