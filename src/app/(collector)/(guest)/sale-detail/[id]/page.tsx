@@ -9,7 +9,15 @@ import { toast } from "@/hooks/use-toast";
 import { formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
-import { Loader2, ShoppingCart, StarIcon, Tag, User, Mail, Phone } from "lucide-react";
+import {
+  Loader2,
+  ShoppingCart,
+  StarIcon,
+  Tag,
+  User,
+  Mail,
+  Phone,
+} from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useContext } from "react";
@@ -114,6 +122,7 @@ const SaleDetailsPage = () => {
             {/* Product Information */}
             <div className="space-y-8">
               <div className="aspect-square w-full relative rounded-2xl overflow-hidden shadow-lg border-4 border-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={
                     dataSale?.inventory?.product?.imagePath ||

@@ -37,6 +37,7 @@ export default function RequestSaleDetail({
 
   return (
     <div className="flex gap-6">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={sale?.inventory.product.imagePath}
         alt={sale?.inventory.product.name}

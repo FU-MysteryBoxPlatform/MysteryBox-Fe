@@ -164,6 +164,7 @@ export default function Page() {
                 : "Quay lại trang chủ"}
             </Button>
           </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={
               isSuccess || isVNPaySuccess

@@ -68,6 +68,7 @@ export default function InventoryPage() {
               {inventoryItems.map((item) => (
                 <Card key={item.id} className="overflow-hidden">
                   <div className="aspect-square relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
@@ -102,6 +103,7 @@ export default function InventoryPage() {
                 .map((item) => (
                   <Card key={item.id} className="overflow-hidden">
                     <div className="aspect-square relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.image || "/placeholder.svg"}
                         alt={item.name}
@@ -136,6 +138,7 @@ export default function InventoryPage() {
                 .map((item) => (
                   <Card key={item.id} className="overflow-hidden">
                     <div className="aspect-square relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.image || "/placeholder.svg"}
                         alt={item.name}
@@ -170,6 +173,7 @@ export default function InventoryPage() {
                 .map((item) => (
                   <Card key={item.id} className="overflow-hidden">
                     <div className="aspect-square relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={item.image || "/placeholder.svg"}
                         alt={item.name}

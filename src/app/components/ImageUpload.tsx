@@ -75,8 +75,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         className="hidden"
       />
       {previewUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <div className="relative w-fit">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={previewUrl}
             alt="Preview"

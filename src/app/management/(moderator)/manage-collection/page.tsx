@@ -170,6 +170,7 @@ export default function Page() {
                     collections?.map((collection) => (
                       <TableRow key={collection.collectionId}>
                         <TableCell className="sm:table-cell">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             alt="Product image"
                             className="aspect-square rounded-md object-cover w-12 h-12"

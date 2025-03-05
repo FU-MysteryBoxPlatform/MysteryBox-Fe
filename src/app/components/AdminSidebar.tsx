@@ -69,6 +69,7 @@ export function AdminSidebar() {
         <SidebarGroup>
           <div className="mb-10 flex-1 flex-shrink-0">
             <Link href="/" className="flex items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-large.png"
                 alt="mybox"

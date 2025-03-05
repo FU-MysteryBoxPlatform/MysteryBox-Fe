@@ -8,9 +8,9 @@ export type TUpdateAccountData = {
   gender: boolean;
   dob: string;
   image: string;
-  avatar: string;
-  mainRole: string;
-  phoneNumber: string;
+  avatar?: string;
+  mainRole?: string;
+  phoneNumber?: string;
 };
 
 type TAccountResponse = {

@@ -13,6 +13,7 @@ export default function Page() {
   return (
     <div>
       <div className="flex gap-6 max-md:flex-col">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/mock-images/image1.png"
           alt="image"
@@ -60,6 +61,7 @@ export default function Page() {
               {Array.from({ length: 5 }, (_, i) => (
                 <div key={i} className="grid grid-cols-2 gap-6">
                   <div className="flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/mock-images/image1.png"
                       alt="image"

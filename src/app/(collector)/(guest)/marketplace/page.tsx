@@ -34,14 +34,14 @@ export default function Home() {
     };
 
     fetchExchanges();
-  }, []);
+  }, [getAllExchange]);
 
   if (loading)
     return (
-        <div className="w-screen h-[90vh] flex items-center justify-center">
-          <LoadingIndicator />
-        </div>
-      );
+      <div className="w-screen h-[90vh] flex items-center justify-center">
+        <LoadingIndicator />
+      </div>
+    );
   if (error)
     return <div className="text-center text-red-500">Failed to load data.</div>;
 
@@ -58,6 +58,7 @@ export default function Home() {
           >
             <Card className="overflow-hidden transition-all hover:shadow-md h-full">
               <div className="aspect-square relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={
                     item.requestInventoryItem.product.imagePath ||

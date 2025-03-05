@@ -272,6 +272,7 @@ export default function InventoryCard({
                 className="flex items-center justify-between"
               >
                 <div className="flex flex-col space-x-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={product.imagePath}
                     alt={product.name}

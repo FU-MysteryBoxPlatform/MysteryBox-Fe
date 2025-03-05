@@ -17,6 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   return (
     <div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/auction-banner.png"
         alt="Banner auctions"

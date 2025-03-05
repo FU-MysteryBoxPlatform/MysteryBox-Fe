@@ -32,8 +32,8 @@ export default function ProductInCart({
             toggleSelectProduct(saleId || collectionId || "");
           }}
         />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <Link href={`/sale-detail/${saleId}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
             alt={title}

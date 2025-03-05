@@ -15,6 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex max-md:flex-col items-start gap-6">
             <div className="md:w-[200px] w-full  p-4 border border-gray-300 rounded-lg grid gap-2">
               <div className="flex flex-col items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={user?.avatar}
                   alt=""

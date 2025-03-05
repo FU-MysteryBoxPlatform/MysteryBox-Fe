@@ -162,6 +162,7 @@ export default function TradePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="rounded-lg overflow-hidden shadow-lg relative group">
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={
               tradeItemDetail?.requestInventoryItem.product?.imagePath ||
@@ -285,6 +286,7 @@ export default function TradePage() {
                               >
                                 <div className="flex gap-3 p-3">
                                   <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                       src={
                                         item.product?.imagePath ||

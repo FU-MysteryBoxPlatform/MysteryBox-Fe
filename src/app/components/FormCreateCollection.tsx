@@ -229,7 +229,8 @@ export default function FormCreateCollection() {
           <div className="flex flex-wrap gap-4">
             {images.map((image, idx) => (
               <div key={idx} className="w-fit relative">
-                <img src={image} className="w-24 h-24" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image} alt="" className="w-24 h-24" />
                 <div
                   className="absolute w-6 h-6 flex items-center justify-center rounded-full -top-3 -right-3 bg-[#E12E43] text-white cursor-pointer"
                   onClick={handleRemoveImage(idx)}
@@ -269,6 +270,7 @@ export default function FormCreateCollection() {
               }}
             >
               <div className="flex flex-col justify-start items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={product.imagePath}
                   alt="Product image"

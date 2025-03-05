@@ -21,7 +21,7 @@ export default function Page() {
       setUser(data.result);
     }
     route.push(`/${page}`);
-  }, [data, setUser]);
+  }, [data, page, route, setUser]);
 
   if (isLoading) return <div>Loading...</div>;
   return <div>Authentication</div>;
