@@ -147,33 +147,26 @@ export default function Page() {
                         </TableCell>
 
                         <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button className="bg-[#E12E43] hover:bg-[#B71C32]">
-                                Up role
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {acc.mainRole !== "ADMIN" && (
+                          {acc.mainRole === "COLLECTOR" && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button className="bg-[#E12E43] hover:bg-[#B71C32]">
+                                  Up role
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
                                 <DropdownMenuItem
-                                  onClick={handleUpRole(acc.id, "ADMIN")}
+                                  onClick={handleUpRole(acc.id, "MODERATORS")}
                                 >
-                                  {isPending ? <LoadingIndicator /> : "ADMIN"}
-                                </DropdownMenuItem>
-                              )}
-                              {acc.mainRole !== "MODERATORS" && (
-                                <DropdownMenuItem
-                                  onClick={handleUpRole(acc.id, "ADMIN")}
-                                >
-                                  {isLoading ? (
+                                  {isPending ? (
                                     <LoadingIndicator />
                                   ) : (
                                     "MODERATORS"
                                   )}
                                 </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
