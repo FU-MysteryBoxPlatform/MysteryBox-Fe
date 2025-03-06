@@ -12,29 +12,27 @@ export default function Home() {
   const [data, setData] = useState<ExchangeRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    const fetchExchanges = async () => {
-      try {
-        const response = await getAllExchange.mutateAsync({
-          pageNumber: 1,
-          pageSize: 10,
-          exchangeStatus: 0,
-        });
-        setData(response.result.items);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unexpected error occurred.");
-        }
-      } finally {
-        setLoading(false);
+  const fetchExchanges = async () => {
+    try {
+      const response = await getAllExchange.mutateAsync({
+        pageNumber: 1,
+        pageSize: 10,
+        exchangeStatus: 0,
+      });
+      setData(response.result.items);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred.");
       }
-    };
-
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchExchanges();
-  }, [getAllExchange]);
+  }, []);
 
   if (loading)
     return (
