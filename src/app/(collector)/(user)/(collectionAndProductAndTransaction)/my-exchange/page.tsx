@@ -1,4 +1,4 @@
-"use client";
+"use client";;
 import { useContext, useEffect, useState } from "react";
 import {
   Card,
@@ -54,7 +54,6 @@ import { ExchangeRequest, OfferExchange } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
-import { set } from "lodash";
 import { ExchangeStatus } from "@/types/enum";
 
 interface TradeDetailsModalProps {
