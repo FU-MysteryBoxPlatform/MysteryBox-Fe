@@ -22,10 +22,15 @@ import {
   Check,
   Clock,
   Coins,
+  Eye,
   ShoppingBag,
   X,
+  XCircleIcon,
 } from "lucide-react";
-import { useGetAllExchangeRequestByUserId } from "@/hooks/api/useExchange";
+import {
+  useCancelExchangeRequest,
+  useGetAllExchangeRequestByUserId,
+} from "@/hooks/api/useExchange";
 import { GlobalContext } from "@/provider/global-provider";
 import RarityColorBadge from "@/app/components/RarityColorBadge";
 import { formatDate } from "@/lib/utils";
@@ -49,6 +54,8 @@ import { ExchangeRequest, OfferExchange } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import { set } from "lodash";
+import { ExchangeStatus } from "@/types/enum";
 
 interface TradeDetailsModalProps {
   exchangeRequest: ExchangeRequest;
@@ -61,10 +68,12 @@ const OfferCard = ({
   offer,
   onAccept,
   onReject,
+  isLoading,
 }: {
   offer: OfferExchange;
   onAccept: (offerId: string) => void;
   onReject: (offerId: string) => void;
+  isLoading: boolean;
 }) => {
   const offeredItem = offer.offeredInventoryItem;
   const offerer = offer.createByAccount;
@@ -158,14 +167,18 @@ const OfferCard = ({
                     size="sm"
                     className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
                     onClick={() => onReject(offer.offerExchangeId)}
+                    disabled={isLoading}
                   >
+                    {isLoading && <LoadingIndicator />}
                     <X className="h-4 w-4 mr-1" /> Từ Chối
                   </Button>
                   <Button
                     size="sm"
                     className="bg-emerald-600 hover:bg-emerald-700"
                     onClick={() => onAccept(offer.offerExchangeId)}
+                    disabled={isLoading}
                   >
+                    {isLoading && <LoadingIndicator />}
                     <Check className="h-4 w-4 mr-1" /> Chấp Nhận
                   </Button>
                 </>
@@ -295,6 +308,7 @@ const TradeDetailsModal = ({
                     offer={offer}
                     onAccept={handleAcceptOffer}
                     onReject={handleRejectOffer}
+                    isLoading={isLoading}
                   />
                 ))}
               </div>
@@ -312,11 +326,8 @@ export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { mutate: confirm, isPending: isPendingConfirm } =
     useConfirmAcceptedOfffer();
-  const { data: exchangeRequests } = useGetAllExchangeRequestByUserId(
-    user?.id ?? "",
-    1,
-    10
-  );
+  const { data: exchangeRequests, refetch: refetchGetAll } =
+    useGetAllExchangeRequestByUserId(user?.id ?? "", 1, 10);
 
   const {
     data: offerData,
@@ -325,6 +336,40 @@ export default function Page() {
   } = useGetAllOfferByExchangeId(selectedExchange ?? "", 0, 0);
 
   const { data: offerItems } = useGetAllOfferByAccountId(user?.id ?? "", 0, 0);
+  const cancelExchange = useCancelExchangeRequest(selectedExchange ?? "");
+
+  const getStatusBadge = (statusId: ExchangeStatus) => {
+    const statusMap = {
+      [ExchangeStatus.PENDING]: {
+        text: "Đang Chờ",
+        className: "bg-yellow-100 text-yellow-700",
+      },
+      [ExchangeStatus.REJECTED]: {
+        text: "Đã Từ Chối",
+        className: "bg-red-100 text-red-700",
+      },
+      [ExchangeStatus.COMPLETED]: {
+        text: "Đã Chấp Nhận",
+        className: "bg-green-100 text-green-700",
+      },
+      [ExchangeStatus.CANCELLED]: {
+        text: "Đã Hủy",
+        className: "bg-gray-100 text-gray-700",
+      },
+    };
+
+    const { text, className } =
+      statusMap[statusId] || statusMap[ExchangeStatus.PENDING];
+
+    return (
+      <Badge
+        variant="outline"
+        className={`px-3 py-1 rounded-full text-xs font-semibold text-nowrap ${className}`}
+      >
+        {text}
+      </Badge>
+    );
+  };
 
   const { toast } = useToast();
   useEffect(() => {
@@ -379,7 +424,7 @@ export default function Page() {
     );
   }
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 bg-background">
+    <div className="w-full max-w-7xl mx-auto p-6 bg-background">
       <h1 className="text-3xl font-bold text-center mb-6 text-red-700">
         Trung Tâm Giao Dịch
       </h1>
@@ -428,6 +473,9 @@ export default function Page() {
                         <TableHead className="hidden md:table-cell">
                           Đã Đăng
                         </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          Trạng thái
+                        </TableHead>
                         <TableHead className="text-right">Thao Tác</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -469,6 +517,24 @@ export default function Page() {
                           <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
                             {formatDate(request.createDate)}
                           </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            <Badge
+                              variant="outline"
+                              className={`px-3 py-1 rounded-full text-xs font-semibold text-nowrap ${
+                                request.statusId === 0
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : request.statusId === 2
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}
+                            >
+                              {request.statusId === 0
+                                ? "Đang Chờ"
+                                : request.statusId === 1
+                                ? "Đã Chấp Nhận"
+                                : "Đã Từ Chối"}
+                            </Badge>
+                          </TableCell>
                           <TableCell className="text-right">
                             <Dialog
                               open={
@@ -478,15 +544,47 @@ export default function Page() {
                               onOpenChange={setIsModalOpen}
                             >
                               <DialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleOpenModal(request.exchangeRequestId)
-                                  }
-                                >
-                                  Chi tiết
-                                </Button>
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleOpenModal(request.exchangeRequestId)
+                                    }
+                                  >
+                                    <Eye className="h-4 w-4 " />
+                                  </Button>
+
+                                  {request.statusId !==
+                                    ExchangeStatus.CANCELLED && (
+                                    <Button
+                                      size="sm"
+                                      style={{
+                                        backgroundColor: "#F87171",
+                                        color: "#fff",
+                                        textAlign: "center",
+                                      }}
+                                      onClick={() => {
+                                        setSelectedExchange(
+                                          request.exchangeRequestId
+                                        );
+                                        cancelExchange.mutate(
+                                          request.exchangeRequestId,
+                                          {
+                                            onSuccess: () => {
+                                              toast({
+                                                title: "Hủy yêu cầu thành công",
+                                              });
+                                              refetchGetAll();
+                                            },
+                                          }
+                                        );
+                                      }}
+                                    >
+                                      <XCircleIcon className="h-4 w-4" />
+                                    </Button>
+                                  )}
+                                </>
                               </DialogTrigger>
                               {selectedExchangeRequest &&
                                 offerData?.result?.items && (
@@ -602,21 +700,7 @@ export default function Page() {
                           </div>
                         </TableCell>
                         <TableCell className="px-4 py-3 font-semibold">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold text-nowrap ${
-                              item.offerExchangeStatusId === 0
-                                ? "bg-yellow-100 text-yellow-700"
-                                : item.offerExchangeStatusId === 1
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}
-                          >
-                            {item.offerExchangeStatusId === 0
-                              ? "Đang Chờ"
-                              : item.offerExchangeStatusId === 1
-                              ? "Đã Chấp Nhận"
-                              : "Đã Từ Chối"}
-                          </span>
+                          {getStatusBadge(item.exchangeRequest.statusId)}
                         </TableCell>
                       </TableRow>
                     ))}

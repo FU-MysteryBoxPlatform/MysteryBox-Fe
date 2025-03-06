@@ -71,6 +71,14 @@ export default function InventoryCard({
   const { mutate: mutateCreateExchange, isPending: isLoading } =
     useCreateExchangeRequest();
   const collectionData = useMemo(() => data?.result, [data]);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  type ExchangeRequest = {
+    inventoryId: string;
+    content: string;
+  };
+
+  const [exchangeRequestData, setExchangeRequestData] =
+    useState<ExchangeRequest>();
 
   console.log({ collectionData });
 
@@ -110,7 +118,24 @@ export default function InventoryCard({
       }
     );
   };
-
+  const handleConfirmExchange = () => {
+    if (exchangeRequestData) {
+      mutateCreateExchange(exchangeRequestData, {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            toast({
+              title: "Tạo yêu cầu trao đổi thành công!",
+            });
+          } else {
+            toast({
+              title: "Tạo yêu cầu trao đổi thất bại!",
+            });
+          }
+        },
+      });
+      setOpenConfirmModal(false);
+    }
+  };
   return (
     <div className="flex flex-col">
       <div className="relative">
@@ -132,25 +157,11 @@ export default function InventoryCard({
                 {!collectionId && (
                   <DropdownMenuItem
                     onClick={() => {
-                      mutateCreateExchange(
-                        {
-                          inventoryId: id,
-                          content: "Yêu cầu trao đổi vật phẩm",
-                        },
-                        {
-                          onSuccess: (data) => {
-                            if (data.isSuccess) {
-                              toast({
-                                title: "Tạo yêu cầu trao đổi thành công!",
-                              });
-                            } else {
-                              toast({
-                                title: "Tạo yêu cầu trao đổi thất bại!",
-                              });
-                            }
-                          },
-                        }
-                      );
+                      setExchangeRequestData({
+                        inventoryId: id,
+                        content: "Yêu cầu trao đổi vật phẩm",
+                      });
+                      setOpenConfirmModal(true);
                     }}
                   >
                     Trao đổi
@@ -300,6 +311,26 @@ export default function InventoryCard({
           >
             Mở túi mù
           </Button>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận trao đổi</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn tạo yêu cầu trao đổi vật phẩm này không?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2">
+            <Button onClick={() => setOpenConfirmModal(false)}>Hủy</Button>
+            <Button
+              onClick={handleConfirmExchange}
+              className="bg-[#E12E43] hover:bg-[#B71C32]"
+            >
+              {isLoading ? <LoadingIndicator /> : "Xác nhận"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

@@ -15,7 +15,7 @@ export type ExchangeFilterRequest = {
   pageNumber?: number;
   pageSize?: number;
   keyword?: string;
-  rarityStatus?: number
+  rarityStatus?: number;
 };
 
 export const useCreateExchangeRequest = () => {
@@ -32,7 +32,8 @@ export const useGetExchangeRequestById = (exchangeRequestId: string) => {
 
 export const useGetAllExchangeRequest = () => {
   return useApiMutation<ExchangeResponse, ExchangeFilterRequest>(
-    `/exchange/get-all-exchange-request`, "post"
+    `/exchange/get-all-exchange-request`,
+    "post"
   );
 };
 
@@ -48,5 +49,12 @@ export const useGetAllExchangeRequestByUserId = (
       pageNumber +
       "/" +
       pageSize
+  );
+};
+
+export const useCancelExchangeRequest = (exchangeId: string) => {
+  return useApiMutation<ExchangeRequest, string>(
+    `/exchange/cancel-exchange?exchangeId=${exchangeId}`,
+    "put"
   );
 };
