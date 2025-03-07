@@ -3,39 +3,20 @@ import AuctionCard from "@/app/components/AuctionCard";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { Button } from "@/components/ui/button";
 import { useGetAllAuctions } from "@/hooks/api/useAuction";
-import { Sale, useManageSale } from "@/hooks/api/useManageSale";
 import { Auction } from "@/types";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
-  const [saleData, setSaleData] = useState<Sale[]>([]);
   const [auctionData, setAuctionData] = useState<Auction[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
-  const { mutate: mutateManageSale, isPending } = useManageSale();
 
-  const mutateAuction = useGetAllAuctions();
+  const { mutate: mutateAuction, isPending } = useGetAllAuctions();
 
   useEffect(() => {
-    // mutateManageSale(
-    //   {
-    //     saleStatus: 1,
-    //     pageNumber: pageNumber,
-    //     pageSize: 6,
-    //   },
-    //   {
-    //     onSuccess: (data) => {
-    //       if (data.isSuccess) {
-    //         setSaleData((preSale) => [...preSale, ...data.result.items]);
-    //         setTotalPages(data.result.totalPages);
-    //       }
-    //     },
-    //   }
-    // );
-
-    mutateAuction.mutate(
+    mutateAuction(
       {
         pageNumber: pageNumber,
         pageSize: 6,
