@@ -226,7 +226,6 @@ export type InventoryItem = {
   itemStatus: unknown | null;
 };
 
-
 export interface ExchangeRequest {
   exchangeRequestId: string;
   requestInventoryItemId: string;
@@ -261,3 +260,21 @@ export interface OfferExchange {
   updateByAccount: unknown | null;
 }
 
+export type AuctionStatus = {
+  id: number;
+  name: string;
+  dropRate?: string;
+};
+export type Auction = {
+  auctionId: string;
+  inventoryId: string;
+  inventory: Inventory;
+  accountId: string;
+  account: Account;
+  startTime: string;
+  endTime: string;
+  minimunBid: number;
+  currentBid: number;
+  statusId: number;
+  auctionStatus: AuctionStatus;
+};

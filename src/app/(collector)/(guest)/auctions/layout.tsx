@@ -84,12 +84,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 }
 
 const SIDE_ITEMS = [
+  // {
+  //   name: "Đăng ký & Đấu thầu",
+  //   value: "/auctions/register-and-bid",
+  // },
   {
-    name: "Đăng ký & Đấu thầu",
-    value: "/auctions/register-and-bid",
-  },
-  {
-    name: "Auctions boxes",
+    name: "Các phiên đấu giá",
     value: "/auctions/auctions-boxes",
   },
   {

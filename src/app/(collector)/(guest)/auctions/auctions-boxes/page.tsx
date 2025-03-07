@@ -1,53 +1,68 @@
-"use client";
+"use client";;
+import AuctionCard from "@/app/components/AuctionCard";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-import ProductCard from "@/app/components/ProductCard";
 import { Button } from "@/components/ui/button";
+import { useGetAllAuctions } from "@/hooks/api/useAuction";
 import { Sale, useManageSale } from "@/hooks/api/useManageSale";
+import { Auction } from "@/types";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
   const [saleData, setSaleData] = useState<Sale[]>([]);
+  const [auctionData, setAuctionData] = useState<Auction[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const { mutate: mutateManageSale, isPending } = useManageSale();
 
+  const mutateAuction = useGetAllAuctions();
+
   useEffect(() => {
-    mutateManageSale(
+    // mutateManageSale(
+    //   {
+    //     saleStatus: 1,
+    //     pageNumber: pageNumber,
+    //     pageSize: 6,
+    //   },
+    //   {
+    //     onSuccess: (data) => {
+    //       if (data.isSuccess) {
+    //         setSaleData((preSale) => [...preSale, ...data.result.items]);
+    //         setTotalPages(data.result.totalPages);
+    //       }
+    //     },
+    //   }
+    // );
+
+    mutateAuction.mutate(
       {
-        saleStatus: 1,
         pageNumber: pageNumber,
         pageSize: 6,
       },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setSaleData((preSale) => [...preSale, ...data.result.items]);
+            setAuctionData(data.result.items);
             setTotalPages(data.result.totalPages);
           }
         },
       }
     );
-  }, [mutateManageSale, pageNumber]);
+  }, [pageNumber]);
 
   return (
     <div className="">
-      <div className="grid grid-cols-3 gap-4">
-        {saleData.map((product) => (
+      <div className="grid grid-cols-2 gap-4">
+        {auctionData.map((product) => (
           <div
-            key={product.inventoryId}
+            key={product.auctionId}
             className="cursor-pointer"
             onClick={() =>
               router.push("/auctions/auctions-boxes/" + product.inventoryId)
             }
           >
-            <ProductCard
-              image={product.inventory?.product?.imagePath}
-              price={product.totalAmount}
-              title={product.inventory?.product?.name}
-              saleId={product.saleId}
-            />
+            <AuctionCard auction={product} />
           </div>
         ))}
       </div>
