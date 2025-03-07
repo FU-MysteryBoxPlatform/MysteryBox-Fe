@@ -88,7 +88,10 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
               <span>Listed by {auctionData.account?.firstName}</span>
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="px-2 py-1">
+          <Badge
+            variant="secondary"
+            className={`px-2 py-1 ${getStatusColor()}`}
+          >
             {getStatusLabel()}
           </Badge>
         </div>
