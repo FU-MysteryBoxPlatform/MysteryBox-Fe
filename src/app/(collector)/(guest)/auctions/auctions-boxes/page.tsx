@@ -4,7 +4,6 @@ import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { Button } from "@/components/ui/button";
 import { useGetAllAuctions } from "@/hooks/api/useAuction";
 import { Auction } from "@/types";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
