@@ -104,7 +104,8 @@ export default function Page() {
         } catch (error) {
           if (retryCount < MAX_RETRIES) {
             retryCount++;
-            setTimeout(startConnection, RETRY_DELAY); // Retry connection
+            setTimeout(startConnection, RETRY_DELAY);
+            console.log(error); // Retry connection
           } else {
             console.log("Max retries reached. Could not connect to SignalR.");
           }
