@@ -105,16 +105,16 @@ const OfferCard = ({
       <CardHeader className="p-4 pb-2 flex flex-row items-center gap-3">
         <Avatar className="h-10 w-10 border-2 border-emerald-200">
           <AvatarImage
-            src={offerer.avatar || undefined}
-            alt={`${offerer.firstName} ${offerer.lastName}`}
+            src={offerer?.avatar || undefined}
+            alt={`${offerer?.firstName ?? ''} ${offerer?.lastName ?? ''}`}
           />
-          <AvatarFallback>{offerer.firstName?.charAt(0) || "U"}</AvatarFallback>
+          <AvatarFallback>{offerer?.firstName?.charAt(0) || "U"}</AvatarFallback>
         </Avatar>
         <div>
           <h3 className="font-medium text-base">
-            {offerer.firstName} {offerer.lastName}
+            {offerer?.firstName ?? ''} {offerer?.lastName ?? ''}
           </h3>
-          <p className="text-xs text-muted-foreground">{offerer.email}</p>
+          {offerer && <p className="text-xs text-muted-foreground">{offerer.email}</p>}
         </div>
         {getStatusBadge((offer?.offerExchangeStatusId as 0 | 1 | 2) || 0)}
       </CardHeader>
@@ -260,19 +260,19 @@ const TradeDetailsModal = ({
             <div className="flex items-center gap-2 md:ml-auto">
               <Avatar className="h-10 w-10 border-2 border-red-200">
                 <AvatarImage
-                  src={requester.avatar || undefined}
-                  alt={`${requester.firstName} ${requester.lastName}`}
+                  src={requester?.avatar || undefined}
+                  alt={`${requester?.firstName ?? ''} ${requester?.lastName ?? ''}`}
                 />
                 <AvatarFallback>
-                  {requester.firstName?.charAt(0) || "U"}
+                  {requester?.firstName?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-medium">
-                  {requester.firstName} {requester.lastName}
+                  {requester?.firstName ?? ''} {requester?.lastName ?? ''}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {requester.email}
+                  {requester?.email ?? ''}
                 </p>
               </div>
             </div>
