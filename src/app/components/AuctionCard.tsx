@@ -91,16 +91,14 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
   // Determine auction status label
   const getStatusLabel = (): string => {
     switch (auctionData.statusId) {
+      case 0:
+        return "Sắp diễn ra";
       case 1:
-        return "Pending";
+        return "Đang diễn ra";
       case 2:
-        return "Cancelled";
+        return "Kết thúc";
       case 3:
-        return "Active";
-      case 4:
-        return "Completed";
-      case 5:
-        return "Failed";
+        return "Huỷ";
       default:
         return "Unknown";
     }
@@ -109,16 +107,14 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
   // Determine status badge color
   const getStatusColor = (): string => {
     switch (auctionData.statusId) {
-      case 1:
+      case 0:
         return "bg-yellow-100 text-yellow-800";
+      case 1:
+        return "bg-green-100 text-green-800";
       case 2:
         return "bg-red-100 text-red-800";
       case 3:
-        return "bg-green-100 text-green-800";
-      case 4:
-        return "bg-blue-100 text-blue-800";
-      case 5:
-        return "bg-gray-100 text-gray-800";
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -154,9 +150,7 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
                   description: "Vui lòng thanh toán cọc để tham gia đấu giá",
                 });
               }, 3000);
-              router.push(
-                `/auctions/auctions-boxes/${auctionData.inventoryId}`
-              );
+              router.push(`/auctions/auctions-boxes/${auctionData.auctionId}`);
             }
           } else {
             toast({

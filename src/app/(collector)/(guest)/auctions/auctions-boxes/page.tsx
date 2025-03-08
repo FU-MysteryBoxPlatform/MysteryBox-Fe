@@ -18,7 +18,7 @@ export default function Page() {
       {
         pageNumber: pageNumber,
         pageSize: 6,
-        status: 0,
+        status: 1,
       },
       {
         onSuccess: (data) => {

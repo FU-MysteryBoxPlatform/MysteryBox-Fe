@@ -13,7 +13,6 @@ export type BaseEntity = {
   updateByAccount: Account | null;
 };
 
-
 export type TAccount = {
   id: string;
   phoneNumber: string;
@@ -236,7 +235,7 @@ export type InventoryItem = {
   itemStatus: unknown | null;
 };
 
-export interface ExchangeRequest {
+export type ExchangeRequest = BaseEntity & {
   exchangeRequestId: string;
   requestInventoryItemId: string;
   requestInventoryItem: InventoryItem;
@@ -245,15 +244,9 @@ export interface ExchangeRequest {
   statusId: number;
   status: unknown | null;
   content: string | null;
-  createDate: string;
-  updateDate: string;
-  createBy: string;
-  createByAccount: Account;
-  updateBy: string | null;
-  updateByAccount: unknown | null;
-}
+};
 
-export interface OfferExchange {
+export type OfferExchange = BaseEntity & {
   offerExchangeId: string;
   exchangeRequestId: string;
   exchangeRequest: ExchangeRequest;
@@ -262,13 +255,7 @@ export interface OfferExchange {
   offerExchangeStatusId: number;
   offerExchangeStatus: unknown | null;
   content: string;
-  createDate: string;
-  updateDate: string;
-  createBy: string;
-  createByAccount: Account;
-  updateBy: string | null;
-  updateByAccount: unknown | null;
-}
+};
 
 export type AuctionStatus = {
   id: number;
@@ -300,4 +287,15 @@ export type AuctionParticipantRequest = BaseEntity & {
   auction: Auction;
   statusId: number;
   status: AuctionParticipantRequestStatus;
+};
+
+export type AuctionHistory = BaseEntity & {
+  auctionHistoryId: string;
+  auctionId: string;
+  auction: Auction;
+  accountId: string;
+  account: null | Account;
+  amount: number;
+  statusId: number;
+  auctionHistoryStatus: null | any;
 };
