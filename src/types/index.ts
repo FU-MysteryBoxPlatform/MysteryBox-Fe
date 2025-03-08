@@ -289,6 +289,11 @@ export type AuctionParticipantRequest = BaseEntity & {
   status: AuctionParticipantRequestStatus;
 };
 
+export type AuctionHistoryStatus = {
+  id: number;
+  name: string;
+};
+
 export type AuctionHistory = BaseEntity & {
   auctionHistoryId: string;
   auctionId: string;
@@ -297,5 +302,5 @@ export type AuctionHistory = BaseEntity & {
   account: null | Account;
   amount: number;
   statusId: number;
-  auctionHistoryStatus: null | any;
+  auctionHistoryStatus: AuctionHistoryStatus | null;
 };
