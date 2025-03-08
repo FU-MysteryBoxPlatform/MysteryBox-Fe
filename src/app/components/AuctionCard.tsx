@@ -16,6 +16,7 @@ import { useJoinAuction } from "@/hooks/api/useAuction";
 import { GlobalContext } from "@/provider/global-provider";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
+import LoadingIndicator from "./LoadingIndicator";
 
 // Modal Component
 const PolicyModal: React.FC<{
@@ -250,7 +251,8 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
             onClick={() => setIsModalOpen(true)}
             className="flex animate-pulse font-bold items-center text-red-600 hover:text-red-800"
           >
-            Đấu giá ngay
+            {isPending ? <LoadingIndicator /> : " Đấu giá ngay"}
+
             <Info className="h-4 w-4 ml-2" />
           </button>
         </div>
