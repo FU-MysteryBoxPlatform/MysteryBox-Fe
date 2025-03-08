@@ -87,7 +87,7 @@ export default function Home() {
               <CardFooter className="p-4 pt-0 flex justify-between bg-white mt-auto">
                 <div className="text-sm">
                   <span className="text-gray-500">Người đăng: </span>
-                  {item.createByAccount.firstName}
+                  {item.createByAccount?.firstName}
                 </div>
               </CardFooter>
             </Card>
