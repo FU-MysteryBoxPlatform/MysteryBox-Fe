@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Page() {
-  const router = useRouter();
   const [auctionData, setAuctionData] = useState<Auction[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
@@ -41,9 +40,6 @@ export default function Page() {
           <div
             key={product.auctionId}
             className="cursor-pointer"
-            // onClick={() =>
-            //   router.push("/auctions/auctions-boxes/" + product.inventoryId)
-            // }
           >
             <AuctionCard auction={product} />
           </div>
