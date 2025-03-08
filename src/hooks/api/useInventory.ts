@@ -1,5 +1,5 @@
 import { Collection, TAccount } from "@/types";
-import { useApiMutation } from "./useApi";
+import { useApiMutation, useApiQuery } from "./useApi";
 import { Account } from "./useManageSale";
 import { TProductSale } from "./useSale";
 
@@ -102,5 +102,11 @@ export const useGetAllInventory = () => {
   return useApiMutation<TGetAllInventoryResponse, TGetInventory>(
     "/inventory/get-all-item-in-inventory",
     "post"
+  );
+};
+
+export const useGetInventoryById = (inventoryId: string) => {
+  return useApiQuery<TGetAllInventoryResponse>(
+    `/inventory/get-item-in-inventory/${inventoryId}`
   );
 };

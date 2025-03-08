@@ -8,13 +8,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
 import { AlignJustify } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useContext } from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { user } = useContext(GlobalContext);
   const pathname = usePathname();
   const router = useRouter();
+
   return (
     <div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -66,7 +70,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     key={item.name}
                     className={cn(
                       "px-2 py-1 rounded-md cursor-pointer hover:bg-gray-100",
-                      pathname.includes(item.value) && "bg-gray-100 font-bold"
+                      pathname.includes(item.value) && "bg-gray-100 font-bold",
+                      item.needLogin && !user && "hidden"
                     )}
                     onClick={() => router.push(item.value)}
                   >
@@ -84,10 +89,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 }
 
 const SIDE_ITEMS = [
-  // {
-  //   name: "Đăng ký & Đấu thầu",
-  //   value: "/auctions/register-and-bid",
-  // },
+  {
+    name: "Đăng ký & Đấu thầu",
+    value: "/auctions/register-and-bid",
+    needLogin: true,
+  },
   {
     name: "Các phiên đấu giá",
     value: "/auctions/auctions-boxes",

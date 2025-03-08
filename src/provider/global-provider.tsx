@@ -128,8 +128,14 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     const accessToken = cookie.get("ACCESS_TOKEN");
     if (!accessToken) {
       localStorage.removeItem("user");
-    } else if (savedUser) {
+    }
+    if (savedUser) {
       setUser(JSON.parse(savedUser));
+    } else {
+      localStorage.removeItem("user");
+      // remove access token
+      cookie.delete("ACCESS_TOKEN");
+      cookie.delete("REFRESH_TOKEN");
     }
     setIsFetchingUser(false);
   }, []);

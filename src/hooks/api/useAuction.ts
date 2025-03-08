@@ -11,14 +11,27 @@ export type GetAuction = {
 };
 
 export type GetAuctionResponse = {
-    items: Auction[];
-    totalItems: number;
-    totalPages: number;
-    };
+  items: Auction[];
+  totalItems: number;
+  totalPages: number;
+};
+
+export type RequestAuctionRequest = {
+  inventoryId: string;
+  startTime: string;
+  endTime: string;
+  minimunBid: number;
+};
 
 export const useGetAllAuctions = () => {
   return useApiMutation<GetAuctionResponse, GetAuction>(
     "/auction/get-all-auction",
     "post"
+  );
+};
+
+export const useRequestAuction = () => {
+  return useApiMutation<string, RequestAuctionRequest>(
+    "/auction/create-auction"
   );
 };
