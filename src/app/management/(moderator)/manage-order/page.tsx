@@ -107,6 +107,8 @@ export default function Page() {
     );
   }, [email, endDate, mutateGetOrders, page, startDate, status, type]);
 
+  console.log({ orderDetail });
+
   return (
     <div className="p-6">
       <Card>

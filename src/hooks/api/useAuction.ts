@@ -23,8 +23,12 @@ export type GetAuctionResponse = {
   totalPages: number;
 };
 
-export type JoinAuctionResponse = {};
-
+export type RequestAuctionRequest = {
+  inventoryId: string;
+  startTime: string;
+  endTime: string;
+  minimunBid: number;
+};
 export const useGetAllAuctions = () => {
   return useApiMutation<GetAuctionResponse, GetAuction>(
     "/auction/get-all-auction",
@@ -36,5 +40,10 @@ export const useJoinAuction = () => {
   return useApiMutation<string | AuctionParticipantRequest, JoinAuctionRequest>(
     "/auction/participate-an-auction",
     "post"
+  );
+};
+export const useRequestAuction = () => {
+  return useApiMutation<string, RequestAuctionRequest>(
+    "/auction/create-auction"
   );
 };
