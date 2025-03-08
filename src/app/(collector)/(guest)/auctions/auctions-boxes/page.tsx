@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import AuctionCard from "@/app/components/AuctionCard";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { Button } from "@/components/ui/button";
@@ -13,17 +13,19 @@ export default function Page() {
   const [totalPages, setTotalPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
 
-  const { mutate: mutateAuction, isPending } = useGetAllAuctions();
+  const { mutateAsync: mutateAuction, isPending } = useGetAllAuctions();
 
   useEffect(() => {
     mutateAuction(
       {
         pageNumber: pageNumber,
         pageSize: 6,
+        status: 0,
       },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
+            console.log("ehehe",data)
             setAuctionData(data.result.items);
             setTotalPages(data.result.totalPages);
           }
@@ -39,9 +41,9 @@ export default function Page() {
           <div
             key={product.auctionId}
             className="cursor-pointer"
-            onClick={() =>
-              router.push("/auctions/auctions-boxes/" + product.inventoryId)
-            }
+            // onClick={() =>
+            //   router.push("/auctions/auctions-boxes/" + product.inventoryId)
+            // }
           >
             <AuctionCard auction={product} />
           </div>

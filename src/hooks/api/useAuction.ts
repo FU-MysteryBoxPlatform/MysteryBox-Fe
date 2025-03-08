@@ -1,4 +1,4 @@
-import { Auction } from "@/types";
+import { Auction, AuctionParticipantRequest } from "@/types";
 import { useApiMutation } from "./useApi";
 
 export type GetAuction = {
@@ -10,15 +10,31 @@ export type GetAuction = {
   pageSize: number;
 };
 
+export type JoinAuctionRequest = {
+  accountId: string;
+  auctionId: string;
+  paymentMethod: number;
+  returnUrl: string;
+};
+
 export type GetAuctionResponse = {
-    items: Auction[];
-    totalItems: number;
-    totalPages: number;
-    };
+  items: Auction[];
+  totalItems: number;
+  totalPages: number;
+};
+
+export type JoinAuctionResponse = {};
 
 export const useGetAllAuctions = () => {
   return useApiMutation<GetAuctionResponse, GetAuction>(
     "/auction/get-all-auction",
+    "post"
+  );
+};
+
+export const useJoinAuction = () => {
+  return useApiMutation<string | AuctionParticipantRequest, JoinAuctionRequest>(
+    "/auction/participate-an-auction",
     "post"
   );
 };

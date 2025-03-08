@@ -61,6 +61,8 @@ export default function Page() {
     isSuccess || isVNPaySuccess ? 1 : 2
   );
 
+  const auctionId = searchParams.get("auctionId") || "";
+
   // Lấy dữ liệu từ URL
   useEffect(() => {
     if (!searchParams) return;
@@ -110,6 +112,9 @@ export default function Page() {
         onSuccess: (data) => {
           if (data.isSuccess) {
             setCart((cart || []).filter((item) => item.selected === false));
+            if ((auctionId && isSuccess) || (auctionId && isVNPaySuccess)) {
+              router.push(`/auctions/auctions-boxes/${auctionId}`);
+            }
           }
           toast({ title: data.messages[0] });
         },

@@ -4,6 +4,16 @@ export type TBaseResponse<T> = {
   messages: string[];
 };
 
+export type BaseEntity = {
+  createDate: string;
+  updateDate: string;
+  createBy: string | null;
+  updateBy: string | null;
+  createByAccount: Account | null;
+  updateByAccount: Account | null;
+};
+
+
 export type TAccount = {
   id: string;
   phoneNumber: string;
@@ -277,4 +287,17 @@ export type Auction = {
   currentBid: number;
   statusId: number;
   auctionStatus: AuctionStatus;
+};
+
+export type AuctionParticipantRequestStatus = {
+  id: number;
+  name: string;
+};
+
+export type AuctionParticipantRequest = BaseEntity & {
+  auctionParticipantRequestId: string;
+  auctionId: string;
+  auction: Auction;
+  statusId: number;
+  status: AuctionParticipantRequestStatus;
 };
