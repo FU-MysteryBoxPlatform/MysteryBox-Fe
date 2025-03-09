@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
-const authenticatedUrls = ["/profile", "/my-collection", "/my-product"];
+const authenticatedUrls = [
+  "/profile",
+  "/my-collection",
+  "/my-product",
+  "/messages",
+  "/my-exchange",
+  "/my-request-sell",
+  "/my-transaction",
+];
 
 export default function middleware(request: NextRequest) {
   const { cookies } = request;
