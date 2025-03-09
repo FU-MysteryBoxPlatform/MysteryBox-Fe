@@ -2,24 +2,30 @@
 
 import type React from "react";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
-  SidebarHeader,
-  SidebarProvider,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Send, Phone, Video, MoreVertical } from "lucide-react";
+import { MoreVertical, Phone, Search, Send, Video } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 // Sample data for inbox messages
 const inboxData = [
@@ -199,7 +205,7 @@ export default function ChatPage() {
   return (
     <div className="flex h-[calc(100vh-74px)] bg-background [&>div]:min-h-full">
       <SidebarProvider>
-        <Sidebar className="border-r" collapsible="none">
+        <Sidebar className="border-r max-md:hidden" collapsible="none">
           <SidebarHeader>
             <div className="p-2">
               <div className="relative">
@@ -262,6 +268,83 @@ export default function ChatPage() {
         </Sidebar>
 
         <div className="flex flex-col flex-1">
+          {/*  Inbox list in mobile */}
+          <Accordion type="single" collapsible className="md:hidden">
+            <AccordionItem value="item-1">
+              <AccordionTrigger className="w-full px-4">
+                See all inboxes
+              </AccordionTrigger>
+              <AccordionContent>
+                <Sidebar
+                  className="border-r md:hidden w-full h-fit"
+                  collapsible="none"
+                >
+                  <SidebarHeader>
+                    <div className="p-2">
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          type="search"
+                          placeholder="Search messages..."
+                          className="pl-8"
+                        />
+                      </div>
+                    </div>
+                  </SidebarHeader>
+                  <SidebarSeparator />
+                  <SidebarContent className="max-h-[200px] overflow-y-auto">
+                    <SidebarGroup>
+                      <SidebarGroupLabel>Messages</SidebarGroupLabel>
+                      <SidebarGroupContent>
+                        <SidebarMenu>
+                          {inboxData.map((contact) => (
+                            <SidebarMenuItem key={contact.id}>
+                              <SidebarMenuButton
+                                isActive={selectedContact.id === contact.id}
+                                onClick={() => setSelectedContact(contact)}
+                                className="flex items-center gap-3 h-16"
+                              >
+                                <div className="relative">
+                                  <Avatar>
+                                    <AvatarImage
+                                      src={contact.avatar}
+                                      alt={contact.name}
+                                    />
+                                    <AvatarFallback>
+                                      {contact.name.charAt(0)}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  {contact.unread > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                                      {contact.unread}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="flex flex-col flex-1 overflow-hidden">
+                                  <div className="flex justify-between">
+                                    <span className="font-medium">
+                                      {contact.name}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {contact.time}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground truncate">
+                                    {contact.lastMessage}
+                                  </p>
+                                </div>
+                              </SidebarMenuButton>
+                            </SidebarMenuItem>
+                          ))}
+                        </SidebarMenu>
+                      </SidebarGroupContent>
+                    </SidebarGroup>
+                  </SidebarContent>
+                </Sidebar>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
           {/* Chat header */}
           <div className="flex items-center justify-between border-b p-4">
             <div className="flex items-center gap-3">
