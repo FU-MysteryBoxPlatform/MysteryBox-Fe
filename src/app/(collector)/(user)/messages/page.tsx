@@ -2,29 +2,10 @@
 
 import type React from "react";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarSeparator,
-} from "@/components/ui/sidebar";
-import { MoreVertical, Phone, Search, Send, Video } from "lucide-react";
+import { MoreVertical, Phone, Send, Video } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // Sample data for inbox messages
@@ -203,231 +184,84 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-74px)] bg-background [&>div]:min-h-full">
-      <SidebarProvider>
-        <Sidebar className="border-r max-md:hidden" collapsible="none">
-          <SidebarHeader>
-            <div className="p-2">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search messages..."
-                  className="pl-8"
-                />
-              </div>
-            </div>
-          </SidebarHeader>
-          <SidebarSeparator />
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Messages</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {inboxData.map((contact) => (
-                    <SidebarMenuItem key={contact.id}>
-                      <SidebarMenuButton
-                        isActive={selectedContact.id === contact.id}
-                        onClick={() => setSelectedContact(contact)}
-                        className="flex items-center gap-3 h-16"
-                      >
-                        <div className="relative">
-                          <Avatar>
-                            <AvatarImage
-                              src={contact.avatar}
-                              alt={contact.name}
-                            />
-                            <AvatarFallback>
-                              {contact.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          {contact.unread > 0 && (
-                            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                              {contact.unread}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex flex-col flex-1 overflow-hidden">
-                          <div className="flex justify-between">
-                            <span className="font-medium">{contact.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {contact.time}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {contact.lastMessage}
-                          </p>
-                        </div>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-
-        <div className="flex flex-col flex-1">
-          {/*  Inbox list in mobile */}
-          <Accordion type="single" collapsible className="md:hidden">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="w-full px-4">
-                See all inboxes
-              </AccordionTrigger>
-              <AccordionContent>
-                <Sidebar
-                  className="border-r md:hidden w-full h-fit"
-                  collapsible="none"
-                >
-                  <SidebarHeader>
-                    <div className="p-2">
-                      <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          type="search"
-                          placeholder="Search messages..."
-                          className="pl-8"
-                        />
-                      </div>
-                    </div>
-                  </SidebarHeader>
-                  <SidebarSeparator />
-                  <SidebarContent className="max-h-[200px] overflow-y-auto">
-                    <SidebarGroup>
-                      <SidebarGroupLabel>Messages</SidebarGroupLabel>
-                      <SidebarGroupContent>
-                        <SidebarMenu>
-                          {inboxData.map((contact) => (
-                            <SidebarMenuItem key={contact.id}>
-                              <SidebarMenuButton
-                                isActive={selectedContact.id === contact.id}
-                                onClick={() => setSelectedContact(contact)}
-                                className="flex items-center gap-3 h-16"
-                              >
-                                <div className="relative">
-                                  <Avatar>
-                                    <AvatarImage
-                                      src={contact.avatar}
-                                      alt={contact.name}
-                                    />
-                                    <AvatarFallback>
-                                      {contact.name.charAt(0)}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  {contact.unread > 0 && (
-                                    <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                                      {contact.unread}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="flex flex-col flex-1 overflow-hidden">
-                                  <div className="flex justify-between">
-                                    <span className="font-medium">
-                                      {contact.name}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">
-                                      {contact.time}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-muted-foreground truncate">
-                                    {contact.lastMessage}
-                                  </p>
-                                </div>
-                              </SidebarMenuButton>
-                            </SidebarMenuItem>
-                          ))}
-                        </SidebarMenu>
-                      </SidebarGroupContent>
-                    </SidebarGroup>
-                  </SidebarContent>
-                </Sidebar>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          {/* Chat header */}
-          <div className="flex items-center justify-between border-b p-4">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage
-                  src={selectedContact.avatar}
-                  alt={selectedContact.name}
-                />
-                <AvatarFallback>
-                  {selectedContact.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-medium">{selectedContact.name}</h2>
-                <p className="text-xs text-muted-foreground">Online</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" title="Voice call">
-                <Phone className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" title="Video call">
-                <Video className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" title="More options">
-                <MoreVertical className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Chat messages */}
-          <div
-            ref={chatMessagesRef}
-            className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
-          >
-            {isLoading && (
-              <p className="text-center">Loading older messages...</p>
-            )}
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.sender === "me" ? "justify-end" : "justify-start"
-                }`}
-              >
-                <div
-                  className={`max-w-[70%] rounded-lg p-3 ${
-                    message.sender === "me"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  }`}
-                >
-                  <p>{message.content}</p>
-                  <p
-                    className={`text-xs mt-1 ${
-                      message.sender === "me"
-                        ? "text-primary-foreground/70"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {message.timestamp}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Message input */}
-          <div className="border-t p-4">
-            <form onSubmit={handleSendMessage} className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1"
-              />
-              <Button type="submit" size="icon">
-                <Send className="h-5 w-5" />
-              </Button>
-            </form>
+    <div className="">
+      {/* Chat header */}
+      <div className="flex items-center justify-between border-b p-4">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage
+              src={selectedContact.avatar}
+              alt={selectedContact.name}
+            />
+            <AvatarFallback>{selectedContact.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h2 className="font-medium">{selectedContact.name}</h2>
+            <p className="text-xs text-muted-foreground">Online</p>
           </div>
         </div>
-      </SidebarProvider>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" title="Voice call">
+            <Phone className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" title="Video call">
+            <Video className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" title="More options">
+            <MoreVertical className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Chat messages */}
+      <div
+        ref={chatMessagesRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+      >
+        {isLoading && <p className="text-center">Loading older messages...</p>}
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex ${
+              message.sender === "me" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`max-w-[70%] rounded-lg p-3 ${
+                message.sender === "me"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted"
+              }`}
+            >
+              <p>{message.content}</p>
+              <p
+                className={`text-xs mt-1 ${
+                  message.sender === "me"
+                    ? "text-primary-foreground/70"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {message.timestamp}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Message input */}
+      <div className="border-t p-4">
+        <form onSubmit={handleSendMessage} className="flex gap-2">
+          <Input
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-1"
+          />
+          <Button type="submit" size="icon">
+            <Send className="h-5 w-5" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
