@@ -1,3 +1,153 @@
-export default function Page() {
-  return <div></div>;
+"use client";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  ChatMessage,
+  useCreateChatMessage,
+  useGetAllChatMessageByConversationId,
+} from "@/hooks/api/useChatMessage";
+import { GlobalContext } from "@/provider/global-provider";
+import dayjs from "dayjs";
+import { MoreVertical, Phone, Send, Video } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useContext, useEffect, useRef, useState } from "react";
+
+export default function ChatPage() {
+  const [messages, setMessages] = useState<ChatMessage[]>();
+  const [newMessage, setNewMessage] = useState<string>("");
+  const { user } = useContext(GlobalContext);
+  const { id } = useParams();
+
+  const { data, refetch } = useGetAllChatMessageByConversationId(
+    id as string,
+    1,
+    20
+  );
+
+  const { mutate: sendMessage } = useCreateChatMessage();
+
+  const partner = data?.result.converstationParticipants.find(
+    (item) => item.account.id !== user?.id
+  )?.account;
+
+  // Reference to the chat messages container
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to the bottom whenever messages change
+  useEffect(() => {
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSendMessage = () => {
+    sendMessage(
+      {
+        accountId: user?.id || "",
+        converstationId: id as string,
+        message: newMessage,
+      },
+      {
+        onSuccess: () => {
+          setNewMessage("");
+          refetch();
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    refetch();
+  }, [refetch, id]);
+
+  useEffect(() => {
+    setMessages(data?.result.chatMessages || []);
+  }, [data]);
+
+  return (
+    <div className="h-full flex flex-col">
+      {/* Chat header */}
+      <div className="flex items-center justify-between border-b p-4">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src={partner?.avatar} alt={partner?.userName} />
+            <AvatarFallback>{partner?.userName.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h2 className="font-medium">
+              {partner?.firstName} {partner?.lastName}
+            </h2>
+            <p className="text-xs text-muted-foreground">Online</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" title="Voice call">
+            <Phone className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" title="Video call">
+            <Video className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" title="More options">
+            <MoreVertical className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Chat messages */}
+      <div
+        ref={chatMessagesRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+      >
+        {messages?.map((message) => {
+          const isMe = message.conversationParticipant.account.id === user?.id;
+          return (
+            <div
+              key={message.chatMessageId}
+              className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[70%] rounded-lg p-3 ${
+                  isMe ? "bg-primary text-primary-foreground" : "bg-muted"
+                }`}
+              >
+                <p>{message.content}</p>
+                <p
+                  className={`text-xs mt-1 ${
+                    isMe
+                      ? "text-primary-foreground/70"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {dayjs(message.createDate).format("HH:mm")}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Message input */}
+      <div className="border-t p-4">
+        <form className="flex gap-2">
+          <Input
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); // Prevent the default form submission
+                handleSendMessage();
+              }
+            }}
+            placeholder="Nhập tin nhắn..."
+            className="flex-1"
+          />
+          <Button type="button" size="icon" onClick={handleSendMessage}>
+            <Send className="h-5 w-5" />
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
 }
