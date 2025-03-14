@@ -66,6 +66,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             await refetch(); // Fetch new bids when a new bid is placed
           });
         } catch (error) {
+          console.log("SignalR connection failed. Retrying...", error);
           if (retryCount < MAX_RETRIES) {
             retryCount++;
             setTimeout(startConnection, RETRY_DELAY); // Retry connection

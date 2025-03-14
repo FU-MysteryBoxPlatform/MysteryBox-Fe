@@ -20,7 +20,9 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState<string>("");
   const { user } = useContext(GlobalContext);
   const { id } = useParams();
-  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(
+    null
+  );
 
   const { data, refetch } = useGetAllChatMessageByConversationId(
     id as string,
@@ -71,6 +73,8 @@ export default function ChatPage() {
             await refetch(); // Fetch new bids when a new bid is placed
           });
         } catch (error) {
+          console.log("SignalR connection failed. Retrying...", error);
+
           if (retryCount < MAX_RETRIES) {
             retryCount++;
             setTimeout(startConnection, RETRY_DELAY); // Retry connection
