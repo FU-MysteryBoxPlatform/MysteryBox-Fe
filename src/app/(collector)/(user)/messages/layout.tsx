@@ -20,12 +20,14 @@ import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
 import { useParams, useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import * as signalR from "@microsoft/signalr"; // Import SignalR
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useContext(GlobalContext);
   const [conversations, setConversations] = useState<TConverstation[]>([]);
   const router = useRouter();
   const { id } = useParams();
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
   const { data, refetch, isLoading } = useGetAllInboxByAccount(
     user?.id || "",
@@ -36,6 +38,45 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refetch();
   }, [refetch]);
+  useEffect(() => {
+    const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`${process.env.NEXT_PUBLIC_API_URL}/notifications`)
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(newConnection);
+
+    return () => {
+      if (connection) {
+        connection.stop();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let retryCount = 0;
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY = 3000; // 3 seconds
+
+    const startConnection = async () => {
+      if (connection) {
+        try {
+          await connection.start();
+          connection.on("LOAD_NEW_CONVERSATION", async () => {
+            await refetch(); // Fetch new bids when a new bid is placed
+          });
+        } catch (error) {
+          if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            setTimeout(startConnection, RETRY_DELAY); // Retry connection
+          } else {
+            console.log("Max retries reached. Could not connect to SignalR.");
+          }
+        }
+      }
+    };
+    startConnection();
+  }, [connection]); // Ensure connection starts once it's set
 
   useEffect(() => {
     setConversations(data?.result.items || []);

@@ -13,12 +13,14 @@ import dayjs from "dayjs";
 import { MoreVertical, Phone, Send, Video } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
+import * as signalR from "@microsoft/signalr"; // Import SignalR
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>();
   const [newMessage, setNewMessage] = useState<string>("");
   const { user } = useContext(GlobalContext);
   const { id } = useParams();
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
 
   const { data, refetch } = useGetAllChatMessageByConversationId(
     id as string,
@@ -41,6 +43,45 @@ export default function ChatPage() {
       chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
     }
   }, [messages]);
+  useEffect(() => {
+    const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`${process.env.NEXT_PUBLIC_API_URL}/notifications`)
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(newConnection);
+
+    return () => {
+      if (connection) {
+        connection.stop();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let retryCount = 0;
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY = 3000; // 3 seconds
+
+    const startConnection = async () => {
+      if (connection) {
+        try {
+          await connection.start();
+          connection.on("LOAD_NEW_CONVERSATION", async () => {
+            await refetch(); // Fetch new bids when a new bid is placed
+          });
+        } catch (error) {
+          if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            setTimeout(startConnection, RETRY_DELAY); // Retry connection
+          } else {
+            console.log("Max retries reached. Could not connect to SignalR.");
+          }
+        }
+      }
+    };
+    startConnection();
+  }, [connection]); // Ensure connection starts once it's set
 
   const handleSendMessage = () => {
     sendMessage(
