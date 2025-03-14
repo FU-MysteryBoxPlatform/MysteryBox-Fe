@@ -40,7 +40,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [refetch]);
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`${process.env.NEXT_PUBLIC_API_URL}/notifications`)
+      .withUrl(`${process.env.NEXT_PUBLIC_DOMAIN}/notifications`)
       .withAutomaticReconnect()
       .build();
 
