@@ -31,8 +31,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const { data, refetch, isLoading } = useGetAllInboxByAccount(
     user?.id || "",
-    1,
-    1000
+    0,
+    0
   );
 
   useEffect(() => {

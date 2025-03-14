@@ -26,8 +26,8 @@ export default function ChatPage() {
 
   const { data, refetch } = useGetAllChatMessageByConversationId(
     id as string,
-    1,
-    20
+    0,
+    0
   );
 
   const { mutate: sendMessage } = useCreateChatMessage();
