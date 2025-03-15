@@ -13,6 +13,7 @@ import { GlobalContext } from "@/provider/global-provider";
 import {
   ArrowLeftRight,
   ChartArea,
+  Coins,
   Crown,
   HandCoins,
   Settings,
@@ -49,6 +50,11 @@ const MOD_ITEMS = [
     title: "Quản lý đấu giá",
     url: "/management/manage-auction",
     icon: Crown,
+  },
+  {
+    title: "Quản lý yêu cầu rút tiền",
+    url: "/management/manage-withdraw",
+    icon: Coins,
   },
 ];
 
