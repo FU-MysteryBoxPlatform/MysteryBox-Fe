@@ -9,6 +9,8 @@ const authenticatedUrls = [
   "/my-exchange",
   "/my-request-sell",
   "/my-transaction",
+  "/orders",
+  "/withdraw-request",
 ];
 
 export default function middleware(request: NextRequest) {

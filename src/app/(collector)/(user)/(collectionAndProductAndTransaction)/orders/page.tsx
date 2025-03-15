@@ -11,6 +11,7 @@ import { Calendar, Loader2, Filter } from "lucide-react";
 import Paginator from "@/app/components/Paginator";
 import queryString from "query-string";
 import { useRouter, useSearchParams } from "next/navigation";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 
 export default function Page() {
   const { user } = useContext(GlobalContext);
@@ -92,11 +93,8 @@ export default function Page() {
 
   if (isLoading) {
     return (
-      <div className="flex w-full items-center justify-center bg-gray-50">
-        <div className="flex items-center gap-2 bg-white p-4 rounded-lg shadow-md">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span className="text-lg font-medium text-gray-700">Loading ...</span>
-        </div>
+      <div className="flex w-full items-center justify-center h-[70vh]">
+        <LoadingIndicator />
       </div>
     );
   }
