@@ -1,5 +1,11 @@
 "use client";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
@@ -17,11 +23,11 @@ import {
   useGetAllInboxByAccount,
 } from "@/hooks/api/useChatMessage";
 import { GlobalContext } from "@/provider/global-provider";
+import * as signalR from "@microsoft/signalr"; // Import SignalR
 import dayjs from "dayjs";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import * as signalR from "@microsoft/signalr"; // Import SignalR
-import Link from "next/link";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user } = useContext(GlobalContext);
@@ -87,11 +93,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [data]);
 
   useEffect(() => {
-    if (!isLoading && conversations.length > 0)
+    if (!isLoading && conversations.length > 0 && !id)
       router.push(`/messages/${conversations[0].converstation.conversationId}`);
-  }, [conversations, isLoading, router]);
-
-  console.log({ conversations });
+  }, [conversations, id, isLoading, router]);
 
   if (isLoading)
     return (
@@ -101,8 +105,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     );
 
   return (
-    <div className="flex h-[calc(100vh-74px)] bg-background [&>div]:min-h-full">
-      <SidebarProvider>
+    <div className="flex h-[calc(100vh-74px)] bg-background [&>div]:min-h-full flex-col md:flex-row">
+      <SidebarProvider className="flex-col md:flex-row">
         <Sidebar className="border-r max-md:hidden" collapsible="none">
           <SidebarContent>
             <SidebarGroup>
@@ -141,7 +145,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 <span className="font-semibold">
                                   {partner?.firstName} {partner?.lastName}
                                 </span>
-                                <span className="text-xs text-muted-foreground">
+                                <span className="text-xs text-muted-foreground md:hidden lg:block">
                                   {dayjs(c.latestChatMessage.createDate).format(
                                     "DD/MM/YYYY"
                                   )}
@@ -170,6 +174,90 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </SidebarGroup>
           </SidebarContent>
         </Sidebar>
+        {/*  Inbox list in mobile */}
+        <Accordion type="single" collapsible className="md:hidden">
+          <AccordionItem value="item-1">
+            <AccordionTrigger className="w-full px-4">
+              Xem tất cả tin nhắn
+            </AccordionTrigger>
+            <AccordionContent>
+              <Sidebar
+                className="border-r md:hidden w-full h-fit"
+                collapsible="none"
+              >
+                <SidebarContent className="max-h-[200px] overflow-y-auto">
+                  <SidebarGroup>
+                    <SidebarGroupLabel>Messages</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {conversations.length > 0 ? (
+                          conversations.map((c) => {
+                            const partner = c.converstationParticipants.find(
+                              (item) => item.account.id !== user?.id
+                            )?.account;
+                            return (
+                              <SidebarMenuItem
+                                key={c.converstation.conversationId}
+                              >
+                                <SidebarMenuButton
+                                  isActive={
+                                    c.converstation.conversationId === id
+                                  }
+                                  onClick={() =>
+                                    router.push(
+                                      `/messages/${c.converstation.conversationId}`
+                                    )
+                                  }
+                                  className="flex items-center gap-3 h-16"
+                                >
+                                  <div className="relative">
+                                    <Avatar>
+                                      <AvatarImage
+                                        src={partner?.avatar}
+                                        alt={partner?.userName}
+                                      />
+                                      <AvatarFallback>
+                                        {partner?.userName.charAt(0)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                  </div>
+                                  <div className="flex flex-col flex-1 overflow-hidden">
+                                    <div className="flex justify-between">
+                                      <span className="font-semibold">
+                                        {partner?.firstName} {partner?.lastName}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">
+                                        {dayjs(
+                                          c.latestChatMessage.createDate
+                                        ).format("DD/MM/YYYY")}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground truncate">
+                                      {c.latestChatMessage.content}
+                                    </p>
+                                  </div>
+                                </SidebarMenuButton>
+                              </SidebarMenuItem>
+                            );
+                          })
+                        ) : (
+                          <div className="flex flex-col items-center justify-center mt-10 gap-4">
+                            <img
+                              src="/empty-inbox.png"
+                              alt="empty inbox"
+                              className="bject-cover w-20"
+                            />
+                            <p>Bạn chưa có tin nhắn nào</p>
+                          </div>
+                        )}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </SidebarGroup>
+                </SidebarContent>
+              </Sidebar>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
         {!isLoading && conversations.length === 0 ? (
           <div className="w-full h-ơ90vh flex items-center justify-center flex-col">
             <p className="text-center">Bạn chưa có tin nhắn</p>

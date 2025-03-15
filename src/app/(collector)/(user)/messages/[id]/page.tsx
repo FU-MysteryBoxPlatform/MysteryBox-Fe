@@ -92,9 +92,9 @@ export default function ChatPage() {
     if (!newMessage) {
       toast({
         title: "Tin nhắn không được để trống",
-      })
+      });
       return;
-    };
+    }
 
     sendMessage(
       {
@@ -151,7 +151,7 @@ export default function ChatPage() {
       {/* Chat messages */}
       <div
         ref={chatMessagesRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
+        className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth max-md:max-h-[65vh]"
       >
         {messages?.map((message) => {
           const isMe = message.conversationParticipant.account.id === user?.id;
