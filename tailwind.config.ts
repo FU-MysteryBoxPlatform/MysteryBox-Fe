@@ -141,34 +141,16 @@ export default {
   					transform: 'translateX(100%) rotate(45deg)'
   				}
   			},
-  			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
-  			},
-  			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
-  			}
   		},
   		animation: {
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out',
-  			wiggle: 'wiggle 1s infinite linear',
-  			'box-open': 'box-open 0.5s ease-in-out forwards',
-  			'caret-blink': 'caret-blink 1.25s ease-out infinite',
-  			'zoom-out': 'zoom-out 0.5s ease-in-out forwards',
-  			'zoom-in': 'zoom-in 0.5s ease-in-out forwards',
-  			holo: 'holo 1s infinite linear',
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+			'accordion-down': 'accordion-down 0.2s ease-out',
+			'accordion-up': 'accordion-up 0.2s ease-out',
+			wiggle: 'wiggle 1s infinite linear',
+			'box-open': 'box-open 0.5s ease-in-out forwards',
+			'caret-blink': 'caret-blink 1.25s ease-out infinite',
+			'zoom-out': 'zoom-out 0.5s ease-in-out forwards',
+			'zoom-in': 'zoom-in 0.5s ease-in-out forwards',
+			holo: 'holo 1s infinite linear'
   		}
   	}
   },
