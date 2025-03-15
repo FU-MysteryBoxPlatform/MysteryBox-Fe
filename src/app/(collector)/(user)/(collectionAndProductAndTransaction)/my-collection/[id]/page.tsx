@@ -1,38 +1,62 @@
 "use client";
+import { useGetCollectionProgressById } from "@/hooks/api/useCollection";
+import { useGetCollectionById } from "@/hooks/api/useManageCollection";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Page() {
   const { id } = useParams();
-  console.log({ id });
+  const { data, refetch: refetchProgress } = useGetCollectionProgressById(
+    id as string
+  );
+
+  const collectionProgress = data?.result.userCollectionProgress;
+  const ownedProductIds = data?.result.products.map((item) => item.productId);
+  const { data: collectionData, refetch: refetchCollection } =
+    useGetCollectionById(collectionProgress?.collectionId as string);
+  const collectionProducts = collectionData?.result.products;
+
+  useEffect(() => {
+    refetchProgress();
+  }, [refetchProgress, id]);
+
+  useEffect(() => {
+    refetchCollection();
+  }, [refetchCollection, collectionProgress?.collectionId]);
 
   return (
     <div className="flex-1">
       <p className="text-lg md:text-xl font-bold mb-4 md:mb-6">
-        Bộ sưu tập <span className="text-[#E12E43]">Attack on Titan</span>
+        Bộ sưu tập{" "}
+        <span className="text-[#E12E43]">
+          {collectionProgress?.collection.collectionName}
+        </span>
       </p>
       <p className="font-semibold mb-4">
         Bạn đã sưu tập được{" "}
         <span className="text-[#E12E43]">
-          3/{PRODUCTS_IN_COLLECTION.length}
+          {ownedProductIds?.length}/{collectionProducts?.length}
         </span>{" "}
         vật phẩm trong bộ sưu tập này
       </p>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 w-full">
-        {PRODUCTS_IN_COLLECTION.map((item) => {
+        {collectionProducts?.map((item) => {
+          const isOwned = ownedProductIds?.includes(item.productId);
+
           return (
             <div
-              key={item.id}
+              key={item.productId}
               className={cn(
                 "relative flex flex-col items-center gap-2 border rounded-lg p-4 cursor-pointer",
-                !item.isOwned
+                !isOwned
                   ? "opacity-50 border-red-300"
                   : "border-green-400 hover:bg-green-100"
               )}
             >
               <Image
-                src={item.thumbImg}
+                src={item.imagePath}
                 alt="thumb"
                 width={120}
                 height={120}

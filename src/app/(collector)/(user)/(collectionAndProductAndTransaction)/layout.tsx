@@ -76,4 +76,8 @@ const SIDEBAR = [
     name: "Lịch sử giao dịch",
     value: "my-transaction",
   },
+  {
+    name: "Tin nhắn",
+    value: "messages",
+  },
 ];
