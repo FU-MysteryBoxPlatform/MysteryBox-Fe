@@ -14,6 +14,7 @@ import { MoreVertical, Phone, Send, Video } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr"; // Import SignalR
+import { toast } from "@/hooks/use-toast";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>();
@@ -88,6 +89,13 @@ export default function ChatPage() {
   }, [connection]); // Ensure connection starts once it's set
 
   const handleSendMessage = () => {
+    if (!newMessage) {
+      toast({
+        title: "Tin nhắn không được để trống",
+      })
+      return;
+    };
+
     sendMessage(
       {
         accountId: user?.id || "",
