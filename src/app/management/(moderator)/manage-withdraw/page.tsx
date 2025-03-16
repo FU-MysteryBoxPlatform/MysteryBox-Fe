@@ -55,14 +55,12 @@ const FormApprove = ({
   const { user } = useContext(GlobalContext);
   const [image, setImage] = useState<string>("");
 
-  console.log({ image });
-
-  const { mutate: mutateConfirm } = useConfirmWalletRequest();
+  const { mutate: mutateConfirm, isPending } = useConfirmWalletRequest();
 
   const handleApprove = () => {
     mutateConfirm(
       {
-        requestId,
+        walletRequestId: requestId,
         accountId: user?.id || "",
         image,
       },
@@ -92,7 +90,7 @@ const FormApprove = ({
       />
 
       <Button onClick={handleApprove} className="w-full">
-        Xác nhận
+        {isPending ? <LoadingIndicator /> : "Xác nhận"}
       </Button>
     </div>
   );

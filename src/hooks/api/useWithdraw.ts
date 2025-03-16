@@ -101,6 +101,6 @@ export const useGetAllWalletRequest = () => {
 export const useConfirmWalletRequest = () => {
   return useApiMutation<
     unknown,
-    { requestId: string; accountId: string; image: string }
+    { walletRequestId: string; accountId: string; image: string }
   >("/wallet/approved-wallet-request", "put");
 };
