@@ -18,6 +18,23 @@ type TAccountResponse = {
   totalPages: number;
 };
 
+type TUpdateBankAccountRequest = {
+  accountId: string;
+  bankName: string;
+  bankAccountNumber: string;
+};
+
+export type TGetAccountWalletResponse = {
+  walletId: string;
+  balance: number;
+  lastTransactionDate: string;
+  createdAt: string;
+  lastUpdatedAt: string;
+  isLocked: false;
+  accountId: string;
+  account: TAccount;
+};
+
 export const useUpdateAccount = () => {
   return useApiMutation<TAccount, TUpdateAccountData>(
     "/account/update-account",
@@ -39,5 +56,18 @@ export const useUpRole = () => {
   return useApiMutation<unknown, { accountId: string; roleName: string }>(
     `/account/up-role`,
     "post"
+  );
+};
+
+export const useUpdateBankAccount = () => {
+  return useApiMutation<unknown, TUpdateBankAccountRequest>(
+    "/account/update-bank-request",
+    "put"
+  );
+};
+
+export const useGetAccountWallet = (id: string) => {
+  return useApiQuery<TGetAccountWalletResponse>(
+    `/account/get-account-wallet/${id}`
   );
 };

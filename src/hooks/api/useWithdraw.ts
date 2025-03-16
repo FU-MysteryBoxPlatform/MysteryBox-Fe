@@ -72,10 +72,14 @@ export type TModWithdraw = {
   updateDate: string;
   createBy: string;
   createByAccount: TAccount;
+  updateByAccount: TAccount;
 };
 
 export type TWithdrawResponse = {
-  items: TWithdrawDetail[];
+  items: {
+    walletTransaction: TWithdrawDetail;
+    walletRequest: TModWithdraw;
+  }[];
   totalPages: number;
 };
 

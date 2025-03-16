@@ -4,6 +4,12 @@ import Paginator from "@/app/components/Paginator";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -15,7 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TWithdrawDetail, useGetAllWithdraw } from "@/hooks/api/useWithdraw";
+import {
+  TModWithdraw,
+  TWithdrawDetail,
+  useGetAllWithdraw,
+} from "@/hooks/api/useWithdraw";
 import { formatDate, formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
@@ -36,7 +46,14 @@ export default function Page() {
   const startDate = params["startDate"];
   const endDate = params["endDate"];
 
-  const [withdraws, setWithdraws] = useState<TWithdrawDetail[]>([]);
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [confirmImage, setConfirmImage] = useState<string>("");
+  const [withdraws, setWithdraws] = useState<
+    {
+      walletTransaction: TWithdrawDetail;
+      walletRequest: TModWithdraw;
+    }[]
+  >([]);
   const [totalPages, setTotalPages] = useState(0);
 
   const { mutate: mutateGetAllWithdraw, isPending: isPendingWithdraw } =
@@ -185,17 +202,17 @@ export default function Page() {
                 {withdraws.length > 0 &&
                   withdraws.map((w) => (
                     <div
-                      key={w.walletTransactionId}
+                      key={w.walletTransaction.walletTransactionId}
                       className="bg-white shadow-lg p-4 rounded-lg my-1 text-sm font-sans"
                     >
                       <div className="flex justify-between">
                         <span className="inline-block">
                           <strong> Mã giao dịch:</strong>{" "}
-                          {w.walletTransactionId.substring(0, 8)}
+                          {w.walletTransaction.walletTransactionId}
                         </span>
 
                         <span className="inline-block text-gray-600 text-sm">
-                          {formatDate(w.timeStamp)}
+                          {formatDate(w.walletTransaction.timeStamp)}
                         </span>
                       </div>
 
@@ -204,19 +221,32 @@ export default function Page() {
                           <strong className="text-gray-600">Trạng thái</strong>:{" "}
                           <span
                             className={`${renderColorWithdrawStatus(
-                              w.walletTransactionStatusId
+                              w.walletTransaction.walletTransactionStatusId
                             )}`}
                           >
-                            {renderWithdrawStatus(w.walletTransactionStatusId)}
+                            {renderWithdrawStatus(
+                              w.walletTransaction.walletTransactionStatusId
+                            )}
                           </span>
                         </span>
 
                         <span className="inline-block text-gray-500 text-sm">
                           Tổng tiền:
                           <strong className="ml-1 text-blue-700 ">
-                            {formatPriceVND(w.amount)}
+                            {formatPriceVND(w.walletTransaction.amount)}
                           </strong>
                         </span>
+                      </div>
+                      <div>
+                        <button
+                          onClick={() => {
+                            setOpenDetailModal(true);
+                            setConfirmImage(w.walletRequest.image);
+                          }}
+                          className="text-blue-600 hover:underline"
+                        >
+                          Xem hình ảnh xác nhận
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -236,6 +266,15 @@ export default function Page() {
               )}
             </CardContent>
           </Card>
+
+          <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Hình ảnh xác nhận</DialogTitle>
+              </DialogHeader>
+              <img src={confirmImage} alt="image" className="w-full" />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

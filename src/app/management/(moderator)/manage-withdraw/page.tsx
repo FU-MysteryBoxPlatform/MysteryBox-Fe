@@ -107,7 +107,9 @@ export default function Page() {
   const endDate = params["endDate"];
 
   const [openApproveModal, setOpenApproveModal] = useState(false);
+  const [openDetailModal, setOpenDetailModal] = useState(false);
   const [withdraws, setWithdraws] = useState<TModWithdraw[]>([]);
+  const [detailWithdraw, setDetailWithdraw] = useState<TModWithdraw>();
   const [totalPages, setTotalPages] = useState(0);
 
   const { mutate: mutateGetAllWithdraw, isPending: isPendingWithdraw } =
@@ -297,6 +299,18 @@ export default function Page() {
                                 </Dialog>
                               </TableCell>
                             )}
+                            {w.walletRequestStatus.name === "COMPELETED" && (
+                              <TableCell>
+                                <Button
+                                  onClick={() => {
+                                    setOpenDetailModal(true);
+                                    setDetailWithdraw(w);
+                                  }}
+                                >
+                                  Chi tiết
+                                </Button>
+                              </TableCell>
+                            )}
                           </TableRow>
                         );
                       })
@@ -322,6 +336,46 @@ export default function Page() {
           )}
         </CardContent>
       </Card>
+      <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Chi tiết yêu cầu rút tiền</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-2">
+            <p>
+              Mã yêu cầu:{" "}
+              <span className="font-semibold">
+                {detailWithdraw?.walletRequestId}
+              </span>
+            </p>
+            <p>
+              Ngày yêu cầu:{" "}
+              <span className="font-semibold">
+                {dayjs(detailWithdraw?.createDate).format("DD/MM/YYYY")}
+              </span>
+            </p>
+            <p>
+              Tên người yêu cầu:{" "}
+              <span className="font-semibold">
+                {detailWithdraw?.createByAccount.firstName}{" "}
+                {detailWithdraw?.createByAccount.lastName}
+              </span>
+            </p>
+            <p>
+              Tên người xác nhận:{" "}
+              <span className="font-semibold">
+                {detailWithdraw?.walletRequestStatus.name === "COMPELETED"
+                  ? detailWithdraw?.updateByAccount.firstName +
+                    " " +
+                    detailWithdraw?.updateByAccount.lastName
+                  : "--"}
+              </span>
+            </p>
+            <p>Hình ảnh xác nhận:</p>
+            <img src={detailWithdraw?.image} alt="image" className="w-full" />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

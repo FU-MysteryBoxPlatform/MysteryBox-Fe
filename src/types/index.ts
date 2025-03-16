@@ -31,6 +31,8 @@ export type TAccount = {
   roles: TRole[];
   mainRole: "COLLECTOR" | "MODERATORS" | "ADMIN";
   isBanned: boolean;
+  bankAccountNumber?: string;
+  bankName?: string;
 };
 
 export type TRole = {

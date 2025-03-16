@@ -34,8 +34,6 @@ export default function Page() {
     setTotalPages(data?.result.totalPages || 0);
   }, [data]);
 
-  console.log({ collections });
-
   if (isLoading)
     return (
       <div className="w-full flex items-center justify-center">
