@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { useContext, useEffect, useState } from "react";
 import {
   Card,
@@ -106,15 +106,19 @@ const OfferCard = ({
         <Avatar className="h-10 w-10 border-2 border-emerald-200">
           <AvatarImage
             src={offerer?.avatar || undefined}
-            alt={`${offerer?.firstName ?? ''} ${offerer?.lastName ?? ''}`}
+            alt={`${offerer?.firstName ?? ""} ${offerer?.lastName ?? ""}`}
           />
-          <AvatarFallback>{offerer?.firstName?.charAt(0) || "U"}</AvatarFallback>
+          <AvatarFallback>
+            {offerer?.firstName?.charAt(0) || "U"}
+          </AvatarFallback>
         </Avatar>
         <div>
           <h3 className="font-medium text-base">
-            {offerer?.firstName ?? ''} {offerer?.lastName ?? ''}
+            {offerer?.firstName ?? ""} {offerer?.lastName ?? ""}
           </h3>
-          {offerer && <p className="text-xs text-muted-foreground">{offerer.email}</p>}
+          {offerer && (
+            <p className="text-xs text-muted-foreground">{offerer.email}</p>
+          )}
         </div>
         {getStatusBadge((offer?.offerExchangeStatusId as 0 | 1 | 2) || 0)}
       </CardHeader>
@@ -208,7 +212,6 @@ const TradeDetailsModal = ({
   const handleRejectOffer = (offerId: string) => {
     confirm(offerId, true);
   };
-  console.log(isLoading);
 
   return (
     <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
@@ -261,7 +264,9 @@ const TradeDetailsModal = ({
               <Avatar className="h-10 w-10 border-2 border-red-200">
                 <AvatarImage
                   src={requester?.avatar || undefined}
-                  alt={`${requester?.firstName ?? ''} ${requester?.lastName ?? ''}`}
+                  alt={`${requester?.firstName ?? ""} ${
+                    requester?.lastName ?? ""
+                  }`}
                 />
                 <AvatarFallback>
                   {requester?.firstName?.charAt(0) || "U"}
@@ -269,10 +274,10 @@ const TradeDetailsModal = ({
               </Avatar>
               <div>
                 <p className="font-medium">
-                  {requester?.firstName ?? ''} {requester?.lastName ?? ''}
+                  {requester?.firstName ?? ""} {requester?.lastName ?? ""}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {requester?.email ?? ''}
+                  {requester?.email ?? ""}
                 </p>
               </div>
             </div>

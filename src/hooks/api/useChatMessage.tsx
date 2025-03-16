@@ -2,9 +2,9 @@ import { TAccount } from "@/types";
 import { useApiMutation, useApiQuery } from "./useApi";
 
 type TCreateConversationRequest = {
-  converstationName: string;
+  converstationName?: string;
   receiverId: string;
-  message: string;
+  message?: string;
   image?: string;
   senderId: string;
 };
@@ -123,7 +123,7 @@ export const useGetChatByMessageId = (chatMessageId: string) => {
 };
 
 export const useCreateConversation = () => {
-  return useApiMutation<unknown, TCreateConversationRequest>(
+  return useApiMutation<Converstation, TCreateConversationRequest>(
     "/chat/create-converstation",
     "post"
   );

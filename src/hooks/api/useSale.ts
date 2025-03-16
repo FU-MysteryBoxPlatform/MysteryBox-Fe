@@ -23,12 +23,7 @@ export type TSaleInventory = {
   inventoryId: string;
   product: TProductSale;
   quantity: number;
-  account: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-  };
+  account: TAccount;
 };
 
 export type TSaleDetailData = {

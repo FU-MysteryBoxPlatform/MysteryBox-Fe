@@ -2,19 +2,36 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   ChatMessage,
   useCreateChatMessage,
   useGetAllChatMessageByConversationId,
 } from "@/hooks/api/useChatMessage";
+import { toast } from "@/hooks/use-toast";
 import { GlobalContext } from "@/provider/global-provider";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as signalR from "@microsoft/signalr"; // Import SignalR
 import dayjs from "dayjs";
-import { MoreVertical, Phone, Send, Video } from "lucide-react";
+import { CircleAlert, Send } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useRef, useState } from "react";
-import * as signalR from "@microsoft/signalr"; // Import SignalR
-import { toast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const ReportUserSchema = z.object({
+  reason: z.string().min(1, "Vui lòng nhập lý do báo cáo"),
+});
+
+type ReportUserForm = z.infer<typeof ReportUserSchema>;
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>();
@@ -24,6 +41,11 @@ export default function ChatPage() {
   const [connection, setConnection] = useState<signalR.HubConnection | null>(
     null
   );
+  const [openReportModal, setOpenReportModal] = useState(false);
+
+  const { handleSubmit, register, formState } = useForm<ReportUserForm>({
+    resolver: zodResolver(ReportUserSchema),
+  });
 
   const { data, refetch } = useGetAllChatMessageByConversationId(
     id as string,
@@ -39,6 +61,10 @@ export default function ChatPage() {
 
   // Reference to the chat messages container
   const chatMessagesRef = useRef<HTMLDivElement>(null);
+
+  const onsubmit = (data: ReportUserForm) => {
+    console.log(data);
+  };
 
   // Scroll to the bottom whenever messages change
   useEffect(() => {
@@ -136,14 +162,14 @@ export default function ChatPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" title="Voice call">
-            <Phone className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" title="Video call">
-            <Video className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" title="More options">
-            <MoreVertical className="h-5 w-5" />
+          <Button
+            variant="ghost"
+            size="icon"
+            title="Report"
+            type="button"
+            onClick={() => setOpenReportModal(true)}
+          >
+            <CircleAlert className="h-5 w-5" />
           </Button>
         </div>
       </div>
@@ -201,6 +227,37 @@ export default function ChatPage() {
           </Button>
         </form>
       </div>
+
+      <Dialog open={openReportModal} onOpenChange={setOpenReportModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Báo cáo người dùng</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <form>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="reason">Lý do báo cáo</Label>
+                <Textarea
+                  id="reason"
+                  placeholder="Nhập lý do báo cáo"
+                  {...register("reason")}
+                />
+                {formState.errors.reason && (
+                  <p className="text-red-500 text-sm">
+                    {formState.errors.reason.message}
+                  </p>
+                )}
+              </div>
+            </form>
+            <Button
+              className="bg-[#E12E43] text-white hover:bg-[#B71C32] w-full"
+              onClick={handleSubmit(onsubmit)}
+            >
+              Báo cáo
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

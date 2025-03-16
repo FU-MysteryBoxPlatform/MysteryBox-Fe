@@ -1,9 +1,11 @@
 "use client";
 
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCreateConversation } from "@/hooks/api/useChatMessage";
 import { useSaleDetail } from "@/hooks/api/useSale";
 import { toast } from "@/hooks/use-toast";
 import { formatPriceVND } from "@/lib/utils";
@@ -11,22 +13,26 @@ import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
 import {
   Loader2,
+  Mail,
+  MessageCircle,
+  Phone,
   ShoppingCart,
   StarIcon,
   Tag,
   User,
-  Mail,
-  Phone,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useContext } from "react";
 
 const SaleDetailsPage = () => {
   const params = useParams();
-  const { addToCart } = useContext(GlobalContext);
+  const router = useRouter();
+  const { user, addToCart } = useContext(GlobalContext);
 
   const { data: sale, isLoading } = useSaleDetail((params.id as string) || "");
+  const { mutate: mutateCreateConversation, isPending } =
+    useCreateConversation();
 
   const dataSale = sale?.result;
 
@@ -41,6 +47,26 @@ const SaleDetailsPage = () => {
       title: "Thêm vào giỏ hàng thành công!",
       description: "Sản phẩm đã được thêm vào giỏ hàng của bạn",
     });
+  };
+
+  const handleSendMessage = () => {
+    mutateCreateConversation(
+      {
+        receiverId: dataSale?.inventory?.account?.id || "",
+        senderId: user?.id || "",
+        message: "Xin chào bạn",
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            router.push(`/messages/${data.result?.conversationId}`);
+          } else
+            toast({
+              title: data.messages[0],
+            });
+        },
+      }
+    );
   };
 
   if (isLoading) {
@@ -256,6 +282,22 @@ const SaleDetailsPage = () => {
                       <div className="text-sm text-gray-500">Số điện thoại</div>
                     </div>
                   </div>
+                  {user?.id !== dataSale?.inventory?.account?.id && (
+                    <div
+                      className="flex items-center p-3 rounded-lg bg-gray-50 cursor-pointer"
+                      onClick={handleSendMessage}
+                    >
+                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mr-3 text-primary">
+                        <MessageCircle className="w-6 h-6" />
+                      </div>
+                      <p>Nhắn tin</p>
+                      {isPending && (
+                        <div className="ml-auto">
+                          <LoadingIndicator />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
