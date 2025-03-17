@@ -88,6 +88,11 @@ export type TModGetAllWithdrawResponse = {
   totalPages: number;
 };
 
+export type TCreateWithdrawRequest = {
+  accountId: string;
+  amount: number;
+};
+
 export const useGetAllWithdraw = () => {
   return useApiMutation<TWithdrawResponse, TGetAllWithdrawRequest>(
     "/wallet/get-all-wallet-transaction-with-filter",
@@ -107,4 +112,11 @@ export const useConfirmWalletRequest = () => {
     unknown,
     { walletRequestId: string; accountId: string; image: string }
   >("/wallet/approved-wallet-request", "put");
+};
+
+export const useCreateWithdrawRequest = () => {
+  return useApiMutation<unknown, TCreateWithdrawRequest>(
+    "/wallet/create-withraw-money-from-wallet",
+    "post"
+  );
 };

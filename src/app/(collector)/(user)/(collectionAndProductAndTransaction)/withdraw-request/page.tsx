@@ -1,6 +1,7 @@
 "use client";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
+import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,6 +10,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
@@ -24,17 +27,29 @@ import {
 import {
   TModWithdraw,
   TWithdrawDetail,
+  useCreateWithdrawRequest,
   useGetAllWithdraw,
 } from "@/hooks/api/useWithdraw";
+import { toast } from "@/hooks/use-toast";
 import { formatDate, formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
+import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
 import { CalendarIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useContext, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const walletTransactionType = 4;
+
+const CreateWithdrawRequestSchema = z.object({
+  amount: z.string().min(1, "Vui lòng nhập số tiền"),
+});
+export type CreateWithdrawRequestForm = z.infer<
+  typeof CreateWithdrawRequestSchema
+>;
 
 export default function Page() {
   const { user } = useContext(GlobalContext);
@@ -46,6 +61,7 @@ export default function Page() {
   const startDate = params["startDate"];
   const endDate = params["endDate"];
 
+  const [openCreateWithdrawModal, setOpenCreateWithdrawModal] = useState(false);
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [confirmImage, setConfirmImage] = useState<string>("");
   const [withdraws, setWithdraws] = useState<
@@ -56,8 +72,15 @@ export default function Page() {
   >([]);
   const [totalPages, setTotalPages] = useState(0);
 
+  const { handleSubmit, register, formState } =
+    useForm<CreateWithdrawRequestForm>({
+      resolver: zodResolver(CreateWithdrawRequestSchema),
+    });
+
   const { mutate: mutateGetAllWithdraw, isPending: isPendingWithdraw } =
     useGetAllWithdraw();
+
+  const { mutate: mutateCreateWithdrawRequest } = useCreateWithdrawRequest();
 
   const handleFilterByStatus = (value: string) => {
     params["status"] = value;
@@ -74,6 +97,29 @@ export default function Page() {
     params["endDate"] = dayjs(date).toISOString();
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
+  };
+
+  const onSubmit = (data: CreateWithdrawRequestForm) => {
+    mutateCreateWithdrawRequest(
+      {
+        accountId: user?.id || "",
+        amount: +data.amount,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            toast({
+              title: "Yêu cầu rút tiền đã được tạo thành công",
+            });
+            setOpenCreateWithdrawModal(false);
+          } else {
+            toast({
+              title: data.messages[0],
+            });
+          }
+        },
+      }
+    );
   };
 
   useEffect(() => {
@@ -139,9 +185,12 @@ export default function Page() {
   return (
     <div className="rounded-lg flex-1 max-md:w-full">
       <div>
-        <p className="text-xl md:text-2xl font-semibold mb-2 md:mb-4 border border-gray-300 px-6 py-4 rounded-lg">
-          Yêu cầu rút tiền
-        </p>
+        <div className="mb-2 md:mb-4 border border-gray-300 px-6 py-4 rounded-lg flex items-center justify-between">
+          <p className="text-xl md:text-2xl font-semibold">Yêu cầu rút tiền</p>
+          <Button onClick={() => setOpenCreateWithdrawModal(true)}>
+            Tạo yêu cầu rút tiền
+          </Button>
+        </div>
         <div>
           <Card x-chunk="dashboard-06-chunk-0 border-none">
             <CardHeader>
@@ -276,6 +325,40 @@ export default function Page() {
             </DialogContent>
           </Dialog>
         </div>
+        <Dialog
+          open={openCreateWithdrawModal}
+          onOpenChange={setOpenCreateWithdrawModal}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Tạo yêu cầu thanh toán</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
+              <form>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="amount">Số tiền</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    placeholder="Nhập số tiền"
+                    {...register("amount")}
+                  />
+                  {formState.errors.amount && (
+                    <p className="text-red-500 text-sm">
+                      {formState.errors.amount.message}
+                    </p>
+                  )}
+                </div>
+              </form>
+              <Button
+                className="bg-[#E12E43] text-white hover:bg-[#B71C32] w-full"
+                onClick={handleSubmit(onSubmit)}
+              >
+                Tạo yêu cầu rút tiền
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
