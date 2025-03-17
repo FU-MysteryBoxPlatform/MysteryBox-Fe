@@ -7,7 +7,7 @@ import {
 import { formatDate, formatPriceVND } from "@/lib/utils";
 import { useContext, useState, useEffect } from "react";
 import { GlobalContext } from "@/provider/global-provider";
-import { Calendar, Loader2, Filter } from "lucide-react";
+import { Loader2, Filter } from "lucide-react";
 import Paginator from "@/app/components/Paginator";
 import queryString from "query-string";
 import { useRouter, useSearchParams } from "next/navigation";
