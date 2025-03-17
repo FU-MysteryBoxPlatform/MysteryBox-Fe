@@ -283,7 +283,7 @@ export default function Page() {
                           onChange={(e) => setStartDate(e.target.value)}
                           className="w-full p-2 border border-gray-300 rounded-md text-sm"
                         />
-                        <Calendar className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        {/* <Calendar className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
                       </div>
                     </div>
 
@@ -298,7 +298,7 @@ export default function Page() {
                           onChange={(e) => setEndDate(e.target.value)}
                           className="w-full p-2 border border-gray-300 rounded-md text-sm"
                         />
-                        <Calendar className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        {/* <Calendar className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
                       </div>
                     </div>
 

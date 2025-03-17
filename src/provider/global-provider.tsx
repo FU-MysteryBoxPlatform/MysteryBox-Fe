@@ -131,7 +131,7 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     }
     if (savedUser && savedUser !== "null") {
       setUser(JSON.parse(savedUser));
-    } else if (savedUser === "null") {
+    } else if (savedUser === "null" || !savedUser) {
       localStorage.removeItem("user");
       // remove access token
       cookie.delete("ACCESS_TOKEN");
