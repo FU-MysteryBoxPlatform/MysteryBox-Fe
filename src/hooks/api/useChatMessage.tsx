@@ -95,6 +95,12 @@ export type TChatMessageResponse = {
   converstationParticipants: ConversationParticipant[];
 };
 
+export type TCreateReportRequest = {
+  accountId: string;
+  saleAccountId: string;
+  reason: string;
+};
+
 export const useGetAllInboxByAccount = (
   accountId: string,
   pageNumber: number,
@@ -132,6 +138,13 @@ export const useCreateConversation = () => {
 export const useCreateChatMessage = () => {
   return useApiMutation<unknown, TCreateChatMessage>(
     "/chat/create-chat-message",
+    "post"
+  );
+};
+
+export const useCreateReport = () => {
+  return useApiMutation<unknown, TCreateReportRequest>(
+    "/report/create-report",
     "post"
   );
 };

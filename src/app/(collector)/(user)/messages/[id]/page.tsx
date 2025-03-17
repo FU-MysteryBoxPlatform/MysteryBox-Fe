@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   ChatMessage,
   useCreateChatMessage,
+  useCreateReport,
   useGetAllChatMessageByConversationId,
 } from "@/hooks/api/useChatMessage";
 import { toast } from "@/hooks/use-toast";
@@ -54,6 +55,7 @@ export default function ChatPage() {
   );
 
   const { mutate: sendMessage } = useCreateChatMessage();
+  const { mutate: createReport } = useCreateReport();
 
   const partner = data?.result.converstationParticipants.find(
     (item) => item.account.id !== user?.id
@@ -63,7 +65,11 @@ export default function ChatPage() {
   const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   const onsubmit = (data: ReportUserForm) => {
-    console.log(data);
+    createReport({
+      accountId: user?.id || "",
+      saleAccountId: partner?.id || "",
+      reason: data.reason,
+    });
   };
 
   // Scroll to the bottom whenever messages change
