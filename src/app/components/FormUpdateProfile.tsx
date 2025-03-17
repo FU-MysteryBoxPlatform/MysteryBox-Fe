@@ -17,6 +17,7 @@ import { ImageUploader } from "./ImageUpload";
 import { useUpdateAccount } from "@/hooks/api/useAccount";
 import dayjs from "dayjs";
 import { toast } from "@/hooks/use-toast";
+import DatePicker from "react-date-picker";
 
 const UpdateProfileSchema = z.object({
   firstName: z.string().min(1, "Vui lòng nhập tên"),
@@ -24,11 +25,14 @@ const UpdateProfileSchema = z.object({
   gender: z.string().optional(),
 });
 
+type ValuePiece = Date | null;
+
+export type Value = ValuePiece | [ValuePiece, ValuePiece];
 type UpdateProfileForm = z.infer<typeof UpdateProfileSchema>;
 
 export default function FormUpdateProfile() {
   const { user, setUser } = useContext(GlobalContext);
-  const [dob, setDob] = useState<Date | undefined>(new Date());
+  const [dob, setDob] = useState<Value>(new Date());
   const [image, setImage] = useState("");
 
   const updateAccountMutation = useUpdateAccount();
@@ -50,7 +54,9 @@ export default function FormUpdateProfile() {
         lastName: data.lastName,
         gender: data.gender === "1" ? true : false,
         dob: dob
-          ? dayjs(dob).startOf("day").toISOString()
+          ? dayjs(dob as Date)
+              .startOf("day")
+              .toISOString()
           : dayjs().startOf("day").toISOString(),
         image: image,
       },
@@ -68,7 +74,7 @@ export default function FormUpdateProfile() {
     setValue("firstName", user?.firstName || "");
     setValue("lastName", user?.lastName || "");
     setValue("gender", user?.gender ? "1" : "0");
-    setDob(user?.dob ? new Date(user.dob) : undefined);
+    setDob(user?.dob ? new Date(user.dob) : null);
     setImage(user?.avatar || "");
   }, [setValue, user]);
 
@@ -127,16 +133,11 @@ export default function FormUpdateProfile() {
       <div className="flex flex-col space-y-1.5">
         <Label htmlFor="dob">Ngày sinh</Label>
         <div className="relative">
-          <Input
-            id="dob"
-            type="date"
-            value={dob ? dayjs(dob).format("YYYY-MM-DD") : ""}
-            onChange={(e) =>
-              setDob(e.target.value ? new Date(e.target.value) : undefined)
-            }
-            className="w-full"
+          <DatePicker
+            className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
+            value={dob}
+            onChange={setDob}
           />
-         
         </div>
       </div>
 

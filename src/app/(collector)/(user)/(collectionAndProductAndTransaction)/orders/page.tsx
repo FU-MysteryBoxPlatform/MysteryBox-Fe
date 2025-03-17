@@ -1,17 +1,19 @@
 "use client";
+import { Value } from "@/app/components/FormUpdateProfile";
+import LoadingIndicator from "@/app/components/LoadingIndicator";
+import Paginator from "@/app/components/Paginator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   useGetAllOrderByAccount,
   useGetOrderDetail,
 } from "@/hooks/api/useOrder";
 import { formatDate, formatPriceVND } from "@/lib/utils";
-import { useContext, useState, useEffect } from "react";
 import { GlobalContext } from "@/provider/global-provider";
-import { Loader2, Filter } from "lucide-react";
-import Paginator from "@/app/components/Paginator";
-import queryString from "query-string";
+import { Filter, Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import LoadingIndicator from "@/app/components/LoadingIndicator";
+import queryString from "query-string";
+import { useContext, useEffect, useState } from "react";
+import DatePicker from "react-date-picker";
 
 export default function Page() {
   const { user } = useContext(GlobalContext);
@@ -22,8 +24,8 @@ export default function Page() {
   const page = params["page"] || 1;
 
   // Filter states
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState<Value>();
+  const [endDate, setEndDate] = useState<Value>();
   const [statusFilter, setStatusFilter] = useState("");
   interface Order {
     order: {
@@ -61,13 +63,15 @@ export default function Page() {
       // Filter by date range
       if (startDate) {
         result = result.filter(
-          (order) => new Date(order.order.orderDate) >= new Date(startDate)
+          (order) =>
+            new Date(order.order.orderDate) >= new Date(startDate as Date)
         );
       }
 
       if (endDate) {
         result = result.filter(
-          (order) => new Date(order.order.orderDate) <= new Date(endDate)
+          (order) =>
+            new Date(order.order.orderDate) <= new Date(endDate as Date)
         );
       }
 
@@ -86,8 +90,8 @@ export default function Page() {
 
   // Reset filters
   const resetFilters = () => {
-    setStartDate("");
-    setEndDate("");
+    setStartDate(null);
+    setEndDate(null);
     setStatusFilter("");
   };
 
@@ -277,13 +281,11 @@ export default function Page() {
                         Từ ngày:
                       </label>
                       <div className="relative">
-                        <input
-                          type="date"
+                        <DatePicker
+                          className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
                           value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                          onChange={setStartDate}
                         />
-                        {/* <Calendar className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
                       </div>
                     </div>
 
@@ -292,13 +294,11 @@ export default function Page() {
                         Đến ngày:
                       </label>
                       <div className="relative">
-                        <input
-                          type="date"
+                        <DatePicker
+                          className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
                           value={endDate}
-                          onChange={(e) => setEndDate(e.target.value)}
-                          className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                          onChange={setEndDate}
                         />
-                        {/* <Calendar className="h-4 w-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" /> */}
                       </div>
                     </div>
 
