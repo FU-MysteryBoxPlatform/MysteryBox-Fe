@@ -41,12 +41,10 @@ export type BlindBoxCollection = {
 };
 
 export type StatisticResponse = {
-  orderPercentageDifference: number;
   totalSaleProfit: number;
   exchangeProfit: number;
   auctionProfit: number;
   numberOfOrder: number;
-  numberOfOrderDifference: number;
   bestBlindBoxList: BlindBoxCollection[];
 };
 
@@ -59,6 +57,8 @@ export const useGetStatisticForDashboard = (
   );
 };
 
-export const useGetStatistic = () => {
-  return useApiQuery<StatisticResponse>(`statistic/get-statistic-number`);
+export const useGetStatistic = (startTime: string, endTime: string) => {
+  return useApiQuery<StatisticResponse>(
+    `statistic/get-statistic-number?startTime=${startTime}&endTime=${endTime}`
+  );
 };

@@ -31,7 +31,10 @@ export default function Dashboard() {
    dateRange.from.toISOString(),
    dateRange.to.toISOString()
  );
- const { data: dataStatistic } = useGetStatistic();
+ const { data: dataStatistic } = useGetStatistic(
+   dateRange.from.toISOString(),
+   dateRange.to.toISOString()
+ );
 
  // Sort daily sales by date
  const sortedDailySales = dashboardData?.result?.dailySalesPercentage?.sort(
@@ -63,11 +66,7 @@ export default function Dashboard() {
               <div className="text-2xl font-bold">
                 {formatPriceVND(dataStatistic?.result.totalSaleProfit || 0)}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {(dataStatistic?.result.orderPercentageDifference ?? 0) > 0
-                  ? `+${dataStatistic?.result.orderPercentageDifference}% so với tháng trước`
-                  : "Không thay đổi so với tháng trước"}
-              </p>
+             
             </CardContent>
           </Card>
           <Card>
@@ -81,11 +80,7 @@ export default function Dashboard() {
               <div className="text-2xl font-bold">
                 {dataStatistic?.result.numberOfOrder}
               </div>
-              <p className="text-xs text-muted-foreground">
-                {(dataStatistic?.result.numberOfOrderDifference ?? 0) > 0
-                  ? `+${dataStatistic?.result.numberOfOrderDifference}% so với tháng trước`
-                  : "Không thay đổi so với tháng trước"}
-              </p>
+             
             </CardContent>
           </Card>
           <Card>
