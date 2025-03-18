@@ -35,6 +35,8 @@ export default function RequestSaleDetail({
     }
   };
 
+  console.log({ sale });
+
   return (
     <div className="flex gap-6">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -54,10 +56,10 @@ export default function RequestSaleDetail({
         </p>
         <p className="text-sm">
           <span className="font-semibold">Số lượng bán:</span>{" "}
-          {sale?.quantitySold}
+          {sale?.quantitySold || 1}
         </p>
         <p className="text-sm">
-          <span className="font-semibold">Người bán:</span>
+          <span className="font-semibold">Người bán: </span>
           {sale?.inventory.account.firstName +
             " " +
             sale?.inventory.account.lastName}
@@ -66,14 +68,16 @@ export default function RequestSaleDetail({
           <span className="font-semibold">Độ hiếm:</span>{" "}
           {sale?.inventory.product.rarityStatus.dropRate}
         </p>
-        <div className="flex gap-4">
-          <Button
-            className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
-            onClick={handleApproveSale}
-          >
-            {isLoading ? <LoadingIndicator /> : "Duyệt"}
-          </Button>
-        </div>
+        {sale.saleStatusId === 0 && (
+          <div className="flex gap-4">
+            <Button
+              className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
+              onClick={handleApproveSale}
+            >
+              {isLoading ? <LoadingIndicator /> : "Duyệt"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
