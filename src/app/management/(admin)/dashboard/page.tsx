@@ -1,5 +1,4 @@
-"use client";
-
+"use client";;
 import { useState } from "react";
 import {
   Card,
@@ -8,11 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, ShoppingCart, TrendingUp } from "lucide-react";
 import { formatPriceVND } from "@/lib/utils";
 import { SalesChart } from "@/app/components/SalesChart";
-import { CollectionCard } from "@/app/components/CollectionCard";
 import { CollectionTable } from "@/app/components/CollectionTable";
 import { useGetStatistic, useGetStatisticForDashboard } from "@/hooks/api/useDashboard";
 import { subMonths } from "date-fns";

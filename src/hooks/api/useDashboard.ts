@@ -1,4 +1,4 @@
-import { useApiMutation, useApiQuery } from "./useApi";
+import { useApiQuery } from "./useApi";
 
 export type DailySalesPercentage = {
   date: string;
