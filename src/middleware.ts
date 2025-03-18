@@ -11,6 +11,7 @@ const authenticatedUrls = [
   "/my-transaction",
   "/orders",
   "/withdraw-request",
+  "/auctions/register-and-bid",
 ];
 
 export default function middleware(request: NextRequest) {

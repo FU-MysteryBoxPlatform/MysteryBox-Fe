@@ -19,6 +19,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  const SIDE_ITEMS = [
+    {
+      name: "Đăng ký & Đấu thầu",
+      value: "/auctions/register-and-bid",
+      needLogin: true,
+    },
+    {
+      name: "Các phiên đấu giá",
+      value: "/auctions/auctions-boxes",
+    },
+    {
+      name: "Winning bids",
+      value: "/auctions/winning-bids",
+    },
+  ];
+
   return (
     <div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -45,7 +61,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   key={item.name}
                   className={cn(
                     "px-2 py-1 rounded-md cursor-pointer hover:bg-gray-100",
-                    pathname.includes(item.value) && "bg-gray-100 font-bold"
+                    pathname.includes(item.value) && "bg-gray-100 font-bold",
+                    item.needLogin && !user && "hidden"
                   )}
                   onClick={() => router.push(item.value)}
                 >
@@ -87,23 +104,3 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-
-const SIDE_ITEMS = [
-  {
-    name: "Đăng ký & Đấu thầu",
-    value: "/auctions/register-and-bid",
-    needLogin: true,
-  },
-  {
-    name: "Các phiên đấu giá",
-    value: "/auctions/auctions-boxes",
-  },
-  {
-    name: "Winning bids",
-    value: "/auctions/winning-bids",
-  },
-  {
-    name: "Item wishlist",
-    value: "/auctions/item-wishlist",
-  },
-];

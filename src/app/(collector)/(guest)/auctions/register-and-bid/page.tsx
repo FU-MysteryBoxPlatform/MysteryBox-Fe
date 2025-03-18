@@ -1,7 +1,6 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Inventory, useGetAllInventory } from "@/hooks/api/useInventory";
 import { cn } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
@@ -70,86 +69,67 @@ export default function Page() {
         Đăng ký và đấu thầu
       </p>
       <div>
-        <Tabs defaultValue="register" className="w-full">
-          <TabsList className="mb-6 grid grid-cols-2 w-full">
-            <TabsTrigger
-              value="register"
-              className="flex items-center justify-center gap-2 data-[state=active]:bg-[#E12E43] data-[state=active]:text-primary-foreground"
-            >
-              <span>Bộ sưu tập</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="bid"
-              className="flex items-center justify-center gap-2 data-[state=active]:bg-[#E12E43] data-[state=active]:text-primary-foreground"
-            >
-              <span>Đấu Thầu</span>
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="register">
-            <div className="max-h-[500px] overflow-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {inventories?.length > 0 &&
-                  inventories?.map((item) => (
-                    <div
-                      key={item.inventoryId}
-                      className={cn(
-                        "border rounded-lg overflow-hidden cursor-pointer transition-all transform hover:translate-y-[-2px] hover:shadow-md hover:border-red-500"
-                      )}
-                      onClick={() =>
-                        router.push(
-                          `/auctions/register-and-bid/${item.inventoryId}`
-                        )
-                      }
-                    >
-                      <div className="flex gap-3 p-3">
-                        <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={
-                              item.product?.imagePath ||
-                              "/mock-images/image2.png"
-                            }
-                            alt={item.product?.name}
-                            className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
-                          />
-                        </div>
-                        <div>
-                          <div className="flex items-center">
-                            <h4 className="font-medium text-red-900">
-                              {item.product?.name}
-                            </h4>
-                          </div>
-                          <p className="text-xs text-gray-600 line-clamp-2 mt-1">
-                            {item.product?.description}
-                          </p>
-                          <Button className="bg-[#E12E43] text-white mt-2 hover:bg-[#E12E43] hover:text-white h-6">
-                            Đăng ký
-                          </Button>
-                        </div>
-                        <div className="flex items-center">
-                          <Badge
-                            className={`ml-2 text-xs ${
-                              getRarityColor(item.inventoryId).classes
-                            }`}
-                          >
-                            {getRarityColor(item.inventoryId).rarity}
-                          </Badge>
-                        </div>
-                      </div>
+        <div className="max-h-[500px] overflow-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {inventories?.length > 0 &&
+              inventories?.map((item) => (
+                <div
+                  key={item.inventoryId}
+                  className={cn(
+                    "border rounded-lg overflow-hidden cursor-pointer transition-all transform hover:translate-y-[-2px] hover:shadow-md hover:border-red-500"
+                  )}
+                  onClick={() =>
+                    router.push(
+                      `/auctions/register-and-bid/${item.inventoryId}`
+                    )
+                  }
+                >
+                  <div className="flex gap-3 p-3">
+                    <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={
+                          item.product?.imagePath || "/mock-images/image2.png"
+                        }
+                        alt={item.product?.name}
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
+                      />
                     </div>
-                  ))}
-              </div>
-            </div>
-            {page < totalPage && (
-              <button
-                className="mt-4 bg-transparent text-black underline mb-4"
-                onClick={() => setPage((page) => page + 1)}
-              >
-                Tải thêm
-              </button>
-            )}
-          </TabsContent>
-        </Tabs>
+                    <div>
+                      <div className="flex items-center">
+                        <h4 className="font-medium text-red-900">
+                          {item.product?.name}
+                        </h4>
+                      </div>
+                      <p className="text-xs text-gray-600 line-clamp-2 mt-1">
+                        {item.product?.description}
+                      </p>
+                      <Button className="bg-[#E12E43] text-white mt-2 hover:bg-[#E12E43] hover:text-white h-6">
+                        Đăng ký
+                      </Button>
+                    </div>
+                    <div className="flex items-center">
+                      <Badge
+                        className={`ml-2 text-xs ${
+                          getRarityColor(item.inventoryId).classes
+                        }`}
+                      >
+                        {getRarityColor(item.inventoryId).rarity}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+        {page < totalPage && (
+          <button
+            className="mt-4 bg-transparent text-black underline mb-4"
+            onClick={() => setPage((page) => page + 1)}
+          >
+            Tải thêm
+          </button>
+        )}
       </div>
     </div>
   );

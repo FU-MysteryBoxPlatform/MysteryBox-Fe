@@ -126,10 +126,11 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
 
     const savedUser = localStorage.getItem("user");
     const accessToken = cookie.get("ACCESS_TOKEN");
+
     if (!accessToken) {
       localStorage.removeItem("user");
     }
-    if (savedUser && savedUser !== "null") {
+    if (savedUser && savedUser !== "null" && accessToken) {
       setUser(JSON.parse(savedUser));
     } else if (savedUser === "null" || !savedUser) {
       localStorage.removeItem("user");
