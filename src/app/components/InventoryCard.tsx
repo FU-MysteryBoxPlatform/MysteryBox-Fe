@@ -202,11 +202,10 @@ export default function InventoryCard({
           alt={title}
           width={120}
           height={120}
-          onClick={() => router.push(`/sale-detail/${id}`)}
-          className="cursor-pointer w-full aspect-square object-cover border border-gray-200"
+          className="cursor-pointer w-full aspect-square object-cover border rounded-lg shadow-lg border-gray-200"
         />
       </div>
-      <p className="font-semibold mt-2 line-clamp-2">{title}</p>
+      <p className="font-semibold text-center mt-2 line-clamp-2">{title}</p>
       {showPrice && (
         <p className="text-sm text-gray-500">{formatPriceVND(price)}</p>
       )}

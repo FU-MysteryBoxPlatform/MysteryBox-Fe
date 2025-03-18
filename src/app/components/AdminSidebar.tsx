@@ -60,6 +60,11 @@ const MOD_ITEMS = [
 
 const ADMIN_ITEMS = [
   {
+    title: "Tổng Quan",
+    url: "/management/dashboard",
+    icon: ChartArea,
+  },
+  {
     title: "Cài đặt hệ thống",
     url: "/management/system-setting",
     icon: Settings,
