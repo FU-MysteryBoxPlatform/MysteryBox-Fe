@@ -1,23 +1,22 @@
 "use client";
+import Notification from "@/app/components/Notification";
+import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
+import cookie from "@/utils/cookie";
 import { MenuIcon } from "lucide-react";
 import Link from "next/link";
-import BellIcon from "../icons/BellIcon";
+import { usePathname, useRouter } from "next/navigation";
+import { useContext } from "react";
 import CartIcon from "../icons/CartIcon";
 import SearchIcon from "../icons/SearchIcon";
 import UserIcon from "../icons/UserIcon";
+import { Button } from "../ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useContext } from "react";
-import { GlobalContext } from "@/provider/global-provider";
-import { usePathname, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import cookie from "@/utils/cookie";
-import { Button } from "../ui/button";
-import Notification from "@/app/components/Notification";
 
 export default function Header() {
   const pathname = usePathname();
@@ -131,7 +130,7 @@ export default function Header() {
                 </div>
                 <div className="grid grid-cols-4 gap-6">
                   <SearchIcon />
-                  <BellIcon />
+                  <Notification />
 
                   {!isFetchingUser && user?.mainRole !== "MODERATORS" && (
                     <Link href="/cart">

@@ -5,6 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import { GlobalContext } from "@/provider/global-provider";
 import { useContext, useState } from "react";
 import LoadingIndicator from "./LoadingIndicator";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 
 export default function RequestSaleDetail({
   sale,
@@ -14,7 +15,10 @@ export default function RequestSaleDetail({
   onApprove: () => void;
 }) {
   const { user } = useContext(GlobalContext);
+  const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingCancel, setIsLoadingCancel] = useState(false);
+
   const handleApproveSale = async () => {
     try {
       setIsLoading(true);
@@ -29,13 +33,31 @@ export default function RequestSaleDetail({
         toast({
           title: "Đã duyệt sản phẩm thành công!",
         });
-      } else toast({ title: "Duyệt sản phẩm thất bại!" });
+      } else toast({ title: response.data.messages[0] });
     } catch (error) {
       console.log(error);
     }
   };
 
-  console.log({ sale });
+  const handleCancelSale = async () => {
+    try {
+      setIsLoadingCancel(true);
+      const response = await axiosClient.put(
+        `/sale/cancel-sale?saleId=${sale.saleId}`
+      );
+
+      setIsLoadingCancel(false);
+
+      if (response.data.isSuccess) {
+        onApprove();
+        toast({
+          title: "Đã từ chối yêu cầu rao bán!",
+        });
+      } else toast({ title: response.data.messages[0] });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex gap-6">
@@ -69,16 +91,41 @@ export default function RequestSaleDetail({
           {sale?.inventory.product.rarityStatus.dropRate}
         </p>
         {sale.saleStatusId === 0 && (
-          <div className="flex gap-4">
+          <div className="flex gap-4 mt-auto [&>*]:flex-1">
             <Button
               className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
               onClick={handleApproveSale}
             >
               {isLoading ? <LoadingIndicator /> : "Duyệt"}
             </Button>
+            <Button onClick={() => setOpen(true)}>
+              {isLoadingCancel ? <LoadingIndicator /> : "Từ chối"}
+            </Button>
           </div>
         )}
       </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader className="font-bold">
+            Từ chối yêu cầu rao bán
+          </DialogHeader>
+          <p>
+            Bạn có chắc chắn mình muốn từ chối yêu cầu rao bán này? Hành động
+            này sẽ không thể được thu hồi lại.
+          </p>
+          <div className="flex items-center [&>*]:flex-1 gap-6">
+            <Button onClick={() => setOpen(false)}>
+              {isLoadingCancel ? <LoadingIndicator /> : "Huỷ"}
+            </Button>
+            <Button
+              className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
+              onClick={handleCancelSale}
+            >
+              {isLoading ? <LoadingIndicator /> : "Xác nhận"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

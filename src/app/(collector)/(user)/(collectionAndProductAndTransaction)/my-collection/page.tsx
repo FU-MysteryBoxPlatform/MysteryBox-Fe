@@ -3,38 +3,42 @@
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
 import {
-  TCollectionProgressDetail,
-  useGetUserCollection,
-} from "@/hooks/api/useCollection";
-import { GlobalContext } from "@/provider/global-provider";
+  TCollection,
+  useGetCollections,
+} from "@/hooks/api/useManageCollection";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
-  const { user } = useContext(GlobalContext);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [collections, setCollections] = useState<TCollectionProgressDetail[]>(
-    []
-  );
-  const { data, isLoading, refetch } = useGetUserCollection(
-    user?.id as string,
-    page,
-    12
-  );
+  const [collections, setCollections] = useState<TCollection[]>([]);
+  const { mutate: mutateGetCollections, isPending } = useGetCollections();
 
   useEffect(() => {
-    refetch();
-  }, [refetch, page]);
+    mutateGetCollections(
+      {
+        pageNumber: page,
+        pageSize: 12,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            setCollections(data.result.items || []);
+            setTotalPages(data.result.totalPages || 0);
+          }
+        },
+      }
+    );
+  }, [mutateGetCollections, page]);
 
-  useEffect(() => {
-    setCollections(data?.result.items || []);
-    setTotalPages(data?.result.totalPages || 0);
-  }, [data]);
+  console.log({ collections });
 
-  if (isLoading)
+  if (isPending)
     return (
       <div className="w-full flex items-center justify-center">
         <LoadingIndicator />
@@ -50,23 +54,29 @@ export default function Page() {
         {collections.map((item) => {
           return (
             <div
-              key={item.userCollectionProgress.userCollecitonProgressId}
-              className="flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 hover:bg-gray-100 cursor-pointer"
-              onClick={() =>
-                router.push(
-                  `/my-collection/${item.userCollectionProgress.userCollecitonProgressId}`
-                )
-              }
+              key={item.collection.collectionId}
+              className={cn(
+                "flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 hover:bg-gray-100",
+                item.userCollectionProgress?.userCollecitonProgressId &&
+                  "cursor-pointer"
+              )}
+              onClick={() => {
+                if (item.userCollectionProgress?.userCollecitonProgressId) {
+                  router.push(
+                    `/my-collection/${item.userCollectionProgress.userCollecitonProgressId}`
+                  );
+                }
+              }}
             >
               <Image
-                src={item.userCollectionProgress?.collection.imagePath}
+                src={item.collection.imagePath}
                 alt="thumb"
                 width={120}
                 height={120}
                 className="w-full h-40 object-cover rounded-lg"
               />
               <p className="text-sm font-semibold">
-                {item.userCollectionProgress?.collection.collectionName}
+                {item.collection.collectionName}
               </p>
             </div>
           );
@@ -78,7 +88,6 @@ export default function Page() {
           totalPages={totalPages}
           onPageChange={(pageNumber) => {
             setPage(pageNumber);
-            refetch();
           }}
           showPreviousNext
         />

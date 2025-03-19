@@ -1,19 +1,23 @@
 import { useApiMutation, useApiQuery } from "./useApi";
+import { TCollectionProgress } from "./useCollection";
 import { TProductSale } from "./useSale";
 
 export type TCollection = {
-  collectionId: string;
-  collectionName: string;
-  description: string;
-  startTime: string;
-  totalItem: number;
-  isDeleted: boolean;
-  isActived: boolean;
-  rewards: string;
-  imagePath: string;
-  endTime: string;
-  blindBoxPrice: number;
-  discountBlindBoxPrice: number;
+  collection: {
+    collectionId: string;
+    collectionName: string;
+    description: string;
+    startTime: string;
+    totalItem: number;
+    isDeleted: boolean;
+    isActived: boolean;
+    rewards: string;
+    imagePath: string;
+    endTime: string;
+    blindBoxPrice: number;
+    discountBlindBoxPrice: number;
+  };
+  userCollectionProgress: TCollectionProgress;
 };
 
 export type TCollectionRequest = {

@@ -75,7 +75,7 @@ function NotificationItem({
 }
 
 export default function Notification() {
-  const { user } = useContext(GlobalContext);
+  const { user, isFetchingUser } = useContext(GlobalContext);
   const [notifications, setNotifications] = useState<TNotification[]>([]);
 
   const { data, refetch } = useGetNotifications(user?.id || "");
@@ -105,6 +105,8 @@ export default function Notification() {
   useEffect(() => {
     setNotifications(data?.result.items || []);
   }, [data]);
+
+  if (!isFetchingUser && !user) return null;
 
   return (
     <Popover>
