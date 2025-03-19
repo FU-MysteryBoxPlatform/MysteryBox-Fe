@@ -31,7 +31,7 @@ export default function Page() {
       <p className="text-lg md:text-xl font-bold mb-4 md:mb-6">
         Bộ sưu tập{" "}
         <span className="text-[#E12E43]">
-          {collectionProgress?.collection.collection.collectionName}
+          {collectionProgress?.collection?.collection?.collectionName}
         </span>
       </p>
       <p className="font-semibold mb-4">
