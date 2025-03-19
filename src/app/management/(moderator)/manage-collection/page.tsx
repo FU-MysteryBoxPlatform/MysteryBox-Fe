@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  TCollection,
+  TCollectionWithProgress,
   useGetCollections,
 } from "@/hooks/api/useManageCollection";
 import dayjs from "dayjs";
@@ -45,7 +45,7 @@ export default function Page() {
   const minPrice = params["minPrice"];
   const maxPrice = params["maxPrice"];
 
-  const [collections, setCollections] = useState<TCollection[]>([]);
+  const [collections, setCollections] = useState<TCollectionWithProgress[]>([]);
   const [totalPages, setTotalPages] = useState(0);
 
   const { mutate: mutateGetCollections, isPending } = useGetCollections();
@@ -168,33 +168,35 @@ export default function Page() {
                 <TableBody>
                   {collections.length > 0 &&
                     collections?.map((collection) => (
-                      <TableRow key={collection.collectionId}>
+                      <TableRow key={collection.collection.collectionId}>
                         <TableCell className="sm:table-cell">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             alt="Product image"
                             className="aspect-square rounded-md object-cover w-12 h-12"
                             height="64"
-                            src={collection.imagePath}
+                            src={collection.collection.imagePath}
                             width="64"
                           />
                         </TableCell>
                         <TableCell className="md:table-cell font-medium line-clamp-2">
-                          {collection.collectionName}
+                          {collection.collection.collectionName}
                         </TableCell>
                         <TableCell className="md:table-cell">
-                          {collection.isActived ? "Đã bắt đầu" : "Chưa bắt đầu"}
+                          {collection.collection.isActived
+                            ? "Đã bắt đầu"
+                            : "Chưa bắt đầu"}
                         </TableCell>
                         <TableCell className="md:table-cell">
-                          {collection.totalItem}
+                          {collection.collection.totalItem}
                         </TableCell>
                         <TableCell className="md:table-cell">
-                          {dayjs(collection.startTime).format(
+                          {dayjs(collection.collection.startTime).format(
                             "YYYY-MM-DD HH:mm A"
                           )}
                         </TableCell>
                         <TableCell className="md:table-cell">
-                          {dayjs(collection.endTime).format(
+                          {dayjs(collection.collection.endTime).format(
                             "YYYY-MM-DD HH:mm A"
                           )}
                         </TableCell>
@@ -215,7 +217,7 @@ export default function Page() {
                                 className="cursor-pointer"
                                 onClick={() =>
                                   router.push(
-                                    `/management/manage-collection/${collection.collectionId}`
+                                    `/management/manage-collection/${collection.collection.collectionId}`
                                   )
                                 }
                               >

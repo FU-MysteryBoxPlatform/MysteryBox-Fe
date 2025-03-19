@@ -1,14 +1,14 @@
 "use client";
-import { useEffect, useState } from "react";
 import {
-  TCollection,
+  TCollectionWithProgress,
   useGetCollections,
 } from "@/hooks/api/useManageCollection";
-import { useRouter } from "next/navigation";
 import { formatPriceVND } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function NewProductsSection() {
-  const [items, setItems] = useState<TCollection[]>([]);
+  const [items, setItems] = useState<TCollectionWithProgress[]>([]);
   const getData = useGetCollections();
   const route = useRouter();
   const fetchData = async () => {

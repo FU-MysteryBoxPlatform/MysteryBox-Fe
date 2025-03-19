@@ -3,20 +3,22 @@ import { TCollectionProgress } from "./useCollection";
 import { TProductSale } from "./useSale";
 
 export type TCollection = {
-  collection: {
-    collectionId: string;
-    collectionName: string;
-    description: string;
-    startTime: string;
-    totalItem: number;
-    isDeleted: boolean;
-    isActived: boolean;
-    rewards: string;
-    imagePath: string;
-    endTime: string;
-    blindBoxPrice: number;
-    discountBlindBoxPrice: number;
-  };
+  collectionId: string;
+  collectionName: string;
+  description: string;
+  startTime: string;
+  totalItem: number;
+  isDeleted: boolean;
+  isActived: boolean;
+  rewards: string;
+  imagePath: string;
+  endTime: string;
+  blindBoxPrice: number;
+  discountBlindBoxPrice: number;
+};
+
+export type TCollectionWithProgress = {
+  collection: TCollection;
   userCollectionProgress: TCollectionProgress;
 };
 
@@ -32,7 +34,7 @@ export type TCollectionRequest = {
 
 export type TCollectionResponse = {
   totalPages: number;
-  items: TCollection[];
+  items: TCollectionWithProgress[];
 };
 
 export type TCollectionDetail = {

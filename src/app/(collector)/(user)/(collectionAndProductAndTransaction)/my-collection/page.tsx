@@ -3,7 +3,7 @@
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
 import {
-  TCollection,
+  TCollectionWithProgress,
   useGetCollections,
 } from "@/hooks/api/useManageCollection";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ export default function Page() {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [collections, setCollections] = useState<TCollection[]>([]);
+  const [collections, setCollections] = useState<TCollectionWithProgress[]>([]);
   const { mutate: mutateGetCollections, isPending } = useGetCollections();
 
   useEffect(() => {
