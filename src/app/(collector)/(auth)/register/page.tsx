@@ -153,6 +153,7 @@ export default function Register() {
         title: "Không thể gửi lại OTP",
         variant: "destructive",
       });
+      console.error("Failed to resend OTP:", error);
     }
   };
 
