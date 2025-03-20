@@ -5,14 +5,15 @@ import { Inventory } from "./useInventory";
 
 export type TOrderDetail = {
   orderDetailId: string;
-  inventoryId: string;
-  inventory: Inventory;
-  collectionId: string;
-  collection: Collection;
+  inventoryId?: string;
+  inventory?: Inventory;
+  collectionId?: string;
+  collection?: Collection;
   orderId: string;
   quantity: number;
   unitPrice: number;
   note: string;
+  order: Order;
 };
 
 export type TOrder = {
@@ -66,4 +67,11 @@ export const useGetAdminOrders = () => {
     `order/get-all-order-by-filter`,
     "post"
   );
+};
+
+export const useGetAdminOrderDetail = (id: string) => {
+  return useApiQuery<{
+    items: TOrderDetail[];
+    totalPages: number;
+  }>(`/order/get-order-detail/${id}`);
 };

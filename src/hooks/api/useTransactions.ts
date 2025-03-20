@@ -1,4 +1,4 @@
-import { PaymentHistory, TAccount } from "@/types";
+import { Order, PaymentHistory, TAccount } from "@/types";
 import { useApiQuery } from "./useApi";
 
 export type TTransaction = {
@@ -13,6 +13,7 @@ export type TTransaction = {
   transactionTypeId: number;
   transactionType: TransactionType;
   orderId: string;
+  order: Order;
   exchangeRequestId: string;
   auctionId: string;
   auctionHistoryId: string;

@@ -31,7 +31,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TOrder, TOrderDetail, useGetAdminOrders } from "@/hooks/api/useOrder";
+import {
+  TOrder,
+  TOrderDetail,
+  useGetAdminOrderDetail,
+  useGetAdminOrders,
+} from "@/hooks/api/useOrder";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { Eye } from "lucide-react";
@@ -39,6 +44,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useEffect, useRef, useState } from "react";
 import DatePicker from "react-date-picker";
+import TableCollection from "./components/TableCollectionsOrderDetails";
 
 export default function Page() {
   const router = useRouter();
@@ -54,9 +60,11 @@ export default function Page() {
 
   const [orders, setOrders] = useState<TOrder[]>();
   const [totalPages, setTotalPages] = useState(0);
+  const [orderId, setOrderId] = useState("");
   const [orderDetail, setOrderDetail] = useState<TOrderDetail[]>();
 
   const { mutate: mutateGetOrders, isPending } = useGetAdminOrders();
+  const { data, refetch } = useGetAdminOrderDetail(orderId);
 
   const handleFilterByEmail = (value: string) => {
     if (ref.current) {
@@ -103,6 +111,14 @@ export default function Page() {
       }
     );
   }, [email, endDate, mutateGetOrders, page, startDate, status, type]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch, orderId]);
+
+  useEffect(() => {
+    setOrderDetail(data?.result.items);
+  }, [data]);
 
   return (
     <div className="p-6">
@@ -213,61 +229,20 @@ export default function Page() {
                                   <Eye
                                     className="h-4 w-4 cursor-pointer"
                                     onClick={() => {
-                                      setOrderDetail(ord.orderDetails);
+                                      setOrderId(order.orderId);
                                     }}
                                   />
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className="max-w-[80vw]">
                                   <DialogHeader>
                                     <DialogTitle>Chi tiết đặt hàng</DialogTitle>
                                   </DialogHeader>
                                   <div className="max-h-[50vh] overflow-auto">
-                                    <p className="mb-2">
-                                      <span className="font-semibold">
-                                        Mã đặt hàng:
-                                      </span>{" "}
-                                      {orderDetail?.[0]?.orderId}
-                                    </p>
-                                    <p className="font-semibold mb-2">
-                                      Bộ sưu tập
-                                    </p>
-                                    <div className="grid grid-cols-3 gap-2 mb-2">
-                                      {orderDetail
-                                        ?.filter((item) => item.collection)
-                                        ?.map((o) => (
-                                          <div key={o.collectionId}>
-                                            <img
-                                              src={o.collection.imagePath}
-                                              alt=""
-                                              className="object-cover w-full aspect-square rounded-md mb-1"
-                                            />
-                                            <p className="text-sm line-clamp-2">
-                                              {o.collection.collectionName}
-                                            </p>
-                                          </div>
-                                        ))}
-                                    </div>
-                                    <p className="font-semibold mb-2">
-                                      Vật phẩm
-                                    </p>
-                                    <div className="grid grid-cols-3 gap-2 mb-2">
-                                      {orderDetail
-                                        ?.filter((item) => item.inventory)
-                                        ?.map((i) => (
-                                          <div key={i.inventoryId}>
-                                            <img
-                                              src={
-                                                i.inventory.product.imagePath
-                                              }
-                                              alt=""
-                                              className="object-cover w-full aspect-square rounded-md mb-1"
-                                            />
-                                            <p className="text-sm line-clamp-2">
-                                              {i.inventory.product.name}
-                                            </p>
-                                          </div>
-                                        ))}
-                                    </div>
+                                    <TableCollection
+                                      orderDetail={orderDetail?.filter(
+                                        (order) => order.collection
+                                      )}
+                                    />
                                   </div>
                                 </DialogContent>
                               </Dialog>
