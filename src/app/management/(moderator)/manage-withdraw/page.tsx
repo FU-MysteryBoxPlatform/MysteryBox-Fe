@@ -3,7 +3,6 @@ import { ImageUploader } from "@/app/components/ImageUpload";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -18,11 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Table,
   TableBody,
@@ -40,10 +34,10 @@ import { toast } from "@/hooks/use-toast";
 import { cn, formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
-import { CalendarIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useContext, useEffect, useState } from "react";
+import DatePicker from "react-date-picker";
 
 const FormApprove = ({
   requestId,
@@ -116,12 +110,14 @@ export default function Page() {
     useGetAllWalletRequest();
 
   const handleFilterByStartDate = (date?: Date) => {
-    params["startDate"] = dayjs(date).toISOString();
+    if (!date) params["startDate"] = null;
+    else params["startDate"] = dayjs(date).toISOString();
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
   const handleFilterByEndDate = (date?: Date) => {
-    params["endDate"] = dayjs(date).toISOString();
+    if (!date) params["endDate"] = null;
+    else params["endDate"] = dayjs(date).toISOString();
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
@@ -180,38 +176,18 @@ export default function Page() {
           </div>
 
           <div className="flex gap-4 [&>*]:flex-1 mb-4">
-            <Popover>
-              <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-                <p>{dayjs(startDate as string).format("DD/MM/YYYY")}</p>
-                <CalendarIcon />
-              </PopoverTrigger>
-              <PopoverContent>
-                <Calendar
-                  mode="single"
-                  selected={
-                    startDate ? dayjs(startDate as string).toDate() : undefined
-                  }
-                  onSelect={(date) => handleFilterByStartDate(date)}
-                  className="rounded-md border w-fit"
-                />
-              </PopoverContent>
-            </Popover>
-            <Popover>
-              <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-                <p>{dayjs(endDate as string).format("DD/MM/YYYY")}</p>
-                <CalendarIcon />
-              </PopoverTrigger>
-              <PopoverContent>
-                <Calendar
-                  mode="single"
-                  selected={
-                    endDate ? dayjs(endDate as string).toDate() : undefined
-                  }
-                  onSelect={(date) => handleFilterByEndDate(date)}
-                  className="rounded-md border w-fit"
-                />
-              </PopoverContent>
-            </Popover>
+            <DatePicker
+              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
+              value={startDate ? new Date(startDate as string) : null}
+              onChange={(value) => {
+                handleFilterByStartDate(value as Date);
+              }}
+            />
+            <DatePicker
+              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
+              value={endDate ? new Date(endDate as string) : null}
+              onChange={(value) => handleFilterByEndDate(value as Date)}
+            />
           </div>
 
           {isPendingWithdraw ? (

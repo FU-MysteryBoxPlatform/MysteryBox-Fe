@@ -114,3 +114,10 @@ export const useUpdateCollection = () => {
     "put"
   );
 };
+
+export const useDeleteCollection = (id: string) => {
+  return useApiMutation<TCollection, string>(
+    `collection/delete-colleciton?collectionId=${id}`,
+    "delete"
+  );
+};

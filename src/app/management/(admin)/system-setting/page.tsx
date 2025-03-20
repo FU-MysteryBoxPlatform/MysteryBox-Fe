@@ -131,7 +131,9 @@ export default function Page() {
                     {config.vietnameseName}
                   </TableCell>
                   <TableCell className="md:table-cell">
-                    {config.currentValue}
+                    {config.unit.name === "Percent"
+                      ? +config.currentValue * 100
+                      : config.currentValue}
                   </TableCell>
                   <TableCell>
                     {config.unit.name === "Percent"

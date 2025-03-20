@@ -1,7 +1,6 @@
 "use client";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Card,
   CardContent,
@@ -17,11 +16,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -40,10 +34,11 @@ import {
 import { TOrder, TOrderDetail, useGetAdminOrders } from "@/hooks/api/useOrder";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import { CalendarIcon, Ellipsis, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useEffect, useRef, useState } from "react";
+import DatePicker from "react-date-picker";
 
 export default function Page() {
   const router = useRouter();
@@ -75,12 +70,14 @@ export default function Page() {
   };
 
   const handleFilterByStartDate = (date?: Date) => {
-    params["startDate"] = dayjs(date).toISOString();
+    if (!date) params["startDate"] = null;
+    else params["startDate"] = dayjs(date).toISOString();
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
   const handleFilterByEndDate = (date?: Date) => {
-    params["endDate"] = dayjs(date).toISOString();
+    if (!date) params["endDate"] = null;
+    else params["endDate"] = dayjs(date).toISOString();
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
@@ -90,8 +87,8 @@ export default function Page() {
       {
         orderType: +type,
         email: email as string,
-        startTime: startDate as string,
-        endTime: endDate as string,
+        startTime: startDate ? (startDate as string) : undefined,
+        endTime: endDate ? (endDate as string) : undefined,
         orderStatus: +status,
         pageNumber: +(page as string),
         pageSize: 10,
@@ -144,34 +141,18 @@ export default function Page() {
               onChange={(e) => handleFilterByEmail(e.target.value)}
             />
 
-            <Popover>
-              <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-                <p>{dayjs(startDate as string).format("DD/MM/YYYY")}</p>
-                <CalendarIcon />
-              </PopoverTrigger>
-              <PopoverContent>
-                <Calendar
-                  mode="single"
-                  selected={dayjs(startDate as string).toDate()}
-                  onSelect={(date) => handleFilterByStartDate(date)}
-                  className="rounded-md border w-fit"
-                />
-              </PopoverContent>
-            </Popover>
-            <Popover>
-              <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-                <p>{dayjs(endDate as string).format("DD/MM/YYYY")}</p>
-                <CalendarIcon />
-              </PopoverTrigger>
-              <PopoverContent>
-                <Calendar
-                  mode="single"
-                  selected={dayjs(endDate as string).toDate()}
-                  onSelect={(date) => handleFilterByEndDate(date)}
-                  className="rounded-md border w-fit"
-                />
-              </PopoverContent>
-            </Popover>
+            <DatePicker
+              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
+              value={startDate ? new Date(startDate as string) : null}
+              onChange={(value) => {
+                handleFilterByStartDate(value as Date);
+              }}
+            />
+            <DatePicker
+              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
+              value={endDate ? new Date(endDate as string) : null}
+              onChange={(value) => handleFilterByEndDate(value as Date)}
+            />
 
             <Select
               value={type as string}
@@ -209,7 +190,7 @@ export default function Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders?.length &&
+                  {!!orders?.length &&
                     orders?.length > 0 &&
                     orders?.map((ord) => {
                       const order = ord.order;
@@ -290,8 +271,6 @@ export default function Page() {
                                   </div>
                                 </DialogContent>
                               </Dialog>
-
-                              <Ellipsis className="h-4 w-4" />
                             </div>
                           </TableCell>
                         </TableRow>

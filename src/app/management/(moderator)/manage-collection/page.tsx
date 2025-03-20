@@ -1,6 +1,7 @@
 "use client";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
+import axiosClient from "@/axios-client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { DialogContent, DialogHeader } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +30,8 @@ import {
   TCollectionWithProgress,
   useGetCollections,
 } from "@/hooks/api/useManageCollection";
+import { toast } from "@/hooks/use-toast";
+import { Dialog } from "@radix-ui/react-dialog";
 import dayjs from "dayjs";
 import { MoreHorizontal, PlusIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -45,6 +49,9 @@ export default function Page() {
   const minPrice = params["minPrice"];
   const maxPrice = params["maxPrice"];
 
+  const [open, setOpen] = useState(false);
+  const [collectionDeleteId, setCollectionDeleteId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [collections, setCollections] = useState<TCollectionWithProgress[]>([]);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -83,6 +90,43 @@ export default function Page() {
 
       router.push(`?${queryString.stringify(params)}`);
     }, 1000);
+  };
+
+  const handleDeleteCollection = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axiosClient.delete(
+        `/collection/delete-colleciton?collectionId=${collectionDeleteId}`
+      );
+
+      setIsLoading(false);
+
+      if (response.data.isSuccess) {
+        toast({
+          title: "Đã xoá thành công",
+        });
+
+        mutateGetCollections(
+          {
+            keyword: keyword as string,
+            pageNumber: +(page || 1),
+            pageSize: 10,
+            minimumPrice: minPrice ? +minPrice : undefined,
+            maximumPrice: maxPrice ? +maxPrice : undefined,
+          },
+          {
+            onSuccess: (data) => {
+              if (data.isSuccess) {
+                setCollections(data.result.items);
+                setTotalPages(data.result.totalPages);
+              }
+            },
+          }
+        );
+      } else toast({ title: response.data.messages[0] });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -223,7 +267,16 @@ export default function Page() {
                               >
                                 Sửa
                               </DropdownMenuItem>
-                              <DropdownMenuItem>Xóa</DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setOpen(true);
+                                  setCollectionDeleteId(
+                                    collection.collection.collectionId
+                                  );
+                                }}
+                              >
+                                Xóa
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -250,6 +303,24 @@ export default function Page() {
           )}
         </CardContent>
       </Card>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader className="font-bold">Xoá bộ sưu tập</DialogHeader>
+          <p>
+            Bạn có chắc chắn mình muốn xoá bộ sưu tập này? Hành động này sẽ
+            không thể được thu hồi lại.
+          </p>
+          <div className="flex items-center [&>*]:flex-1 gap-6">
+            <Button onClick={() => setOpen(false)}>Huỷ</Button>
+            <Button
+              className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
+              onClick={handleDeleteCollection}
+            >
+              {isLoading ? <LoadingIndicator /> : "Xác nhận"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
