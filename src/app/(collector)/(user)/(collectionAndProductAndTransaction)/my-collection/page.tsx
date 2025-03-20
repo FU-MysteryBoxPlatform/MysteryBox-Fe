@@ -6,6 +6,7 @@ import {
   TCollectionWithProgress,
   useGetCollections,
 } from "@/hooks/api/useManageCollection";
+import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -36,8 +37,6 @@ export default function Page() {
     );
   }, [mutateGetCollections, page]);
 
-  console.log({ collections });
-
   if (isPending)
     return (
       <div className="w-full flex items-center justify-center">
@@ -56,15 +55,17 @@ export default function Page() {
             <div
               key={item.collection.collectionId}
               className={cn(
-                "flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 hover:bg-gray-100",
-                item.userCollectionProgress?.userCollecitonProgressId &&
-                  "cursor-pointer"
+                "flex flex-col items-center gap-2 border border-gray-300 rounded-lg p-4 hover:bg-gray-100 cursor-pointer"
               )}
               onClick={() => {
                 if (item.userCollectionProgress?.userCollecitonProgressId) {
                   router.push(
                     `/my-collection/${item.userCollectionProgress.userCollecitonProgressId}`
                   );
+                } else {
+                  toast({
+                    title: "Bạn chưa sở hữu vật phẩm nào trong bộ sưu tập này!",
+                  });
                 }
               }}
             >
