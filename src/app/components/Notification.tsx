@@ -1,3 +1,5 @@
+"use client";
+
 import BellIcon from "@/components/icons/BellIcon";
 import {
   DropdownMenu,
@@ -16,7 +18,7 @@ import {
   useMarkNotificationAsRead,
 } from "@/hooks/api/useNotification";
 import { GlobalContext } from "@/provider/global-provider";
-import { EllipsisVertical } from "lucide-react";
+import { EllipsisVertical, Loader2 } from "lucide-react";
 import { useContext, useEffect, useMemo, useState } from "react";
 
 function NotificationItem({
@@ -42,30 +44,31 @@ function NotificationItem({
   };
 
   return (
-    <div
-      key={item.notificationId}
-      className="flex items-start gap-2 justify-between"
-    >
-      <div className="hover:bg-gray-100 rounded-md p-2 relative">
-        <div className="font-bold mb-1 flex gap-1 select-none">
-          {item.notificationName}
+    <div className="flex items-start justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="font-semibold text-gray-800 text-sm select-none">
+            {item.notificationName}
+          </span>
           {!item.isRead && (
-            <div className="w-3 h-3 bg-red-500 rounded-full shrink-0"></div>
+            <div className="w-2 h-2 bg-red-500 rounded-full shrink-0"></div>
           )}
         </div>
-        <p className="text-sm select-none">{item.messages}</p>
+        <p className="text-sm text-gray-600 select-none line-clamp-2">
+          {item.messages}
+        </p>
       </div>
       {!item.isRead && (
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <EllipsisVertical className="w-5 h-5 cursor-pointer" />
+          <DropdownMenuTrigger className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+            <EllipsisVertical className="w-4 h-4 text-gray-500" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="p-2">
+          <DropdownMenuContent className="p-1 min-w-[120px]">
             <div
-              className="cursor-pointer p-2 hover:bg-gray-100 rounded-md"
+              className="p-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer"
               onClick={handleMarkAsRead}
             >
-              Đánh dấu là đã đọc
+              Mark as read
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -78,7 +81,7 @@ export default function Notification() {
   const { user, isFetchingUser } = useContext(GlobalContext);
   const [notifications, setNotifications] = useState<TNotification[]>([]);
 
-  const { data, refetch } = useGetNotifications(user?.id || "");
+  const { data, refetch, isLoading } = useGetNotifications(user?.id || "");
   const { mutate: mutateMarkAsReadAll } = useMarkAllNotificationAsRead(
     user?.id || ""
   );
@@ -99,7 +102,7 @@ export default function Notification() {
   };
 
   useEffect(() => {
-    refetch();
+    if (user?.id) refetch();
   }, [refetch, user?.id]);
 
   useEffect(() => {
@@ -110,41 +113,52 @@ export default function Notification() {
 
   return (
     <Popover>
-      <PopoverTrigger>
-        <div className="relative w-fit">
-          {numberOfUnreadNotifications > 0 && (
-            <div className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white bg-red-500 text-xs">
-              {numberOfUnreadNotifications}
-            </div>
-          )}
-          <BellIcon />
-        </div>
+      <PopoverTrigger className="relative p-2 hover:bg-gray-100 rounded-full transition-colors">
+        <BellIcon className="w-6 h-6 text-gray-700" />
+        {numberOfUnreadNotifications > 0 && (
+          <span className="absolute top-0 right-0 w-4 h-4 flex items-center justify-center rounded-full text-xs text-white bg-red-500">
+            {numberOfUnreadNotifications > 9
+              ? "9+"
+              : numberOfUnreadNotifications}
+          </span>
+        )}
       </PopoverTrigger>
-      <PopoverContent>
-        <div className="font-bold text-lg mb-6 flex items-center justify-between">
-          Thông báo
+      <PopoverContent className="w-80 p-0 shadow-lg rounded-lg border border-gray-200 bg-white">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <EllipsisVertical className="w-5 h-5 cursor-pointer" />
+            <DropdownMenuTrigger className="p-1 hover:bg-gray-200 rounded-full transition-colors">
+              <EllipsisVertical className="w-5 h-5 text-gray-600" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-2">
+            <DropdownMenuContent className="p-1 min-w-[120px]">
               <div
-                className="cursor-pointer p-2 hover:bg-gray-100 rounded-md"
+                className="p-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md cursor-pointer"
                 onClick={handleMarkAsReadAll}
               >
-                Đánh dấu là đã đọc
+                Mark all as read
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="grid gap-2 max-h-[300px] overflow-auto">
-          {notifications.map((notification) => (
-            <NotificationItem
-              key={notification.notificationId}
-              item={notification}
-              onSuccess={refetch}
-            />
-          ))}
+
+        {/* Content */}
+        <div className="max-h-[300px] overflow-y-auto">
+          {isLoading ? (
+            <div className="flex justify-center items-center py-6">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+            </div>
+          ) : notifications.length === 0 ? (
+            <p className="text-center text-gray-500 py-6">No notifications</p>
+          ) : (
+            notifications.map((notification) => (
+              <NotificationItem
+                key={notification.notificationId}
+                item={notification}
+                onSuccess={refetch}
+              />
+            ))
+          )}
         </div>
       </PopoverContent>
     </Popover>

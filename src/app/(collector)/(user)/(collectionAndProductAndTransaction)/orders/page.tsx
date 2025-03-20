@@ -31,6 +31,7 @@ export default function Page() {
   const [startDate, setStartDate] = useState<Value>();
   const [endDate, setEndDate] = useState<Value>();
   const [statusFilter, setStatusFilter] = useState("");
+
   interface Order {
     order: {
       orderId: string;
@@ -41,13 +42,7 @@ export default function Page() {
   }
 
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
-
-  const { data: data, isLoading } = useGetAllOrderByAccount(
-    user?.id ?? "",
-    +page,
-    6
-  );
-
+  const { data, isLoading } = useGetAllOrderByAccount(user?.id ?? "", +page, 6);
   const orders = data?.result.items || [];
   const totalPages = data?.result.totalPages || 0;
   const {
@@ -56,47 +51,38 @@ export default function Page() {
     refetch,
   } = useGetOrderDetail(id);
 
-  // Apply filters when orders or filter values change
+  // Apply filters
   useEffect(() => {
     if (orders.length > 0) {
       let result = [...orders];
-
-      // Filter by status
       if (statusFilter !== "") {
         result = result.filter(
           (order) => order.order.statusId === parseInt(statusFilter)
         );
       }
-
-      // Filter by date range
       if (startDate) {
         result = result.filter(
           (order) =>
             new Date(order.order.orderDate) >= new Date(startDate as Date)
         );
       }
-
       if (endDate) {
         result = result.filter(
           (order) =>
             new Date(order.order.orderDate) <= new Date(endDate as Date)
         );
       }
-
       setFilteredOrders(result);
     } else {
       setFilteredOrders([]);
     }
   }, [orders, startDate, endDate, statusFilter]);
 
-  // Apply filters
   const applyFilters = () => {
-    // Reset to first page when applying filters
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
 
-  // Reset filters
   const resetFilters = () => {
     setStartDate(null);
     setEndDate(null);
@@ -141,237 +127,209 @@ export default function Page() {
     setId(id);
   };
 
-  console.log({ detail });
-
   return (
-    <div className="rounded-lg flex-1 max-md:w-full">
-      <div>
-        <p className="text-xl md:text-2xl font-semibold mb-2 md:mb-4 border border-gray-300 px-6 py-4 rounded-lg">
-          Đơn hàng của bạn
-        </p>
-        <div>
-          <Card x-chunk="dashboard-06-chunk-0 border-none">
-            <CardHeader>
-              <CardTitle>Quản lý tất cả đơn hàng của bạn</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-12 gap-4">
-                {/* Orders list - adjusts from 12 columns on mobile to 6 on larger screens */}
-                <div className="col-span-12 md:col-span-6 p-4">
-                  {filteredOrders.length > 0 ? (
-                    filteredOrders.map((order) => (
-                      <div
-                        key={order.order.orderId}
-                        className={`bg-white shadow-lg p-4 rounded-lg my-1 text-sm font-sans cursor-pointer ${
-                          id === order.order.orderId
-                            ? "border-2 border-blue-500"
-                            : ""
-                        }`}
-                        onClick={() => fetchDetail(order.order.orderId)}
-                      >
-                        <div className="flex justify-between">
-                          <span className="inline-block">
-                            <strong> Mã đơn hàng:</strong>{" "}
-                            {order.order.orderId.substring(0, 8)}
-                          </span>
+    <div className="container mx-auto p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6 text-gray-800">
+        Đơn hàng của bạn
+      </h1>
 
-                          <span className="inline-block text-gray-600 text-sm">
-                            {formatDate(order.order.orderDate)}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between my-2">
-                          <span className="inline-block">
-                            <strong className="text-gray-600">
-                              Trạng thái
-                            </strong>
-                            :{" "}
-                            <span
-                              className={`${renderColorOrderStatus(
-                                order.order.statusId
-                              )}`}
-                            >
-                              {renderOrderStatus(order.order.statusId)}
-                            </span>
-                          </span>
-
-                          <span className="inline-block text-gray-500 text-sm">
-                            Tổng tiền:
-                            <strong className="ml-1 text-blue-700 ">
-                              {formatPriceVND(order.order.totalAmount)}
-                            </strong>
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      Không có đơn hàng nào
-                    </div>
-                  )}
-                </div>
-
-                {/* Details and filters panel - stacked on mobile, side by side on larger screens */}
-                <div className="col-span-12 md:col-span-6 p-4">
-                  {/* Order details section */}
-                  {id !== "" && (
-                    <div className="bg-white shadow-lg p-4 rounded-lg mb-4 text-base font-sans">
-                      <div className="flex justify-center mb-2">
-                        <span className="inline-block">
-                          <strong className="">Chi tiết đơn hàng</strong>
-                        </span>
-                      </div>
-                      {isLoading2 ? (
-                        <div className="flex items-center justify-center p-4">
-                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                        </div>
-                      ) : (
-                        <div className="max-h-80 overflow-y-auto">
-                          {detail?.result.items.map((item) => (
-                            <div key={item.orderDetailId}>
-                              <div className="flex justify-between my-2 border border-gray-200 p-2 rounded-lg">
-                                <span className="flex items-center">
-                                  <img
-                                    src={
-                                      item.collection
-                                        ? item.collection.imagePath
-                                        : item.inventory?.product.imagePath
-                                    }
-                                    alt=""
-                                    className="w-16 h-16 md:w-20 md:h-20 aspect-square object-cover"
-                                  />
-                                  <div className="flex flex-col ml-2">
-                                    <strong className="text-gray-600 text-xs md:text-sm line-clamp-2">
-                                      {item.collection
-                                        ? `Túi mù ${item.collection.collectionName}`
-                                        : `${item.inventory?.product.name}`}
-                                    </strong>
-                                    <span className="text-blue-700 text-xs md:text-sm font-semibold">
-                                      Đơn giá: {formatPriceVND(item.unitPrice)}
-                                    </span>
-                                    {item.order.statusId === 1 &&
-                                      !item.isRated && (
-                                        <button
-                                          className="text-blue-500 underline text-sm text-left"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setOpenRatingModal(true);
-                                            setOrderDetailId(
-                                              item.orderDetailId
-                                            );
-                                          }}
-                                        >
-                                          Đánh giá
-                                        </button>
-                                      )}
-                                  </div>
-                                </span>
-
-                                <span className="flex items-center text-gray-500 text-xs md:text-sm">
-                                  SL:{" "}
-                                  <strong className="ml-1 text-blue-700">
-                                    {item.quantity}
-                                  </strong>
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Filter section */}
-                  <div className="bg-white shadow-lg p-4 rounded-lg text-base font-sans">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="font-semibold flex items-center">
-                        <Filter className="h-4 w-4 mr-2" />
-                        Bộ lọc đơn hàng
+      <Card className="shadow-md border-none">
+        <CardHeader className="bg-gray-50">
+          <CardTitle className="text-lg md:text-xl font-semibold text-gray-700">
+            Quản lý đơn hàng
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Orders List */}
+            <div className="space-y-4">
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <div
+                    key={order.order.orderId}
+                    className={`bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer ${
+                      id === order.order.orderId
+                        ? "border-2 border-blue-500"
+                        : "border border-gray-200"
+                    }`}
+                    onClick={() => fetchDetail(order.order.orderId)}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-gray-800">
+                        Mã đơn hàng: {order.order.orderId.substring(0, 8)}
                       </span>
-                      <button
-                        className="text-xs text-blue-600 hover:text-blue-800"
-                        onClick={resetFilters}
-                      >
-                        Đặt lại
-                      </button>
+                      <span className="text-sm text-gray-500">
+                        {formatDate(order.order.orderDate)}
+                      </span>
                     </div>
-
-                    {/* Date range filter */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Từ ngày:
-                      </label>
-                      <div className="relative">
-                        <DatePicker
-                          className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-                          value={startDate}
-                          onChange={setStartDate}
-                        />
-                      </div>
+                    <div className="flex justify-between mt-2">
+                      <span>
+                        Trạng thái:{" "}
+                        <span
+                          className={`${renderColorOrderStatus(
+                            order.order.statusId
+                          )} font-medium`}
+                        >
+                          {renderOrderStatus(order.order.statusId)}
+                        </span>
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        Tổng tiền:{" "}
+                        <strong className="text-blue-600">
+                          {formatPriceVND(order.order.totalAmount)}
+                        </strong>
+                      </span>
                     </div>
-
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Đến ngày:
-                      </label>
-                      <div className="relative">
-                        <DatePicker
-                          className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-                          value={endDate}
-                          onChange={setEndDate}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Status filter */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Trạng thái:
-                      </label>
-                      <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md text-sm"
-                      >
-                        <option value="">Tất cả</option>
-                        <option value="0">Chờ xác nhận</option>
-                        <option value="1">Đang xử lý</option>
-                        <option value="2">Hoàn thành</option>
-                        <option value="3">Đã hủy</option>
-                      </select>
-                    </div>
-
-                    {/* Apply button */}
-                    <button
-                      onClick={applyFilters}
-                      className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors text-sm font-medium"
-                    >
-                      Áp dụng bộ lọc
-                    </button>
                   </div>
-                </div>
-              </div>
-
-              {/* Pagination */}
-              {orders.length > 0 ? (
-                <Paginator
-                  currentPage={+(page as string)}
-                  totalPages={totalPages}
-                  onPageChange={(pageNumber) => {
-                    params["page"] = pageNumber.toString();
-                    router.push(`?${queryString.stringify(params)}`);
-                  }}
-                  showPreviousNext
-                />
+                ))
               ) : (
-                <div className="w-full text-center mt-10">
+                <div className="text-center py-8 text-gray-500">
                   Không có đơn hàng nào
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            </div>
+
+            {/* Order Details & Filters */}
+            <div className="space-y-6">
+              {/* Order Details */}
+              {id && (
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
+                    Chi tiết đơn hàng
+                  </h3>
+                  {isLoading2 ? (
+                    <div className="flex items-center justify-center p-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                    </div>
+                  ) : (
+                    <div className="max-h-80 overflow-y-auto space-y-4">
+                      {detail?.result.items.map((item) => (
+                        <div
+                          key={item.orderDetailId}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={
+                                item.collection
+                                  ? item.collection.imagePath
+                                  : item.inventory?.product.imagePath
+                              }
+                              alt=""
+                              className="w-16 h-16 object-cover rounded-md"
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 line-clamp-2">
+                                {item.collection
+                                  ? `Túi mù ${item.collection.collectionName}`
+                                  : `${item.inventory?.product.name}`}
+                              </p>
+                              <p className="text-sm text-blue-600">
+                                {formatPriceVND(item.unitPrice)}
+                              </p>
+                              {item.order.statusId === 1 && !item.isRated && (
+                                <button
+                                  className="text-blue-500 hover:underline text-sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenRatingModal(true);
+                                    setOrderDetailId(item.orderDetailId);
+                                  }}
+                                >
+                                  Đánh giá
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          <span className="text-sm text-gray-600">
+                            SL: <strong>{item.quantity}</strong>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Filters */}
+              <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-semibold text-gray-700 flex items-center">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Bộ lọc
+                  </h3>
+                  <button
+                    className="text-sm text-blue-600 hover:text-blue-800"
+                    onClick={resetFilters}
+                  >
+                    Đặt lại
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Từ ngày
+                    </label>
+                    <DatePicker
+                      className="w-full h-10 border-gray-200 rounded-md"
+                      value={startDate}
+                      onChange={setStartDate}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Đến ngày
+                    </label>
+                    <DatePicker
+                      className="w-full h-10 border-gray-200 rounded-md"
+                      value={endDate}
+                      onChange={setEndDate}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      Trạng thái
+                    </label>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full p-2 border border-gray-200 rounded-md text-sm"
+                    >
+                      <option value="">Tất cả</option>
+                      <option value="0">Chờ xác nhận</option>
+                      <option value="1">Đang xử lý</option>
+                      <option value="2">Hoàn thành</option>
+                      <option value="3">Đã hủy</option>
+                    </select>
+                  </div>
+                  <button
+                    onClick={applyFilters}
+                    className="w-full py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                  >
+                    Áp dụng
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pagination */}
+          {orders.length > 0 && (
+            <div className="mt-6">
+              <Paginator
+                currentPage={+(page as string)}
+                totalPages={totalPages}
+                onPageChange={(pageNumber) => {
+                  params["page"] = pageNumber.toString();
+                  router.push(`?${queryString.stringify(params)}`);
+                }}
+                showPreviousNext
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <Dialog open={openRatingModal} onOpenChange={setOpenRatingModal}>
         <DialogContent>
           <RatingForm
