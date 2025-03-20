@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import {
   Card,
   CardContent,
@@ -26,8 +26,6 @@ import Link from "next/link";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import SaleStatusBadge from "@/app/components/SaleStatusBadge";
 
-
-
 export default function Page() {
   const { user } = useContext(GlobalContext);
   const router = useRouter();
@@ -36,85 +34,128 @@ export default function Page() {
   const page = params["page"] || 1;
   const { data, isPending } = useAllSaleByAccountId(user?.id ?? "", +page, 10);
   const totalPages = data?.result.totalPages ?? 0;
+
   return (
-    <div className="p-6  rounded-lg flex-1 max-md:w-full">
-      <Card className="border shadow-sm pb-6">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5 text-primary" />
-            Lịch Sử Rao Bán
+    <div className="w-full max-w-7xl mx-auto p-6 bg-white rounded-lg">
+      <h1 className="text-3xl font-bold text-center mb-4 text-gray-900">
+        Lịch Sử Rao Bán
+      </h1>
+      <p className="text-center text-gray-600 mb-8">
+        Theo dõi trạng thái các vật phẩm bạn đã đăng bán
+      </p>
+
+      <Card className="shadow-lg border border-gray-200 rounded-xl">
+        <CardHeader className="p-6 bg-white border-b border-gray-200">
+          <CardTitle className="flex items-center gap-2 text-2xl font-semibold text-gray-900">
+            <History className="h-6 w-6 text-emerald-600" />
+            Danh Sách Rao Bán
           </CardTitle>
-          <CardDescription>
-            Danh sách các vật phẩm bạn đã từng rao bán và trạng thái của chúng.
+          <CardDescription className="text-gray-600">
+            Xem thông tin chi tiết về các vật phẩm đã rao bán và trạng thái hiện
+            tại
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          {isPending && (
-            <div className="w-full flex items-center justify-center mb-10">
+        <CardContent className="p-6">
+          {isPending ? (
+            <div className="flex justify-center py-12">
               <LoadingIndicator />
             </div>
-          )}
-          <div className="rounded-md border overflow-hidden">
-            <Table>
-              <TableHeader className="bg-muted/50">
-                <TableRow>
-                  <TableHead className="w-[80px]">ID</TableHead>
-                  <TableHead>Vật Phẩm</TableHead>
-                  <TableHead>Giá</TableHead>
-                  <TableHead>Phí sàn</TableHead>
-                  <TableHead>Gía list sàn</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Duyệt bởi
-                  </TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Ngày duyệt
-                  </TableHead>
-                  <TableHead>Trạng Thái</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data?.result.items.map((item) => (
-                  <TableRow key={item.saleId} className="hover:bg-muted/50">
-                    <TableCell className="font-medium">
-                      <Link href={`/sale-detail/${item.saleId}`}>
-                        {item.saleId.substring(0, 8)}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{item.inventory.product.name}</TableCell>
-                    <TableCell>{formatPriceVND(item.unitPrice)} </TableCell>
-                    <TableCell>{formatPriceVND(item.totalFee)} </TableCell>
-                    <TableCell>{formatPriceVND(item.totalAmount)} </TableCell>
-
-                    <TableCell className="hidden md:table-cell">
-                      {item.updateByAccount?.firstName || "-"}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {formatDate(item.updateDate) || "-"}
-                    </TableCell>
-                    <TableCell>
-                      <SaleStatusBadge status={item.saleStatus.name} />
-                    </TableCell>
+          ) : (
+            <>
+              <Table className="bg-white rounded-lg shadow-md border border-gray-200">
+                <TableHeader className="bg-gray-50">
+                  <TableRow>
+                    <TableHead className="text-gray-900 font-semibold w-[100px]">
+                      ID
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Vật Phẩm
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Giá Bán
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Phí Sàn
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Tổng Giá
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold hidden md:table-cell">
+                      Duyệt Bởi
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold hidden md:table-cell">
+                      Ngày Duyệt
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Trạng Thái
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {data?.result.items.map((item) => (
+                    <TableRow
+                      key={item.saleId}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <TableCell className="font-mono text-sm text-gray-700">
+                        <Link
+                          href={`/sale-detail/${item.saleId}`}
+                          className="text-emerald-600 hover:underline"
+                        >
+                          {item.saleId.substring(0, 8)}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900">
+                        {item.inventory.product.name}
+                      </TableCell>
+                      <TableCell className="text-gray-900 font-semibold">
+                        {formatPriceVND(item.unitPrice)}
+                      </TableCell>
+                      <TableCell className="text-gray-700">
+                        {formatPriceVND(item.totalFee)}
+                      </TableCell>
+                      <TableCell className="text-gray-900 font-semibold">
+                        {formatPriceVND(item.totalAmount)}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-gray-700">
+                        {item.updateByAccount?.firstName || "-"}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-gray-600 text-sm">
+                        {formatDate(item.updateDate) || "-"}
+                      </TableCell>
+                      <TableCell>
+                        <SaleStatusBadge status={item.saleStatus.name} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {data?.result.items.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center py-12 text-gray-500"
+                      >
+                        Không có lịch sử rao bán nào
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              {data && data.result.items.length > 0 && (
+                <div className="mt-6 flex justify-center">
+                  <Paginator
+                    currentPage={+(page as string)}
+                    totalPages={totalPages}
+                    onPageChange={(pageNumber) => {
+                      params["page"] = pageNumber.toString();
+                      router.push(`?${queryString.stringify(params)}`);
+                    }}
+                    showPreviousNext
+                  />
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
-        {data && data?.result?.items?.length > 0 ? (
-          <Paginator
-            currentPage={+(page as string)}
-            totalPages={totalPages}
-            onPageChange={(pageNumber) => {
-              params["page"] = pageNumber.toString();
-              router.push(`?${queryString.stringify(params)}`);
-            }}
-            showPreviousNext
-          />
-        ) : (
-          <div className="w-full text-center mt-10">
-            Không có lịch sử rao bán nào
-          </div>
-        )}
       </Card>
     </div>
   );

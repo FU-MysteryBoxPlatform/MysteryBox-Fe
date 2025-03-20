@@ -59,10 +59,7 @@ export default function Page() {
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [confirmImage, setConfirmImage] = useState<string>("");
   const [withdraws, setWithdraws] = useState<
-    {
-      walletTransaction: TWithdrawDetail;
-      walletRequest: TModWithdraw;
-    }[]
+    { walletTransaction: TWithdrawDetail; walletRequest: TModWithdraw }[]
   >([]);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -73,7 +70,6 @@ export default function Page() {
 
   const { mutate: mutateGetAllWithdraw, isPending: isPendingWithdraw } =
     useGetAllWithdraw();
-
   const { mutate: mutateCreateWithdrawRequest } = useCreateWithdrawRequest();
 
   const handleFilterByStatus = (value: string) => {
@@ -82,15 +78,14 @@ export default function Page() {
     router.push(`?${queryString.stringify(params)}`);
   };
 
-  const handleFilterByStartDate = (date?: Date) => {
-    if (!date) params["startDate"] = null;
-    else params["startDate"] = dayjs(date).toISOString();
+  const handleFilterByStartDate = (date: Date | null) => {
+    params["startDate"] = date ? dayjs(date).toISOString() : null;
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
-  const handleFilterByEndDate = (date?: Date) => {
-    if (!date) params["endDate"] = null;
-    else params["endDate"] = dayjs(date).toISOString();
+
+  const handleFilterByEndDate = (date: Date | null) => {
+    params["endDate"] = date ? dayjs(date).toISOString() : null;
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
@@ -104,14 +99,10 @@ export default function Page() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            toast({
-              title: "Yêu cầu rút tiền đã được tạo thành công",
-            });
+            toast({ title: "Yêu cầu rút tiền đã được tạo thành công" });
             setOpenCreateWithdrawModal(false);
           } else {
-            toast({
-              title: data.messages[0],
-            });
+            toast({ title: data.messages[0], variant: "destructive" });
           }
         },
       }
@@ -119,10 +110,11 @@ export default function Page() {
   };
 
   useEffect(() => {
+    if (!user?.id) return;
     mutateGetAllWithdraw(
       {
-        accountId: user?.id || "",
-        walletTransactionType: walletTransactionType,
+        accountId: user.id,
+        walletTransactionType,
         status: status ? +status : undefined,
         startTime: startDate ? (startDate as string) : undefined,
         endTime: endDate ? (endDate as string) : undefined,
@@ -132,172 +124,150 @@ export default function Page() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setWithdraws(data.result.items);
-            setTotalPages(data.result.totalPages);
+            setWithdraws(data.result.items || []);
+            setTotalPages(data.result.totalPages || 0);
           }
         },
       }
     );
   }, [endDate, startDate, mutateGetAllWithdraw, page, user?.id, status]);
 
+  const statusMap = {
+    0: { text: "Chờ xử lý", className: "bg-yellow-100 text-yellow-800" },
+    1: { text: "Đã xử lý", className: "bg-green-100 text-green-800" },
+    2: { text: "Đã hủy", className: "bg-red-100 text-red-800" },
+    3: { text: "Hoàn tiền", className: "bg-blue-100 text-blue-800" },
+  };
+
+  const renderWithdrawStatus = (status: keyof typeof statusMap) => {
+    return (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+          statusMap[status].className || "bg-gray-100 text-gray-800"
+        }`}
+      >
+        {statusMap[status].text || "Không xác định"}
+      </span>
+    );
+  };
+
   if (isPendingWithdraw) {
     return (
-      <div className="flex w-full items-center justify-center h-[70vh]">
+      <div className="w-full max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen flex items-center justify-center">
         <LoadingIndicator />
       </div>
     );
   }
 
-  const renderWithdrawStatus = (status: number) => {
-    switch (status) {
-      case 0:
-        return "Chờ xử lý";
-      case 1:
-        return "Đã xử lý";
-      case 2:
-        return "Đã huỷ";
-      case 3:
-        return "Hoàn tiền";
-      default:
-        return "Không xác định";
-    }
-  };
-
-  const renderColorWithdrawStatus = (status: number) => {
-    switch (status) {
-      case 0:
-        return "text-orange-400";
-      case 1:
-        return "text-blue-700";
-      case 2:
-        return "text-green-500";
-      case 3:
-        return "text-red-500";
-      default:
-        return "text-gray-500";
-    }
-  };
-
   return (
-    <div className="rounded-lg flex-1 max-md:w-full">
-      <div>
-        <div className="mb-2 md:mb-4 border border-gray-300 px-6 py-4 rounded-lg flex items-center justify-between">
-          <p className="text-xl md:text-2xl font-semibold">Yêu cầu rút tiền</p>
-          <Button onClick={() => setOpenCreateWithdrawModal(true)}>
-            Tạo yêu cầu rút tiền
-          </Button>
-        </div>
-        <div>
-          <Card x-chunk="dashboard-06-chunk-0 border-none">
-            <CardHeader>
-              <CardTitle>Quản lý tất cả yêu cầu rút tiền của bạn</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-4 mb-6 [&>*]:flex-1">
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Trạng thái
-                  </label>
-                  <Select
-                    value={status as string}
-                    onValueChange={(value: string) =>
-                      handleFilterByStatus(value)
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Trạng thái" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Chờ xử lý</SelectItem>
-                      <SelectItem value="1">Đã xử lý</SelectItem>
-                      <SelectItem value="2">Đã huỷ</SelectItem>
-                      <SelectItem value="3">Hoàn tiền</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Từ ngày:
-                  </label>
-                  <div className="relative">
-                    <DatePicker
-                      className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-                      value={startDate ? new Date(startDate as string) : null}
-                      onChange={(value) => {
-                        handleFilterByStartDate(value as Date);
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Đến ngày:
-                  </label>
-                  <div className="relative">
-                    <DatePicker
-                      className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-                      value={endDate ? new Date(endDate as string) : null}
-                      onChange={(value) => handleFilterByEndDate(value as Date)}
-                    />
-                  </div>
-                </div>
-              </div>
+    <div className="w-full max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Yêu Cầu Rút Tiền</h1>
+        <Button
+          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          onClick={() => setOpenCreateWithdrawModal(true)}
+        >
+          Tạo Yêu Cầu Rút Tiền
+        </Button>
+      </div>
+
+      <Card className="shadow-lg border border-gray-200 rounded-xl">
+        <CardHeader className="bg-white border-b border-gray-200">
+          <CardTitle className="text-xl font-semibold text-gray-900">
+            Quản Lý Yêu Cầu Rút Tiền
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div>
+              <Label className="block text-sm font-medium text-gray-700 mb-1">
+                Trạng thái
+              </Label>
+              <Select
+                value={status as string}
+                onValueChange={handleFilterByStatus}
+              >
+                <SelectTrigger className="w-full bg-white border-gray-300">
+                  <SelectValue placeholder="Chọn trạng thái" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Chờ xử lý</SelectItem>
+                  <SelectItem value="1">Đã xử lý</SelectItem>
+                  <SelectItem value="2">Đã hủy</SelectItem>
+                  <SelectItem value="3">Hoàn tiền</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="block text-sm font-medium text-gray-700 mb-1">
+                Từ ngày
+              </Label>
+              <DatePicker
+                className="w-full h-10 [&>div]:border-gray-200 [&>div]:rounded-lg"
+                value={startDate ? new Date(startDate as string) : null}
+                onChange={(value) => handleFilterByStartDate(value as Date | null)}
+              />
+            </div>
+            <div>
+              <Label className="block text-sm font-medium text-gray-700 mb-1">
+                Đến ngày
+              </Label>
+              <DatePicker
+                className="w-full h-10 [&>div]:border-gray-200 [&>div]:rounded-lg"
+                value={endDate ? new Date(endDate as string) : null}
+                onChange={(value) => handleFilterByEndDate(value as Date | null)}
+              />
+            </div>
+          </div>
+
+          {withdraws.length === 0 ? (
+            <div className="text-center py-12 text-gray-600">
+              Bạn chưa có yêu cầu rút tiền nào.
+            </div>
+          ) : (
+            <>
               <div className="grid gap-4 mb-6">
-                {withdraws.length > 0 &&
-                  withdraws.map((w) => (
-                    <div
-                      key={w.walletTransaction.walletTransactionId}
-                      className="bg-white shadow-lg p-4 rounded-lg my-1 text-sm font-sans"
-                    >
-                      <div className="flex justify-between">
-                        <span className="inline-block">
-                          <strong> Mã giao dịch:</strong>{" "}
-                          {w.walletTransaction.walletTransactionId}
-                        </span>
-
-                        <span className="inline-block text-gray-600 text-sm">
-                          {formatDate(w.walletTransaction.timeStamp)}
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between my-2">
-                        <span className="inline-block">
-                          <strong className="text-gray-600">Trạng thái</strong>:{" "}
-                          <span
-                            className={`${renderColorWithdrawStatus(
-                              w.walletTransaction.walletTransactionStatusId
-                            )}`}
-                          >
-                            {renderWithdrawStatus(
-                              w.walletTransaction.walletTransactionStatusId
-                            )}
-                          </span>
-                        </span>
-
-                        <span className="inline-block text-gray-500 text-sm">
-                          Tổng tiền:
-                          <strong className="ml-1 text-blue-700 ">
-                            {formatPriceVND(w.walletTransaction.amount)}
-                          </strong>
-                        </span>
-                      </div>
+                {withdraws.map((w) => (
+                  <div
+                    key={w.walletTransaction.walletTransactionId}
+                    className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <div>
-                        <button
-                          onClick={() => {
-                            setOpenDetailModal(true);
-                            setConfirmImage(w.walletRequest.image);
-                          }}
-                          className="text-blue-600 hover:underline"
-                        >
-                          Xem hình ảnh xác nhận
-                        </button>
+                        <p className="text-sm text-gray-700">
+                          <strong>Mã giao dịch:</strong>{" "}
+                          {w.walletTransaction.walletTransactionId}
+                        </p>
+                        <p className="text-sm text-gray-700 mt-1">
+                          <strong>Trạng thái:</strong>{" "}
+                          {renderWithdrawStatus(
+                            w.walletTransaction.walletTransactionStatusId as 0 | 1 | 2 | 3
+                          )}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">
+                          {formatDate(w.walletTransaction.timeStamp)}
+                        </p>
+                        <p className="text-sm text-gray-900 font-semibold mt-1">
+                          {formatPriceVND(w.walletTransaction.amount)}
+                        </p>
                       </div>
                     </div>
-                  ))}
+                    <Button
+                      variant="link"
+                      className="mt-2 text-emerald-600 hover:underline p-0 h-auto"
+                      onClick={() => {
+                        setOpenDetailModal(true);
+                        setConfirmImage(w.walletRequest.image);
+                      }}
+                    >
+                      Xem hình ảnh xác nhận
+                    </Button>
+                  </div>
+                ))}
               </div>
-
-              {/* Pagination */}
-              {withdraws.length > 0 && (
+              <div className="flex justify-center">
                 <Paginator
                   currentPage={+(page as string)}
                   totalPages={totalPages}
@@ -307,54 +277,67 @@ export default function Page() {
                   }}
                   showPreviousNext
                 />
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
-          <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Hình ảnh xác nhận</DialogTitle>
-              </DialogHeader>
-              <img src={confirmImage} alt="image" className="w-full" />
-            </DialogContent>
-          </Dialog>
-        </div>
-        <Dialog
-          open={openCreateWithdrawModal}
-          onOpenChange={setOpenCreateWithdrawModal}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Tạo yêu cầu thanh toán</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <form>
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="amount">Số tiền</Label>
-                  <Input
-                    id="amount"
-                    type="number"
-                    placeholder="Nhập số tiền"
-                    {...register("amount")}
-                  />
-                  {formState.errors.amount && (
-                    <p className="text-red-500 text-sm">
-                      {formState.errors.amount.message}
-                    </p>
-                  )}
-                </div>
-              </form>
-              <Button
-                className="bg-[#E12E43] text-white hover:bg-[#B71C32] w-full"
-                onClick={handleSubmit(onSubmit)}
+      <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
+        <DialogContent className="max-w-lg rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-gray-900">
+              Hình Ảnh Xác Nhận
+            </DialogTitle>
+          </DialogHeader>
+          <img
+            src={confirmImage}
+            alt="Xác nhận rút tiền"
+            className="w-full rounded-lg"
+          />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={openCreateWithdrawModal}
+        onOpenChange={setOpenCreateWithdrawModal}
+      >
+        <DialogContent className="max-w-md rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-gray-900">
+              Tạo Yêu Cầu Rút Tiền
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <Label
+                htmlFor="amount"
+                className="text-sm font-medium text-gray-700"
               >
-                Tạo yêu cầu rút tiền
-              </Button>
+                Số tiền
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                placeholder="Nhập số tiền"
+                className="mt-1"
+                {...register("amount")}
+              />
+              {formState.errors.amount && (
+                <p className="text-red-500 text-sm mt-1">
+                  {formState.errors.amount.message}
+                </p>
+              )}
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+            <Button
+              type="submit"
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              Tạo Yêu Cầu
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

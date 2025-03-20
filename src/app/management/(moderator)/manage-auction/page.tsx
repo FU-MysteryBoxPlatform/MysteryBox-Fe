@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { useGetAllAuctions } from "@/hooks/api/useAuction";
 import { cn } from "@/lib/utils";
 import { Auction } from "@/types";
@@ -24,58 +25,63 @@ import dayjs from "dayjs";
 import { Ellipsis } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import DatePicker from "react-date-picker";
 
-export default function Page() {
+// Component Tabs
+const FilterTabs = ({
+  status,
+  onChange,
+}: {
+  status: string;
+  onChange: (value: string) => void;
+}) => (
+  <div className="grid grid-cols-3 gap-2 p-2 bg-gray-100 rounded-lg">
+    {TABS.map((tab) => (
+      <Button
+        key={tab.value}
+        variant={tab.value === status ? "default" : "outline"}
+        className={cn(
+          "py-2 text-sm font-medium transition-all",
+          tab.value === status && "bg-[#E12E43] text-white hover:bg-[#c12739]"
+        )}
+        onClick={() => onChange(tab.value)}
+      >
+        {tab.title}
+      </Button>
+    ))}
+  </div>
+);
+
+// Component chính
+export default function AuctionManagementPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const params = queryString.parse(searchParams.toString());
-  const page = params["page"] || 1;
-  const status = params["status"] || "1";
-  const keyword = params["keyword"];
-  const startDate = params["startDate"];
-  const endDate = params["endDate"];
-  const ref = useRef<NodeJS.Timeout>(null);
+  const params = useMemo(
+    () => queryString.parse(searchParams.toString()),
+    [searchParams]
+  );
+  const page = Number(params.page || 1);
+  const status = Array.isArray(params.status) ? params.status[0] : params.status || "1";
+  const keyword = params.keyword as string | undefined;
+  const startDate = params.startDate as string | undefined;
+  const endDate = params.endDate as string | undefined;
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [auctions, setAuctions] = useState<Auction[]>();
+  const [auctions, setAuctions] = useState<Auction[]>([]);
   const [totalPages, setTotalPages] = useState(0);
 
   const { mutate: mutateGetAuction, isPending } = useGetAllAuctions();
 
-  const handleFilterByKeyword = (value: string) => {
-    if (ref.current) {
-      clearTimeout(ref.current);
-    }
-    ref.current = setTimeout(() => {
-      params["keyword"] = value;
-      params["page"] = "1";
-      router.push(`?${queryString.stringify(params)}`);
-    }, 1000);
-  };
-
-  const handleFilterByStartDate = (date?: Date) => {
-    if (!date) params["startDate"] = null;
-    else params["startDate"] = dayjs(date).toISOString();
-    params["page"] = "1";
-    router.push(`?${queryString.stringify(params)}`);
-  };
-  const handleFilterByEndDate = (date?: Date) => {
-    if (!date) params["endDate"] = null;
-    else params["endDate"] = dayjs(date).toISOString();
-    params["page"] = "1";
-    router.push(`?${queryString.stringify(params)}`);
-  };
-
-  useEffect(() => {
+  const fetchAuctions = () => {
     mutateGetAuction(
       {
-        keyword: keyword as string,
-        pageNumber: +(page as string),
+        keyword,
+        pageNumber: page,
         pageSize: 10,
-        status: +status,
-        startTime: startDate ? (startDate as string) : undefined,
-        endTime: endDate ? (endDate as string) : undefined,
+        status: Number(status),
+        startTime: startDate,
+        endTime: endDate,
       },
       {
         onSuccess: (data) => {
@@ -86,69 +92,84 @@ export default function Page() {
         },
       }
     );
-  }, [endDate, keyword, mutateGetAuction, page, startDate, status]);
+  };
+
+  const handleFilterByKeyword = (value: string) => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      router.push(
+        `?${queryString.stringify({ ...params, keyword: value, page: "1" })}`
+      );
+    }, 1000);
+  };
+
+  const handleFilterByDate = (key: "startDate" | "endDate", date?: Date) => {
+    const newParams: { [key: string]: any } = { ...params, page: "1" };
+    newParams[key] = date ? dayjs(date).toISOString() : null;
+    router.push(`?${queryString.stringify(newParams)}`);
+  };
+
+  useEffect(() => {
+    fetchAuctions();
+  }, [page, status, keyword, startDate, endDate]);
 
   return (
-    <div className="p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 justify-between">
+    <div className="container mx-auto py-8">
+      <Card className="shadow-lg">
+        <CardHeader className="border-b">
+          <CardTitle className="text-2xl font-semibold text-gray-800">
             Quản lý đấu giá
           </CardTitle>
-          <CardDescription>
-            Quản lý tất cả các yêu cầu đấu giá trên hệ thống
+          <CardDescription className="text-gray-600">
+            Theo dõi và quản lý tất cả các phiên đấu giá trên hệ thống
           </CardDescription>
         </CardHeader>
-        <div className="p-6">
-          {/* Tabs */}
-          <div className="p-2 flex items-center gap-2 [&>*]:flex-1 bg-gray-100 rounded-md mb-4">
-            {TABS.map((tab, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  tab.value === status && "bg-[#E12E43] text-white",
-                  "text-center rounded-lg cursor-pointer"
-                )}
-                onClick={() => {
-                  params["status"] = tab.value;
-                  router.push(`?${queryString.stringify(params)}`);
-                }}
-              >
-                {tab.title}
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-4 [&>*]:flex-1">
-            <Input
-              placeholder="Tìm kiếm từ khoá"
-              defaultValue={keyword as string}
-              onChange={(e) => handleFilterByKeyword(e.target.value)}
-            />
+        <CardContent className="p-6 space-y-6">
+          <FilterTabs
+            status={status ?? "1"}
+            onChange={(value) =>
+              router.push(
+                `?${queryString.stringify({
+                  ...params,
+                  status: value,
+                  page: "1",
+                })}`
+              )
+            }
+          />
 
-            <DatePicker
-              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-              value={startDate ? new Date(startDate as string) : null}
-              onChange={(value) => {
-                handleFilterByStartDate(value as Date);
-              }}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              placeholder="Tìm kiếm từ khóa"
+              defaultValue={keyword}
+              onChange={(e) => handleFilterByKeyword(e.target.value)}
+              className="h-10 rounded-lg border-gray-200"
             />
             <DatePicker
-              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-              value={endDate ? new Date(endDate as string) : null}
-              onChange={(value) => handleFilterByEndDate(value as Date)}
+              className="w-full h-10 rounded-lg border-gray-200"
+              value={startDate ? new Date(startDate) : null}
+              onChange={(value) =>
+                handleFilterByDate("startDate", value as Date)
+              }
+              clearIcon={null}
+            />
+            <DatePicker
+              className="w-full h-10 rounded-lg border-gray-200"
+              value={endDate ? new Date(endDate) : null}
+              onChange={(value) => handleFilterByDate("endDate", value as Date)}
+              clearIcon={null}
             />
           </div>
-        </div>
-        <CardContent>
+
           {isPending ? (
-            <div className="w-full flex items-center justify-center">
+            <div className="flex justify-center py-10">
               <LoadingIndicator />
             </div>
-          ) : (
+          ) : auctions.length > 0 ? (
             <>
-              <Table className="mb-4">
+              <Table className="min-w-full">
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="bg-gray-50">
                     <TableHead>Tên</TableHead>
                     <TableHead>Vật phẩm</TableHead>
                     <TableHead>Giá bắt đầu</TableHead>
@@ -159,66 +180,64 @@ export default function Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {auctions?.length &&
-                    auctions?.length > 0 &&
-                    auctions?.map((auc) => {
-                      return (
-                        <TableRow key={auc.auctionId}>
-                          <TableCell>
-                            {auc.account.firstName + " " + auc.account.lastName}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <img
-                                src={auc.inventory.product.imagePath}
-                                alt=""
-                                className="w-12 h-12 rounded-md"
-                              />
-                              <p className="line-clamp-1">
-                                {auc.inventory.product.name}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {auc.minimunBid.toLocaleString()}
-                          </TableCell>
-                          <TableCell>
-                            {auc.currentBid.toLocaleString()}
-                          </TableCell>
-
-                          <TableCell>
-                            {dayjs(auc.startTime).format("DD/MM/YYYY")}
-                          </TableCell>
-                          <TableCell>
-                            {dayjs(auc.endTime).format("DD/MM/YYYY")}
-                          </TableCell>
-
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Ellipsis className="h-4 w-4" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                  {auctions.map((auc) => (
+                    <TableRow key={auc.auctionId} className="hover:bg-gray-100">
+                      <TableCell>
+                        {auc.account.firstName} {auc.account.lastName}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={auc.inventory.product.imagePath}
+                            alt={auc.inventory.product.name}
+                            className="w-12 h-12 rounded-md object-cover"
+                          />
+                          <p className="line-clamp-1">
+                            {auc.inventory.product.name}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {auc.minimunBid.toLocaleString()} VND
+                      </TableCell>
+                      <TableCell>
+                        {auc.currentBid.toLocaleString()} VND
+                      </TableCell>
+                      <TableCell>
+                        {dayjs(auc.startTime).format("DD/MM/YYYY")}
+                      </TableCell>
+                      <TableCell>
+                        {dayjs(auc.endTime).format("DD/MM/YYYY")}
+                      </TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm">
+                          <Ellipsis className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
-              {auctions?.length && auctions.length > 0 ? (
+              <div className="mt-6 flex justify-center">
                 <Paginator
-                  currentPage={+(page as string)}
+                  currentPage={page}
                   totalPages={totalPages}
-                  onPageChange={(pageNumber) => {
-                    params["page"] = pageNumber.toString();
-                    router.push(`?${queryString.stringify(params)}`);
-                  }}
+                  onPageChange={(pageNumber) =>
+                    router.push(
+                      `?${queryString.stringify({
+                        ...params,
+                        page: pageNumber,
+                      })}`
+                    )
+                  }
                   showPreviousNext
                 />
-              ) : (
-                <div className="w-full text-center mt-10">
-                  Không có đơn hàng nào
-                </div>
-              )}
+              </div>
             </>
+          ) : (
+            <div className="text-center py-10 text-gray-500">
+              Không có phiên đấu giá nào
+            </div>
           )}
         </CardContent>
       </Card>
@@ -227,16 +246,7 @@ export default function Page() {
 }
 
 const TABS = [
-  {
-    title: "Hoàn thành",
-    value: "1",
-  },
-  {
-    title: "Chờ duyệt",
-    value: "0",
-  },
-  {
-    title: "Đã từ chối",
-    value: "2",
-  },
+  { title: "Hoàn thành", value: "1" },
+  { title: "Chờ duyệt", value: "0" },
+  { title: "Đã từ chối", value: "2" },
 ];

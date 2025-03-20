@@ -29,136 +29,169 @@ import queryString from "query-string";
 const PaymentHistoryDashboard: React.FC = () => {
   const { user } = useContext(GlobalContext);
   const [statusFilter, setStatusFilter] = useState<string>("0");
- const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const params = queryString.parse(searchParams.toString());
   const page = params["page"] || 1;
-  // Call API with explicit status values
+
   const { data: initialData, isPending } = useGetAllTransactionByAccountId(
     user?.id ?? "",
-    Number(statusFilter) || 0, // Status (0, 1, 2, 3)
+    Number(statusFilter) || 0,
     +page,
-    10 // Limit
+    10
   );
 
   const paymentData = initialData?.result.items || [];
   const totalPages = initialData?.result.totalPages || 0;
 
-  // Function to format currency
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(amount);
   };
+
   const getStatusBadge = (status: string | undefined): string => {
     switch (status) {
       case "PENDING":
-        return "bg-yellow-200 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800";
       case "SUCCESS":
-        return "bg-green-200 text-green-800";
+        return "bg-green-100 text-green-800";
       case "FAILED":
-        return "bg-red-200 text-red-800";
+        return "bg-red-100 text-red-800";
       case "CANCELLED":
-        return "bg-gray-400 text-gray-800";
+        return "bg-gray-100 text-gray-800";
       default:
-        return "bg-gray-200 text-gray-800";
+        return "bg-gray-100 text-gray-800";
     }
   };
+
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Lịch sử giao dịch của {user?.firstName}</CardTitle>
-        <div className="flex items-center space-x-2">
-          <div className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4 text-gray-500" />
-            <span className="text-sm text-gray-500">
-              Hiển thị {paymentData.length} giao dịch
-            </span>
+    <div className="w-full max-w-7xl mx-auto p-6 bg-white rounded-lg">
+      <Card className="w-full border-none ">
+        <CardHeader className="bg-white p-6 flex flex-row items-center justify-between">
+          <CardTitle className="text-2xl font-bold text-gray-900">
+            Lịch sử giao dịch của {user?.firstName}
+          </CardTitle>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-5 w-5 text-gray-500" />
+              <span className="text-sm text-gray-600">
+                Hiển thị {paymentData.length} giao dịch
+              </span>
+            </div>
+            <Select
+              value={statusFilter}
+              onValueChange={(value: string) => setStatusFilter(value)}
+            >
+              <SelectTrigger className="w-40 bg-white">
+                <SelectValue placeholder="Lọc theo trạng thái" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-gray-200">
+                <SelectItem value="0" className="text-gray-700">
+                  Đang chờ
+                </SelectItem>
+                <SelectItem value="1" className="text-gray-700">
+                  Hoàn tất
+                </SelectItem>
+                <SelectItem value="2" className="text-gray-700">
+                  Đã hủy
+                </SelectItem>
+                <SelectItem value="3" className="text-gray-700">
+                  Đang xử lý
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select
-            value={statusFilter}
-            onValueChange={(value: string) => setStatusFilter(value)}
-          >
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="0">Pending</SelectItem>
-              <SelectItem value="1">Completed</SelectItem>
-              <SelectItem value="2">Cancelled</SelectItem>
-              <SelectItem value="3">Processing</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          {isPending && (
-            <div className="w-full flex items-center justify-center mb-10">
-              <LoadingIndicator />
-            </div>
-          )}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Ngày đặt</TableHead>
-                <TableHead>Tổng tiền</TableHead>
-                <TableHead>Phương thức thanh toán</TableHead>
-                <TableHead>Trạng thái</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paymentData.map((payment) => (
-                <TableRow key={payment.paymentHistoryId}>
-                  <TableCell className="font-mono text-xs">
-                    {payment.orderId?.substring(0, 8)}...
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {formatDate(payment.date)}
-                  </TableCell>
-                  <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                  <TableCell>{payment.paymentMethod?.name || "N/A"}</TableCell>
-                  <TableCell>
-                    <Badge
-                      className={getStatusBadge(payment.transationStatus?.name)}
-                    >
-                      {payment.transationStatus?.name || "UNKNOWN"}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {paymentData.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center py-6 text-gray-500"
-                  >
-                    No payment records found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          {paymentData.length > 0 ? (
-            <Paginator
-              currentPage={+(page as string)}
-              totalPages={totalPages}
-              onPageChange={(pageNumber) => {
-                params["page"] = pageNumber.toString();
-                router.push(`?${queryString.stringify(params)}`);
-              }}
-              showPreviousNext
-            />
-          ) : (
-            <div className="w-full text-center mt-10">
-              Không có bộ sưu tập nào
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="overflow-x-auto">
+            {isPending ? (
+              <div className="w-full flex items-center justify-center py-12">
+                <LoadingIndicator />
+              </div>
+            ) : (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="">
+                      <TableHead className="text-gray-900 font-semibold">
+                        Order ID
+                      </TableHead>
+                      <TableHead className="text-gray-900 font-semibold">
+                        Ngày đặt
+                      </TableHead>
+                      <TableHead className="text-gray-900 font-semibold">
+                        Tổng tiền
+                      </TableHead>
+                      <TableHead className="text-gray-900 font-semibold">
+                        Phương thức
+                      </TableHead>
+                      <TableHead className="text-gray-900 font-semibold">
+                        Trạng thái
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paymentData.map((payment) => (
+                      <TableRow
+                        key={payment.paymentHistoryId}
+                        className="hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <TableCell className="font-mono text-sm text-gray-700">
+                          {payment.orderId?.substring(0, 8)}...
+                        </TableCell>
+                        <TableCell className="font-medium text-gray-700">
+                          {formatDate(payment.date)}
+                        </TableCell>
+                        <TableCell className="text-gray-900 font-semibold">
+                          {formatCurrency(payment.amount)}
+                        </TableCell>
+                        <TableCell className="text-gray-700">
+                          {payment.paymentMethod?.name || "N/A"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={`${getStatusBadge(
+                              payment.transationStatus?.name
+                            )} px-2 py-1`}
+                          >
+                            {payment.transationStatus?.name || "UNKNOWN"}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {paymentData.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={5}
+                          className="text-center py-12 text-gray-500"
+                        >
+                          Không tìm thấy giao dịch nào
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+                {paymentData.length > 0 && (
+                  <div className="mt-6 flex justify-center">
+                    <Paginator
+                      currentPage={+(page as string)}
+                      totalPages={totalPages}
+                      onPageChange={(pageNumber) => {
+                        params["page"] = pageNumber.toString();
+                        router.push(`?${queryString.stringify(params)}`);
+                      }}
+                      showPreviousNext
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

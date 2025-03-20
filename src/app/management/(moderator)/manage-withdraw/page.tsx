@@ -36,9 +36,10 @@ import { GlobalContext } from "@/provider/global-provider";
 import dayjs from "dayjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import DatePicker from "react-date-picker";
 
+// Form xác nhận
 const FormApprove = ({
   requestId,
   onFinish,
@@ -48,57 +49,79 @@ const FormApprove = ({
 }) => {
   const { user } = useContext(GlobalContext);
   const [image, setImage] = useState<string>("");
-
   const { mutate: mutateConfirm, isPending } = useConfirmWalletRequest();
 
   const handleApprove = () => {
     mutateConfirm(
-      {
-        walletRequestId: requestId,
-        accountId: user?.id || "",
-        image,
-      },
+      { walletRequestId: requestId, accountId: user?.id || "", image },
       {
         onSuccess: (data) => {
-          if (data.isSuccess) {
-            toast({
-              title: "Xác nhận thành công",
-            });
-            onFinish?.();
-          } else {
-            toast({
-              title: data.messages[0],
-            });
-          }
+          toast({
+            title: data.isSuccess ? "Xác nhận thành công" : data.messages[0],
+            variant: data.isSuccess ? "default" : "destructive",
+          });
+          if (data.isSuccess) onFinish?.();
         },
       }
     );
   };
 
   return (
-    <div className="grid gap-6">
+    <div className="space-y-6">
       <ImageUploader
         showPreview
-        onChange={(url) => setImage(url)}
-        className="w-full"
+        onChange={setImage}
+        className="w-full rounded-lg border border-gray-200"
       />
-
-      <Button onClick={handleApprove} className="w-full">
+      <Button
+        onClick={handleApprove}
+        className="w-full bg-green-600 hover:bg-green-700"
+        disabled={isPending}
+      >
         {isPending ? <LoadingIndicator /> : "Xác nhận"}
       </Button>
     </div>
   );
 };
 
-export default function Page() {
+// Component Tabs
+const FilterTabs = ({
+  status,
+  onChange,
+}: {
+  status: string;
+  onChange: (value: string) => void;
+}) => (
+  <div className="grid grid-cols-4 gap-2 p-2 bg-gray-100 rounded-lg">
+    {TABS.map((tab) => (
+      <Button
+        key={tab.value}
+        variant={tab.value === status ? "default" : "outline"}
+        className={cn(
+          "py-2 text-sm font-medium transition-all",
+          tab.value === status && "bg-[#E12E43] text-white hover:bg-[#c12739]"
+        )}
+        onClick={() => onChange(tab.value)}
+      >
+        {tab.title}
+      </Button>
+    ))}
+  </div>
+);
+
+// Component chính
+export default function WithdrawManagementPage() {
   const { user } = useContext(GlobalContext);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const params = queryString.parse(searchParams.toString());
-  const page = params["page"] || 1;
-  const status = params["status"] || "0";
-  const startDate = params["startDate"];
-  const endDate = params["endDate"];
+  const params = useMemo(
+    () => queryString.parse(searchParams.toString()),
+    [searchParams]
+  );
+  const page = Number(params.page || 1);
+  const status = params.status || "0";
+  const startDate = params.startDate;
+  const endDate = params.endDate;
 
   const [openApproveModal, setOpenApproveModal] = useState(false);
   const [openDetailModal, setOpenDetailModal] = useState(false);
@@ -109,27 +132,14 @@ export default function Page() {
   const { mutate: mutateGetAllWithdraw, isPending: isPendingWithdraw } =
     useGetAllWalletRequest();
 
-  const handleFilterByStartDate = (date?: Date) => {
-    if (!date) params["startDate"] = null;
-    else params["startDate"] = dayjs(date).toISOString();
-    params["page"] = "1";
-    router.push(`?${queryString.stringify(params)}`);
-  };
-  const handleFilterByEndDate = (date?: Date) => {
-    if (!date) params["endDate"] = null;
-    else params["endDate"] = dayjs(date).toISOString();
-    params["page"] = "1";
-    router.push(`?${queryString.stringify(params)}`);
-  };
-
-  useEffect(() => {
+  const fetchWithdraws = () => {
     mutateGetAllWithdraw(
       {
         walletRequestType: 1,
-        walletRequestStatus: status ? +status : 0,
-        startTime: startDate ? (startDate as string) : undefined,
-        endTime: endDate ? (endDate as string) : undefined,
-        pageNumber: +(page as string),
+        walletRequestStatus: Number(status),
+        startTime: startDate as string | undefined,
+        endTime: endDate as string | undefined,
+        pageNumber: page,
         pageSize: 10,
       },
       {
@@ -141,64 +151,69 @@ export default function Page() {
         },
       }
     );
-  }, [endDate, startDate, mutateGetAllWithdraw, page, user?.id, status]);
+  };
+
+  const handleFilterByDate = (key: "startDate" | "endDate", date?: Date) => {
+    const newParams: { [key: string]: any } = { ...params, page: "1" };
+    newParams[key] = date ? dayjs(date).toISOString() : null;
+    router.push(`?${queryString.stringify(newParams)}`);
+  };
+
+  useEffect(() => {
+    fetchWithdraws();
+  }, [page, status, startDate, endDate]);
 
   return (
-    <div className="p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 justify-between">
+    <div className="container mx-auto py-8">
+      <Card className="shadow-lg">
+        <CardHeader className="border-b">
+          <CardTitle className="text-2xl font-semibold text-gray-800">
             Quản lý yêu cầu rút tiền
           </CardTitle>
-          <CardDescription>
-            Quản lý tất cả các yêu cầu rút tiền trên hệ thống
+          <CardDescription className="text-gray-600">
+            Theo dõi và xử lý tất cả yêu cầu rút tiền trên hệ thống
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          {/* Tabs */}
-          <div className="p-2 flex items-center gap-2 [&>*]:flex-1 bg-gray-100 rounded-md mb-4">
-            {TABS.map((tab, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  tab.value === status && "bg-[#E12E43] text-white",
-                  "text-center rounded-lg cursor-pointer"
-                )}
-                onClick={() => {
-                  params["status"] = tab.value;
-                  params["page"] = "1";
-                  router.push(`?${queryString.stringify(params)}`);
-                }}
-              >
-                {tab.title}
-              </div>
-            ))}
-          </div>
+        <CardContent className="p-6">
+          <FilterTabs
+            status={status as string}
+            onChange={(value) => {
+              router.push(
+                `?${queryString.stringify({
+                  ...params,
+                  status: value,
+                  page: "1",
+                })}`
+              );
+            }}
+          />
 
-          <div className="flex gap-4 [&>*]:flex-1 mb-4">
+          <div className="grid grid-cols-2 gap-4 my-6">
             <DatePicker
-              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
+              className="w-full h-10 rounded-lg border-gray-200"
               value={startDate ? new Date(startDate as string) : null}
-              onChange={(value) => {
-                handleFilterByStartDate(value as Date);
-              }}
+              onChange={(value) =>
+                handleFilterByDate("startDate", value as Date)
+              }
+              clearIcon={null}
             />
             <DatePicker
-              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
+              className="w-full h-10 rounded-lg border-gray-200"
               value={endDate ? new Date(endDate as string) : null}
-              onChange={(value) => handleFilterByEndDate(value as Date)}
+              onChange={(value) => handleFilterByDate("endDate", value as Date)}
+              clearIcon={null}
             />
           </div>
 
           {isPendingWithdraw ? (
-            <div className="w-full flex items-center justify-center">
+            <div className="flex justify-center py-10">
               <LoadingIndicator />
             </div>
-          ) : (
+          ) : withdraws.length > 0 ? (
             <>
-              <Table className="mb-4">
+              <Table className="min-w-full">
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="bg-gray-50">
                     <TableHead>Tên</TableHead>
                     <TableHead>Tổng tiền</TableHead>
                     <TableHead>Tài khoản</TableHead>
@@ -207,148 +222,117 @@ export default function Page() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {withdraws?.length && withdraws?.length > 0
-                    ? withdraws?.map((w, i) => {
-                        return (
-                          <TableRow key={i}>
-                            <TableCell>
-                              {w.createByAccount.firstName +
-                                " " +
-                                w.createByAccount.lastName}
-                            </TableCell>
-
-                            <TableCell>
-                              {formatPriceVND(w.walletTransaction.amount)}
-                            </TableCell>
-                            <TableCell>{w.bankAccount}</TableCell>
-                            <TableCell>
-                              {dayjs(w.createDate).format("DD/MM/YYYY HH:mm")}
-                            </TableCell>
-                            {w.walletRequestStatus.name === "PENDING" && (
-                              <TableCell>
-                                <Dialog
-                                  open={openApproveModal}
-                                  onOpenChange={setOpenApproveModal}
-                                >
-                                  <DialogTrigger className="text-blue-400">
-                                    Xác nhận
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle>
-                                        Xác nhận yêu cầu rút tiền
-                                      </DialogTitle>
-                                    </DialogHeader>
-                                    <FormApprove
-                                      requestId={w.walletRequestId}
-                                      onFinish={() => {
-                                        setOpenApproveModal(false);
-                                        mutateGetAllWithdraw(
-                                          {
-                                            walletRequestType: 1,
-                                            walletRequestStatus: status
-                                              ? +status
-                                              : 0,
-                                            startTime: startDate
-                                              ? (startDate as string)
-                                              : undefined,
-                                            endTime: endDate
-                                              ? (endDate as string)
-                                              : undefined,
-                                            pageNumber: +(page as string),
-                                            pageSize: 10,
-                                          },
-                                          {
-                                            onSuccess: (data) => {
-                                              if (data.isSuccess) {
-                                                setWithdraws(data.result.items);
-                                                setTotalPages(
-                                                  data.result.totalPages
-                                                );
-                                              }
-                                            },
-                                          }
-                                        );
-                                      }}
-                                    />
-                                  </DialogContent>
-                                </Dialog>
-                              </TableCell>
-                            )}
-                            {w.walletRequestStatus.name === "COMPELETED" && (
-                              <TableCell>
-                                <Button
-                                  onClick={() => {
-                                    setOpenDetailModal(true);
-                                    setDetailWithdraw(w);
-                                  }}
-                                >
-                                  Chi tiết
-                                </Button>
-                              </TableCell>
-                            )}
-                          </TableRow>
-                        );
-                      })
-                    : null}
+                  {withdraws.map((w) => (
+                    <TableRow
+                      key={w.walletRequestId}
+                      className="hover:bg-gray-100"
+                    >
+                      <TableCell>
+                        {w.createByAccount.firstName}{" "}
+                        {w.createByAccount.lastName}
+                      </TableCell>
+                      <TableCell>
+                        {formatPriceVND(w.walletTransaction.amount)}
+                      </TableCell>
+                      <TableCell>{w.bankAccount}</TableCell>
+                      <TableCell>
+                        {dayjs(w.createDate).format("DD/MM/YYYY HH:mm")}
+                      </TableCell>
+                      <TableCell>
+                        {w.walletRequestStatus.name === "PENDING" ? (
+                          <Dialog
+                            open={openApproveModal}
+                            onOpenChange={setOpenApproveModal}
+                          >
+                            <DialogTrigger asChild>
+                              <Button variant="link" className="text-blue-600">
+                                Xác nhận
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Xác nhận yêu cầu rút tiền
+                                </DialogTitle>
+                              </DialogHeader>
+                              <FormApprove
+                                requestId={w.walletRequestId}
+                                onFinish={fetchWithdraws}
+                              />
+                            </DialogContent>
+                          </Dialog>
+                        ) : w.walletRequestStatus.name === "COMPELETED" ? (
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setDetailWithdraw(w);
+                              setOpenDetailModal(true);
+                            }}
+                          >
+                            Chi tiết
+                          </Button>
+                        ) : null}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
-              {withdraws?.length && withdraws.length > 0 ? (
+              <div className="mt-6 flex justify-center">
                 <Paginator
-                  currentPage={+(page as string)}
+                  currentPage={page}
                   totalPages={totalPages}
-                  onPageChange={(pageNumber) => {
-                    params["page"] = pageNumber.toString();
-                    router.push(`?${queryString.stringify(params)}`);
-                  }}
+                  onPageChange={(pageNumber) =>
+                    router.push(
+                      `?${queryString.stringify({
+                        ...params,
+                        page: pageNumber,
+                      })}`
+                    )
+                  }
                   showPreviousNext
                 />
-              ) : (
-                <div className="w-full text-center mt-10">
-                  Không có giao dịch nào
-                </div>
-              )}
+              </div>
             </>
+          ) : (
+            <div className="text-center py-10 text-gray-500">
+              Không có giao dịch nào
+            </div>
           )}
         </CardContent>
       </Card>
+
       <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Chi tiết yêu cầu rút tiền</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-2">
+          <div className="space-y-4 text-sm">
             <p>
-              Mã yêu cầu:{" "}
-              <span className="font-semibold">
-                {detailWithdraw?.walletRequestId}
-              </span>
+              <strong>Mã yêu cầu:</strong> {detailWithdraw?.walletRequestId}
             </p>
             <p>
-              Ngày yêu cầu:{" "}
-              <span className="font-semibold">
-                {dayjs(detailWithdraw?.createDate).format("DD/MM/YYYY")}
-              </span>
+              <strong>Ngày yêu cầu:</strong>{" "}
+              {dayjs(detailWithdraw?.createDate).format("DD/MM/YYYY")}
             </p>
             <p>
-              Tên người yêu cầu:{" "}
-              <span className="font-semibold">
-                {detailWithdraw?.createByAccount.firstName}{" "}
-                {detailWithdraw?.createByAccount.lastName}
-              </span>
+              <strong>Người yêu cầu:</strong>{" "}
+              {detailWithdraw?.createByAccount.firstName}{" "}
+              {detailWithdraw?.createByAccount.lastName}
             </p>
             <p>
-              Tên người xác nhận:{" "}
-              <span className="font-semibold">
-                {detailWithdraw?.walletRequestStatus.name === "COMPELETED"
-                  ? detailWithdraw?.updateByAccount.firstName +
-                    " " +
-                    detailWithdraw?.updateByAccount.lastName
-                  : "--"}
-              </span>
+              <strong>Người xác nhận:</strong>{" "}
+              {detailWithdraw?.walletRequestStatus.name === "COMPELETED"
+                ? `${detailWithdraw?.updateByAccount.firstName} ${detailWithdraw?.updateByAccount.lastName}`
+                : "--"}
             </p>
-            <p>Hình ảnh xác nhận:</p>
-            <img src={detailWithdraw?.image} alt="image" className="w-full" />
+            <p>
+              <strong>Hình ảnh xác nhận:</strong>
+            </p>
+            <img
+              src={detailWithdraw?.image}
+              alt="Confirmation"
+              className="w-full rounded-lg border"
+            />
           </div>
         </DialogContent>
       </Dialog>
@@ -357,20 +341,8 @@ export default function Page() {
 }
 
 const TABS = [
-  {
-    title: "Đang chờ",
-    value: "0",
-  },
-  {
-    title: "Thành công",
-    value: "2",
-  },
-  {
-    title: "Đã huỷ",
-    value: "1",
-  },
-  {
-    title: "Hoàn tiền",
-    value: "3",
-  },
+  { title: "Đang chờ", value: "0" },
+  { title: "Thành công", value: "2" },
+  { title: "Đã huỷ", value: "1" },
+  { title: "Hoàn tiền", value: "3" },
 ];

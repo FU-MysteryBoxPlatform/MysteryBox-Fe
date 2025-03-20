@@ -25,7 +25,6 @@ import {
   Eye,
   ShoppingBag,
   X,
-  XCircleIcon,
 } from "lucide-react";
 import {
   useCancelExchangeRequest,
@@ -49,11 +48,10 @@ import {
   useGetAllOfferByAccountId,
   useGetAllOfferByExchangeId,
 } from "@/hooks/api/useOfferExchange";
-import { Tabs as TabsComponent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExchangeRequest, OfferExchange } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 import { ExchangeStatus } from "@/types/enum";
 
 interface TradeDetailsModalProps {
@@ -76,118 +74,95 @@ const OfferCard = ({
 }) => {
   const offeredItem = offer.offeredInventoryItem;
   const offerer = offer.createByAccount;
+
   const getStatusBadge = (status: 0 | 1 | 2) => {
     const statusMap = {
-      0: {
-        text: "Đang Chờ",
-        className: "bg-yellow-50 text-yellow-700",
-      },
-      1: {
-        text: "Đã Chấp Nhận",
-        className: "bg-green-50 text-green-700",
-      },
-      2: {
-        text: "Đã Từ Chối",
-        className: "bg-red-50 text-red-700",
-      },
+      0: { text: "Đang Chờ", className: "bg-yellow-100 text-yellow-800" },
+      1: { text: "Đã Chấp Nhận", className: "bg-green-100 text-green-800" },
+      2: { text: "Đã Từ Chối", className: "bg-red-100 text-red-800" },
     };
-
     const { text, className } = statusMap[status] || statusMap[0];
-
     return (
-      <Badge variant="outline" className={`ml-auto ${className}`}>
+      <Badge className={`px-3 py-1 rounded-full font-semibold ${className}`}>
         {text}
       </Badge>
     );
   };
+
   return (
-    <Card className="mb-4 overflow-hidden border-2 border-emerald-50 hover:border-emerald-100 transition-all">
-      <CardHeader className="p-4 pb-2 flex flex-row items-center gap-3">
-        <Avatar className="h-10 w-10 border-2 border-emerald-200">
-          <AvatarImage
-            src={offerer?.avatar || undefined}
-            alt={`${offerer?.firstName ?? ""} ${offerer?.lastName ?? ""}`}
-          />
+    <Card className="mb-4 shadow-md border border-gray-200 rounded-lg hover:shadow-lg transition-shadow">
+      <CardHeader className="p-4 flex flex-row items-center gap-4 bg-gray-50 border-b border-gray-200">
+        <Avatar className="h-12 w-12 border-2 border-gray-300">
+          <AvatarImage src={offerer?.avatar ?? undefined} />
           <AvatarFallback>
             {offerer?.firstName?.charAt(0) || "U"}
           </AvatarFallback>
         </Avatar>
-        <div>
-          <h3 className="font-medium text-base">
-            {offerer?.firstName ?? ""} {offerer?.lastName ?? ""}
+        <div className="flex-1">
+          <h3 className="font-semibold text-lg text-gray-900">
+            {offerer?.firstName} {offerer?.lastName}
           </h3>
-          {offerer && (
-            <p className="text-xs text-muted-foreground">{offerer.email}</p>
-          )}
+          <p className="text-sm text-gray-600">{offerer?.email}</p>
         </div>
         {getStatusBadge((offer?.offerExchangeStatusId as 0 | 1 | 2) || 0)}
       </CardHeader>
 
-      <CardContent className="p-4 pt-2">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative aspect-square w-full md:w-1/3 overflow-hidden rounded-md bg-gray-100">
-            <img
-              src={offeredItem.product.imagePath || "/placeholder.svg"}
-              alt={offeredItem.product.name}
-              className="object-cover w-full h-full transition-all hover:scale-105"
-            />
-            <Badge className="absolute top-2 right-2 bg-emerald-600">
-              {offeredItem.product.rarityStatus.name}
-            </Badge>
-          </div>
+      <CardContent className="p-4 flex flex-col md:flex-row gap-6">
+        <div className="relative w-full md:w-1/3 h-48 rounded-lg overflow-hidden shadow-sm">
+          <img
+            src={offeredItem.product.imagePath || "/placeholder.svg"}
+            alt={offeredItem.product.name}
+            className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
+          />
+          <Badge className="absolute top-2 right-2 bg-emerald-600 text-white text-xs">
+            {offeredItem.product.rarityStatus.name}
+          </Badge>
+        </div>
 
-          <div className="w-full md:w-2/3">
-            <h4 className="font-bold text-lg mb-1">
-              {offeredItem.product.name}
-            </h4>
-            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-              {offeredItem.product.description}
-            </p>
-
-            <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-              <div className="flex items-center gap-1">
-                <Coins className="h-4 w-4 text-amber-500" />
-                <span>{offeredItem.product.price.toLocaleString()} VND</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4 text-blue-500" />
-                <span>{formatDate(offeredItem.accquiredDate)}</span>
-              </div>
+        <div className="flex-1 space-y-4">
+          <h4 className="font-bold text-xl text-gray-900">
+            {offeredItem.product.name}
+          </h4>
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {offeredItem.product.description}
+          </p>
+          <div className="grid grid-cols-2 gap-3 text-sm text-gray-700">
+            <div className="flex items-center gap-2">
+              <Coins className="h-4 w-4 text-amber-500" />
+              <span>{offeredItem.product.price.toLocaleString()} VND</span>
             </div>
-
-            {offer.content && offer.content !== "string" && (
-              <div className="text-sm bg-gray-50 p-2 rounded-md mb-3">
-                <span className="font-medium">Lời nhắn: </span>
-                {offer.content}
-              </div>
-            )}
-
-            <div className="flex gap-2 mt-2">
-              {offer?.offerExchangeStatusId === 0 && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                    onClick={() => onReject(offer.offerExchangeId)}
-                    disabled={isLoading}
-                  >
-                    {isLoading && <LoadingIndicator />}
-                    <X className="h-4 w-4 mr-1" /> Từ Chối
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="bg-emerald-600 hover:bg-emerald-700"
-                    onClick={() => onAccept(offer.offerExchangeId)}
-                    disabled={isLoading}
-                  >
-                    {isLoading && <LoadingIndicator />}
-                    <Check className="h-4 w-4 mr-1" /> Chấp Nhận
-                  </Button>
-                </>
-              )}
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-blue-500" />
+              <span>{formatDate(offeredItem.accquiredDate)}</span>
             </div>
           </div>
+          {offer.content && offer.content !== "string" && (
+            <div className="bg-gray-100 p-3 rounded-md text-sm text-gray-700">
+              <span className="font-medium">Lời nhắn: </span>
+              {offer.content}
+            </div>
+          )}
+          {offer?.offerExchangeStatusId === 0 && (
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+                onClick={() => onReject(offer.offerExchangeId)}
+                disabled={isLoading}
+              >
+                <X className="h-4 w-4 mr-2" /> Từ Chối
+              </Button>
+              <Button
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() => onAccept(offer.offerExchangeId)}
+                disabled={isLoading}
+              >
+                <Check className="h-4 w-4 mr-2" /> Chấp Nhận
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -200,125 +175,94 @@ const TradeDetailsModal = ({
   offers,
   confirm,
 }: TradeDetailsModalProps) => {
-  const [activeTab, setActiveTab] = useState("offers");
-
   const requestItem = exchangeRequest.requestInventoryItem;
   const requester = exchangeRequest.createByAccount;
 
-  const handleAcceptOffer = (offerId: string) => {
-    confirm(offerId, true);
-  };
-
-  const handleRejectOffer = (offerId: string) => {
-    confirm(offerId, true);
-  };
+  const handleAcceptOffer = (offerId: string) => confirm(offerId, true);
+  const handleRejectOffer = (offerId: string) => confirm(offerId, false);
 
   return (
-    <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
-      <div className="flex flex-col h-full">
-        <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="text-2xl font-bold text-center">
-            Chi Tiết Giao Dịch
-          </DialogTitle>
-          <DialogDescription className="text-center">
-            Thông tin chi tiết về đề nghị trao đổi
-          </DialogDescription>
-        </DialogHeader>
+    <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-white rounded-xl shadow-xl">
+      <DialogHeader className="p-6 bg-gray-50 border-b border-gray-200">
+        <DialogTitle className="text-2xl font-bold text-gray-900 text-center">
+          Chi Tiết Giao Dịch
+        </DialogTitle>
+        <DialogDescription className="text-gray-600 text-center">
+          Xem thông tin và các đề nghị trao đổi
+        </DialogDescription>
+      </DialogHeader>
 
-        {/* Requested Item Section */}
-        <div className="px-6 py-4 bg-gray-50 border-y ">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="relative w-24 h-24 overflow-hidden rounded-md bg-white border">
-              <img
-                src={requestItem.product.imagePath || "/placeholder.svg"}
-                alt={requestItem.product.name}
-                className="object-cover w-full h-full"
-              />
-              <Badge className="absolute top-1 right-1 text-xs bg-red-600">
-                {requestItem.product.rarityStatus.name}
-              </Badge>
+      <div className="p-6 bg-white">
+        <div className="flex flex-col md:flex-row gap-6 items-center bg-gray-50 p-4 rounded-lg">
+          <div className="relative w-32 h-32 rounded-lg overflow-hidden shadow-md">
+            <img
+              src={requestItem.product.imagePath || "/placeholder.svg"}
+              alt={requestItem.product.name}
+              className="object-cover w-full h-full"
+            />
+            <Badge className="absolute top-2 right-2 bg-red-600 text-white text-xs">
+              {requestItem.product.rarityStatus.name}
+            </Badge>
+          </div>
+          <div className="flex-1 text-center md:text-left space-y-2">
+            <h3 className="font-bold text-xl text-gray-900">
+              {requestItem.product.name}
+            </h3>
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {requestItem.product.description}
+            </p>
+            <div className="flex flex-wrap gap-4 text-sm text-gray-700">
+              <div className="flex items-center gap-2">
+                <Coins className="h-4 w-4 text-amber-500" />
+                <span>{requestItem.product.price.toLocaleString()} VND</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-blue-500" />
+                <span>{formatDate(requestItem.accquiredDate)}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-purple-500" />
+                <span>Đăng: {formatDate(exchangeRequest.createDate)}</span>
+              </div>
             </div>
-
-            <div className="flex-1 text-center md:text-left">
-              <h3 className="font-bold text-lg">{requestItem.product.name}</h3>
-              <p className="text-sm text-muted-foreground line-clamp-1 mb-1">
-                {requestItem.product.description}
+          </div>
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12 border-2 border-gray-300">
+              <AvatarImage src={requester?.avatar ?? undefined} />
+              <AvatarFallback>
+                {requester?.firstName?.charAt(0) || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-semibold text-gray-900">
+                {requester?.firstName} {requester?.lastName}
               </p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-3 text-sm">
-                <div className="flex items-center gap-1">
-                  <Coins className="h-4 w-4 text-amber-500" />
-                  <span>{requestItem.product.price.toLocaleString()} VND</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4 text-blue-500" />
-                  <span>{formatDate(requestItem.accquiredDate)}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4 text-purple-500" />
-                  <span>Đăng: {formatDate(exchangeRequest.createDate)}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 md:ml-auto">
-              <Avatar className="h-10 w-10 border-2 border-red-200">
-                <AvatarImage
-                  src={requester?.avatar || undefined}
-                  alt={`${requester?.firstName ?? ""} ${
-                    requester?.lastName ?? ""
-                  }`}
-                />
-                <AvatarFallback>
-                  {requester?.firstName?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">
-                  {requester?.firstName ?? ""} {requester?.lastName ?? ""}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {requester?.email ?? ""}
-                </p>
-              </div>
+              <p className="text-xs text-gray-600">{requester?.email}</p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Tabs for Offers */}
-        <TabsComponent
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="flex-1 flex flex-col"
-        >
-          <div className="px-6 pt-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold flex items-center gap-2 text-emerald-700">
-                <ArrowLeftRight className="h-5 w-5" />
-                Danh Sách Đề Nghị ({offers.length})
-              </h3>
-            </div>
+      <div className="p-6 flex-1 overflow-y-auto">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <ArrowLeftRight className="h-5 w-5 text-emerald-600" />
+          Đề Nghị Trao Đổi ({offers.length})
+        </h3>
+        {offers.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Chưa có đề nghị nào cho vật phẩm này
           </div>
-
-          <div className="flex-1 px-6 py-4">
-            {offers.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Chưa có đề nghị trao đổi nào cho vật phẩm này
-              </div>
-            ) : (
-              <div className="overflow-y-scroll max-h-[70vh]">
-                {offers.map((offer) => (
-                  <OfferCard
-                    key={offer.offerExchangeId}
-                    offer={offer}
-                    onAccept={handleAcceptOffer}
-                    onReject={handleRejectOffer}
-                    isLoading={isLoading}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </TabsComponent>
+        ) : (
+          offers.map((offer) => (
+            <OfferCard
+              key={offer.offerExchangeId}
+              offer={offer}
+              onAccept={handleAcceptOffer}
+              onReject={handleRejectOffer}
+              isLoading={isLoading}
+            />
+          ))
+        )}
       </div>
     </DialogContent>
   );
@@ -332,54 +276,45 @@ export default function Page() {
     useConfirmAcceptedOfffer();
   const { data: exchangeRequests, refetch: refetchGetAll } =
     useGetAllExchangeRequestByUserId(user?.id ?? "", 1, 10);
-
   const {
     data: offerData,
     refetch,
     isPending,
   } = useGetAllOfferByExchangeId(selectedExchange ?? "", 0, 0);
-
   const { data: offerItems } = useGetAllOfferByAccountId(user?.id ?? "", 0, 0);
   const cancelExchange = useCancelExchangeRequest(selectedExchange ?? "");
+  const { toast } = useToast();
 
   const getStatusBadge = (statusId: ExchangeStatus) => {
     const statusMap = {
       [ExchangeStatus.PENDING]: {
         text: "Đang Chờ",
-        className: "bg-yellow-100 text-yellow-700",
+        className: "bg-yellow-100 text-yellow-800",
       },
       [ExchangeStatus.REJECTED]: {
         text: "Đã Từ Chối",
-        className: "bg-red-100 text-red-700",
+        className: "bg-red-100 text-red-800",
       },
       [ExchangeStatus.COMPLETED]: {
-        text: "Đã Chấp Nhận",
-        className: "bg-green-100 text-green-700",
+        text: "Đã Hoàn Tất",
+        className: "bg-green-100 text-green-800",
       },
       [ExchangeStatus.CANCELLED]: {
         text: "Đã Hủy",
-        className: "bg-gray-100 text-gray-700",
+        className: "bg-gray-100 text-gray-800",
       },
     };
-
     const { text, className } =
       statusMap[statusId] || statusMap[ExchangeStatus.PENDING];
-
     return (
-      <Badge
-        variant="outline"
-        className={`px-3 py-1 rounded-full text-xs font-semibold text-nowrap ${className}`}
-      >
+      <Badge className={`px-3 py-1 rounded-full font-semibold ${className}`}>
         {text}
       </Badge>
     );
   };
 
-  const { toast } = useToast();
   useEffect(() => {
-    if (selectedExchange) {
-      refetch();
-    }
+    if (selectedExchange) refetch();
   }, [selectedExchange, refetch]);
 
   const handleOpenModal = (exchangeRequestId: string) => {
@@ -387,10 +322,6 @@ export default function Page() {
     setIsModalOpen(true);
   };
 
-  // Find the selected exchange request
-  const selectedExchangeRequest = exchangeRequests?.result.items.find(
-    (item) => item.exchangeRequestId === selectedExchange
-  );
   const handleConfirm = (offerId: string, isAccepted: boolean) => {
     confirm(
       {
@@ -403,9 +334,7 @@ export default function Page() {
       },
       {
         onSuccess: () => {
-          toast({
-            title: "Xác nhận thành công",
-          });
+          toast({ title: "Xác nhận thành công" });
           refetch();
         },
       }
@@ -414,305 +343,266 @@ export default function Page() {
 
   if (isPending) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6 bg-background">
-        <h1 className="text-3xl font-bold text-center mb-6 text-red-700">
+      <div className="w-full max-w-7xl mx-auto p-6 bg-gray-50">
+        <h1 className="text-3xl font-bold text-center mb-6 text-gray-900">
           Trung Tâm Giao Dịch
         </h1>
-        <p className="text-center text-muted-foreground mb-8">
-          Trao đổi vật phẩm với người chơi khác trong chợ giao dịch
+        <p className="text-center text-gray-600 mb-8">
+          Trao đổi vật phẩm với người chơi khác
         </p>
-        <div className="w-full flex items-center justify-center">
+        <div className="flex justify-center">
           <LoadingIndicator />
         </div>
       </div>
     );
   }
+
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 bg-background">
-      <h1 className="text-3xl font-bold text-center mb-6 text-red-700">
+    <div className="w-full max-w-7xl mx-auto p-6 bg-white rounded-lg">
+      <h1 className="text-3xl font-bold text-center mb-4 text-gray-900">
         Trung Tâm Giao Dịch
       </h1>
-      <p className="text-center text-muted-foreground mb-8">
-        Trao đổi vật phẩm với người chơi khác trong chợ giao dịch
+      <p className="text-center text-gray-600 mb-8">
+        Quản lý các yêu cầu và đề nghị trao đổi của bạn
       </p>
 
-      <Card className="border shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2">
-            <ShoppingBag className="h-5 w-5 text-primary" />
-            Vật Phẩm Trao Đổi
+      <Card className="shadow-lg border border-gray-200 rounded-xl">
+        <CardHeader className="p-6 bg-white border-b border-gray-200">
+          <CardTitle className="flex items-center gap-2 text-2xl font-semibold text-gray-900">
+            <ShoppingBag className="h-6 w-6 text-emerald-600" /> Giao Dịch Của
+            Bạn
           </CardTitle>
-          <CardDescription>
-            Những vật phẩm bạn đã đăng để trao đổi. Người chơi khác có thể đưa
-            ra đề nghị cho những vật phẩm này.
+          <CardDescription className="text-gray-600">
+            Theo dõi các vật phẩm bạn đã đăng và các đề nghị từ người chơi khác
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div>
-            <Tabs defaultValue="tab1" className="w-full">
-              <TabsList className="flex justify-start gap-4 border-b border-gray-300 mb-4">
-                <TabsTrigger
-                  value="tab1"
-                  className="px-4 py-2 rounded-t-lg text-gray-600 hover:text-black transition-all duration-300 data-[state=active]:text-black data-[state=active]:border-b-2 data-[state=active]:border-blue-500"
-                >
-                  Yêu cầu trao đổi
-                </TabsTrigger>
-                <TabsTrigger
-                  value="tab2"
-                  className="px-4 py-2 rounded-t-lg text-gray-600 hover:text-black transition-all duration-300 data-[state=active]:text-black data-[state=active]:border-b-2 data-[state=active]:border-blue-500"
-                >
-                  Offer với người khác
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="tab1">
-                <div className="rounded-2xl border shadow-lg border-black-100 overflow-hidden p-4">
-                  <Table>
-                    <TableHeader className="bg-muted/50 border border-black-100 shadow-md rounded-lg">
-                      <TableRow>
-                        <TableHead className="w-[80px]">ID</TableHead>
-                        <TableHead>Vật Phẩm - Mã ID</TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Độ Hiếm
-                        </TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Đã Đăng
-                        </TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          Trạng thái
-                        </TableHead>
-                        <TableHead className="text-right">Thao Tác</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {exchangeRequests?.result.items.map((request) => (
-                        <TableRow
-                          key={request.exchangeRequestId}
-                          className="hover:bg-muted/50"
+        <CardContent className="p-6">
+          <Tabs defaultValue="tab1" className="w-full">
+            <TabsList className="grid grid-cols-2 gap-4 mb-6 bg-gray-100 p-1 rounded-lg">
+              <TabsTrigger
+                value="tab1"
+                className="py-2 rounded-md text-gray-700 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+              >
+                Yêu Cầu Trao Đổi
+              </TabsTrigger>
+              <TabsTrigger
+                value="tab2"
+                className="py-2 rounded-md text-gray-700 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all"
+              >
+                Đề Nghị Đã Gửi
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="tab1">
+              <Table className="bg-white rounded-lg shadow-md border border-gray-200">
+                <TableHeader className="bg-gray-50">
+                  <TableRow>
+                    <TableHead className="text-gray-900 font-semibold">
+                      ID
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Vật Phẩm
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold hidden md:table-cell">
+                      Độ Hiếm
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold hidden md:table-cell">
+                      Ngày Đăng
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold hidden md:table-cell">
+                      Trạng Thái
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold text-right">
+                      Thao Tác
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {exchangeRequests?.result.items.map((request) => (
+                    <TableRow
+                      key={request.exchangeRequestId}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <TableCell className="font-mono text-sm text-gray-700">
+                        {request.exchangeRequestId.substring(0, 8)}
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900">
+                        {request.requestInventoryItem.product.name} -{" "}
+                        {request.requestInventoryItem.inventoryId.substring(
+                          0,
+                          8
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        <RarityColorBadge
+                          rarityName={
+                            request.requestInventoryItem.product.rarityStatus
+                              .name || "Common"
+                          }
+                          dropRate={
+                            request.requestInventoryItem.product.rarityStatus
+                              .dropRate
+                          }
+                        />
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell text-gray-600 text-sm">
+                        {formatDate(request.createDate)}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {getStatusBadge(request.statusId)}
+                      </TableCell>
+                      <TableCell className="text-right flex justify-end gap-2">
+                        <Dialog
+                          open={
+                            isModalOpen &&
+                            selectedExchange === request.exchangeRequestId
+                          }
+                          onOpenChange={setIsModalOpen}
                         >
-                          <TableCell className="font-medium">
-                            {request.exchangeRequestId.substring(0, 8)}
-                          </TableCell>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">
-                                {request.requestInventoryItem.product.name} -{" "}
-                                {request.requestInventoryItem.inventoryId.substring(
-                                  0,
-                                  8
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-
-                          <TableCell>
-                            <div className="max-w-[200px] truncate">
-                              <RarityColorBadge
-                                rarityName={
-                                  request.requestInventoryItem.product
-                                    .rarityStatus.name || "Common"
-                                }
-                                dropRate={
-                                  request.requestInventoryItem.product
-                                    .rarityStatus.dropRate
-                                }
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
-                            {formatDate(request.createDate)}
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell">
-                            <Badge
+                          <DialogTrigger asChild>
+                            <Button
                               variant="outline"
-                              className={`px-3 py-1 rounded-full text-xs font-semibold text-nowrap ${
-                                request.statusId === 0
-                                  ? "bg-yellow-100 text-yellow-700"
-                                  : request.statusId === 2
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-red-100 text-red-700"
-                              }`}
-                            >
-                              {request.statusId === 0
-                                ? "Đang Chờ"
-                                : request.statusId === 1
-                                ? "Đã Chấp Nhận"
-                                : "Đã Từ Chối"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Dialog
-                              open={
-                                isModalOpen &&
-                                selectedExchange === request.exchangeRequestId
+                              size="sm"
+                              className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                              onClick={() =>
+                                handleOpenModal(request.exchangeRequestId)
                               }
-                              onOpenChange={setIsModalOpen}
                             >
-                              <DialogTrigger asChild>
-                                <>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleOpenModal(request.exchangeRequestId)
-                                    }
-                                  >
-                                    <Eye className="h-4 w-4 " />
-                                  </Button>
-
-                                  {request.statusId !==
-                                    ExchangeStatus.CANCELLED && (
-                                    <Button
-                                      size="sm"
-                                      style={{
-                                        backgroundColor: "#F87171",
-                                        color: "#fff",
-                                        textAlign: "center",
-                                      }}
-                                      onClick={() => {
-                                        setSelectedExchange(
-                                          request.exchangeRequestId
-                                        );
-                                        cancelExchange.mutate(
-                                          request.exchangeRequestId,
-                                          {
-                                            onSuccess: () => {
-                                              toast({
-                                                title: "Hủy yêu cầu thành công",
-                                              });
-                                              refetchGetAll();
-                                            },
-                                          }
-                                        );
-                                      }}
-                                    >
-                                      <XCircleIcon className="h-4 w-4" />
-                                    </Button>
-                                  )}
-                                </>
-                              </DialogTrigger>
-                              {selectedExchangeRequest &&
-                                offerData?.result?.items && (
-                                  <TradeDetailsModal
-                                    exchangeRequest={selectedExchangeRequest}
-                                    offers={offerData.result.items}
-                                    isLoading={isPendingConfirm}
-                                    confirm={handleConfirm}
-                                  />
-                                )}
-                            </Dialog>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="tab2">
-                <Table className="w-full border border-gray-300 shadow-sm rounded-lg overflow-hidden">
-                  <TableHeader className="bg-gray-100 text-gray-700 uppercase text-sm">
-                    <TableRow className="border-b border-gray-300">
-                      <TableHead className="px-4 py-3 w-20">ID</TableHead>
-                      <TableHead className="px-4 py-3">Người yêu cầu</TableHead>
-                      <TableHead className="px-4 py-3">
-                        Requested Item
-                      </TableHead>
-                      <TableHead className="px-4 py-3">
-                        Vật phẩm offer
-                      </TableHead>
-                      <TableHead className="px-4 py-3">
-                        Người được offer
-                      </TableHead>
-                      <TableHead className="px-4 py-3">Trạng thái</TableHead>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          {selectedExchange && offerData?.result?.items && (
+                            <TradeDetailsModal
+                              exchangeRequest={
+                                exchangeRequests.result.items.find(
+                                  (item) =>
+                                    item.exchangeRequestId === selectedExchange
+                                )!
+                              }
+                              offers={offerData.result.items}
+                              isLoading={isPendingConfirm}
+                              confirm={handleConfirm}
+                            />
+                          )}
+                        </Dialog>
+                        {request.statusId !== ExchangeStatus.CANCELLED && (
+                          <Button
+                            size="sm"
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                            onClick={() =>
+                              cancelExchange.mutate(request.exchangeRequestId, {
+                                onSuccess: () => {
+                                  toast({ title: "Hủy yêu cầu thành công" });
+                                  refetchGetAll();
+                                },
+                              })
+                            }
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {offerItems?.result.items.map((item, index) => (
-                      <TableRow
-                        key={item.offerExchangeId}
-                        className={`border-b border-gray-200 ${
-                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        } hover:bg-gray-100 transition-colors`}
-                      >
-                        <TableCell className="px-4 py-3 font-mono text-sm text-gray-600">
-                          {item.exchangeRequestId.substring(0, 8)}
-                        </TableCell>
-                        <TableCell className="px-4 py-3">
-                          <div className="flex items-center gap-2 text-gray-800 font-medium">
-                            {
-                              item.exchangeRequest.requestInventoryItem.account
-                                .firstName
-                            }{" "}
-                            {
-                              item.exchangeRequest.requestInventoryItem.account
-                                .lastName
+                  ))}
+                </TableBody>
+              </Table>
+            </TabsContent>
+
+            <TabsContent value="tab2">
+              <Table className="bg-white rounded-lg shadow-md border border-gray-200">
+                <TableHeader className="bg-gray-50">
+                  <TableRow>
+                    <TableHead className="text-gray-900 font-semibold">
+                      ID
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Người Yêu Cầu
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Vật Phẩm Yêu Cầu
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Vật Phẩm Đề Nghị
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Người Nhận
+                    </TableHead>
+                    <TableHead className="text-gray-900 font-semibold">
+                      Trạng Thái
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {offerItems?.result.items.map((item) => (
+                    <TableRow
+                      key={item.offerExchangeId}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <TableCell className="font-mono text-sm text-gray-700">
+                        {item.exchangeRequestId.substring(0, 8)}
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900">
+                        {
+                          item.exchangeRequest.requestInventoryItem.account
+                            .firstName
+                        }{" "}
+                        {
+                          item.exchangeRequest.requestInventoryItem.account
+                            .lastName
+                        }
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={
+                              item.exchangeRequest.requestInventoryItem.product
+                                .imagePath
                             }
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <img
-                              src={
-                                item.exchangeRequest.requestInventoryItem
-                                  .product.imagePath
-                              }
-                              alt={
-                                item.exchangeRequest.requestInventoryItem
-                                  .product.name
-                              }
-                              className="w-12 h-12 rounded-md shadow"
-                            />
-                            <span className="text-gray-700 font-medium">
-                              {
-                                item.exchangeRequest.requestInventoryItem
-                                  .product.name
-                              }
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <img
-                              src={
-                                item.exchangeRequest.offeredInventoryItem
-                                  ?.product.imagePath
-                              }
-                              alt={
-                                item.exchangeRequest.offeredInventoryItem
-                                  ?.product.name
-                              }
-                              className="w-12 h-12 rounded-md shadow"
-                            />
-                            <span className="text-gray-700 font-medium">
-                              {
-                                item.exchangeRequest.offeredInventoryItem
-                                  ?.product.name
-                              }
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3">
-                          <div className="flex items-center gap-2 text-gray-800 font-medium">
-                            {
-                              item.exchangeRequest.offeredInventoryItem?.account
-                                .firstName
-                            }{" "}
-                            {
-                              item.exchangeRequest.offeredInventoryItem?.account
-                                .lastName
+                            alt={
+                              item.exchangeRequest.requestInventoryItem.product
+                                .name
                             }
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-4 py-3 font-semibold">
-                          {getStatusBadge(item.exchangeRequest.statusId)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TabsContent>
-            </Tabs>
-          </div>
+                            className="w-12 h-12 rounded-md shadow-sm"
+                          />
+                          <span className="font-medium text-gray-900">
+                            {
+                              item.exchangeRequest.requestInventoryItem.product
+                                .name
+                            }
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={item.offeredInventoryItem?.product.imagePath}
+                            alt={item.offeredInventoryItem?.product.name}
+                            className="w-12 h-12 rounded-md shadow-sm"
+                          />
+                          <span className="font-medium text-gray-900">
+                            {item.offeredInventoryItem?.product.name}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900">
+                        {
+                          item.exchangeRequest.offeredInventoryItem?.account
+                            .firstName
+                        }{" "}
+                        {
+                          item.exchangeRequest.offeredInventoryItem?.account
+                            .lastName
+                        }
+                      </TableCell>
+                      <TableCell>
+                        {getStatusBadge(item.exchangeRequest.statusId)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

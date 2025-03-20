@@ -24,7 +24,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useContext } from "react";
 
-// Menu items.
 const MOD_ITEMS = [
   {
     title: "Quản lý bộ sưu tập",
@@ -46,11 +45,7 @@ const MOD_ITEMS = [
     url: "/management/manage-transaction",
     icon: ArrowLeftRight,
   },
-  {
-    title: "Quản lý đấu giá",
-    url: "/management/manage-auction",
-    icon: Crown,
-  },
+  { title: "Quản lý đấu giá", url: "/management/manage-auction", icon: Crown },
   {
     title: "Quản lý yêu cầu rút tiền",
     url: "/management/manage-withdraw",
@@ -59,21 +54,13 @@ const MOD_ITEMS = [
 ];
 
 const ADMIN_ITEMS = [
-  {
-    title: "Tổng Quan",
-    url: "/management/dashboard",
-    icon: ChartArea,
-  },
+  { title: "Tổng Quan", url: "/management/dashboard", icon: ChartArea },
   {
     title: "Cài đặt hệ thống",
     url: "/management/system-setting",
     icon: Settings,
   },
-  {
-    title: "Quản lý tài khoản",
-    url: "/management/manage-account",
-    icon: User,
-  },
+  { title: "Quản lý tài khoản", url: "/management/manage-account", icon: User },
 ];
 
 export function AdminSidebar() {
@@ -81,67 +68,60 @@ export function AdminSidebar() {
   const { user } = useContext(GlobalContext);
 
   return (
-    <Sidebar>
+    <Sidebar className="w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl">
       <SidebarContent className="p-4">
         <SidebarGroup>
-          <div className="mb-10 flex-1 flex-shrink-0">
+          {/* Logo Section */}
+          <div className="mb-8 flex items-center justify-center pt-6">
             <Link href="/" className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-large.png"
                 alt="mybox"
-                width={32}
-                height={32}
-                className="w-24 object-cover"
+                width={140}
+                height={48}
+                className="object-contain transition-transform hover:scale-105 filter drop-shadow-md"
               />
             </Link>
           </div>
+
+          {/* Menu Section */}
           <SidebarGroupContent>
-            {user?.mainRole === "MODERATORS" ? (
-              <SidebarMenu>
-                {MOD_ITEMS.map((item) => (
-                  <SidebarMenuItem
-                    key={item.title}
-                    className={cn(
-                      pathname.includes(item.url) &&
-                        "bg-gray-200 font-semibold",
-                      "rounded-md"
-                    )}
-                  >
-                    <SidebarMenuButton asChild>
-                      <Link href={item.url}>
-                        <item.icon
-                          strokeWidth={pathname === item.url ? 2.5 : 1}
-                        />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            ) : (
-              <SidebarMenu>
-                {ADMIN_ITEMS.map((item) => (
-                  <SidebarMenuItem
-                    key={item.title}
-                    className={cn(
-                      pathname.includes(item.url) &&
-                        "bg-gray-200 font-semibold",
-                      "rounded-md"
-                    )}
-                  >
-                    <SidebarMenuButton asChild>
-                      <Link href={item.url}>
-                        <item.icon
-                          strokeWidth={pathname === item.url ? 2.5 : 1}
-                        />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            )}
+            <SidebarMenu className="space-y-2">
+              {(user?.mainRole === "MODERATORS" ? MOD_ITEMS : ADMIN_ITEMS).map(
+                (item) => {
+                  const isActive = pathname.includes(item.url);
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        className={cn(
+                          "w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-200",
+                          isActive
+                            ? "bg-red-600 text-white shadow-md"
+                            : "text-black hover:bg-red-700 hover:text-white hover:shadow-sm",
+                          "group"
+                        )}
+                      >
+                        <Link href={item.url}>
+                          <item.icon
+                            className={cn(
+                              "h-5 w-5 transition-colors duration-200",
+                              isActive
+                                ? "text-white"
+                                : "text-black "
+                            )}
+                            strokeWidth={isActive ? 2.5 : 2}
+                          />
+                          <span className="font-medium ">
+                            {item.title}
+                          </span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+              )}
+            </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

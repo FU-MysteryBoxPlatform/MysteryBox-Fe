@@ -97,3 +97,125 @@ body {
     @apply bg-background text-foreground;
   }
 }
+/* globals.css hoặc trong <style> tag */
+.react-date-picker {
+  width: 100%;
+}
+
+/* Đè lên container chính của DatePicker */
+.react-date-picker__wrapper {
+  border: 1px solid #d1d5db !important;
+  /* gray-300 */
+  border-radius: 8px !important;
+  padding: 0.5rem !important;
+  background-color: #ffffff !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Khi focus */
+.react-date-picker__wrapper:focus-within {
+  border-color: #059669 !important;
+  /* emerald-600 */
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2) !important;
+  /* emerald-600/20 */
+}
+
+/* Input bên trong */
+.react-date-picker__inputGroup {
+  font-size: 0.875rem !important;
+  /* text-sm */
+  color: #374151 !important;
+  /* gray-700 */
+}
+
+/* Placeholder */
+.react-date-picker__inputGroup input::placeholder {
+  color: #9ca3af !important;
+  /* gray-400 */
+}
+
+/* Nút clear */
+.react-date-picker__clear-button {
+  color: #6b7280 !important;
+  /* gray-500 */
+  transition: color 0.2s ease;
+}
+
+.react-date-picker__clear-button:hover {
+  color: #6b7280 !important;
+  /* red-500 */
+}
+
+/* Nút lịch */
+.react-date-picker__calendar-button {
+  color: #6b7280 !important;
+  /* gray-500 */
+  transition: color 0.2s ease;
+}
+
+.react-date-picker__calendar-button:hover {
+  color: #059669 !important;
+  /* emerald-600 */
+}
+
+/* Lịch popup */
+.react-calendar {
+  border: 1px solid #d1d5db !important;
+  /* gray-300 */
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  /* shadow-md */
+  padding: 0.5rem !important;
+}
+
+/* Ngày trong lịch */
+.react-calendar__tile {
+  color: #374151 !important;
+  /* gray-700 */
+  border-radius: 4px !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.react-calendar__tile:hover {
+  background-color: #ecfdf5 !important;
+  /* emerald-50 */
+  color: #059669 !important;
+  /* emerald-600 */
+}
+
+/* Ngày được chọn */
+.react-calendar__tile--active {
+  background-color: #059669 !important;
+  /* emerald-600 */
+  color: #ffffff !important;
+}
+
+.react-calendar__tile--active:hover {
+  background-color: #047857 !important;
+  /* emerald-700 */
+}
+
+/* Ngày hiện tại */
+.react-calendar__tile--now {
+  background-color: #f3f4f6 !important;
+  /* gray-100 */
+}
+
+/* Nút điều hướng tháng */
+.react-calendar__navigation button {
+  color: #374151 !important;
+  /* gray-700 */
+  font-weight: 600 !important;
+  transition: color 0.2s ease;
+}
+
+.react-calendar__navigation button:hover {
+  color: #059669 !important;
+  /* emerald-600 */
+}
+
+.react-date-picker__inputGroup__input:invalid {
+  background-color: #8f56561a !important;
+  border: none !important;
+  /* red-600 */
+}

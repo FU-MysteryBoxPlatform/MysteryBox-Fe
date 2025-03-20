@@ -1,15 +1,15 @@
 "use client";
-import { ArrowLeft, Check, Clock, Package, Star } from "lucide-react";
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
 
-import RarityColorBadge from "@/app/components/RarityColorBadge";
+import { useContext, useEffect, useState, useCallback } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, Check, Clock, Package, Star } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -17,161 +17,216 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { useGetExchangeRequestById } from "@/hooks/api/useExchange";
 import { Inventory, useGetAllInventory } from "@/hooks/api/useInventory";
+import { useGetExchangeRequestById } from "@/hooks/api/useExchange";
 import { useCreateOfferExchange } from "@/hooks/api/useOfferExchange";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
-import { useParams } from "next/navigation";
+import RarityColorBadge from "@/app/components/RarityColorBadge";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+
+const ITEMS_PER_PAGE = 10;
+
+interface RarityInfo {
+  rarity: string;
+  classes: string;
+}
+
+const getRarityColor = (id: number): RarityInfo => {
+  const rarityMap = {
+    Common: "bg-gray-200 text-gray-800",
+    Uncommon: "bg-green-100 text-green-800",
+    Rare: "bg-blue-100 text-blue-800",
+    Epic: "bg-purple-100 text-purple-800",
+    Legendary: "bg-orange-100 text-orange-800",
+  };
+
+  const itemId = id;
+  const rarities = Object.keys(rarityMap);
+  const rarity = rarities[itemId % rarities.length] as keyof typeof rarityMap;
+
+  return { rarity, classes: rarityMap[rarity] };
+};
+
+const InventoryItem = ({
+  item,
+  isSelected,
+  onSelect,
+}: {
+  item: Inventory;
+  isSelected: boolean;
+  onSelect: () => void;
+}) => {
+  const { rarity, classes } = getRarityColor(item.itemStatusId);
+
+  return (
+    <div
+      className={cn(
+        "border rounded-lg overflow-hidden cursor-pointer transition-all",
+        "hover:-translate-y-0.5 hover:shadow-md hover:border-red-600",
+        isSelected && "border-2 border-red-600 bg-gray-50 shadow-md"
+      )}
+      onClick={onSelect}
+    >
+      <div className="flex gap-3 p-3">
+        <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
+          <img
+            src={item.product?.imagePath || "/mock-images/image2.png"}
+            alt={item.product?.name}
+            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-gray-900 truncate">
+              {item.product?.name}
+            </h4>
+          </div>
+          <Badge className={cn("text-xs", classes)}>{rarity}</Badge>
+
+          <p className="text-sm text-gray-600 line-clamp-2 mt-1">
+            {item.product?.description}
+          </p>
+          {isSelected && (
+            <div className="mt-1 text-xs text-green-600 flex items-center">
+              <Check className="h-3 w-3 mr-1" /> Đã chọn
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function TradePage() {
   const { user } = useContext(GlobalContext);
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
 
-  const [selectedItem, setSelectedItem] = useState<string>();
+  const [selectedItem, setSelectedItem] = useState<string | undefined>();
   const [tradeSubmitted, setTradeSubmitted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalPage, setTotalPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [inventories, setInventories] = useState<Inventory[]>([]);
-  const [content, setContent] = useState<string>("");
+  const [content, setContent] = useState("");
 
-  const { mutate: mutateGetAllInventory } = useGetAllInventory();
-  const { mutate: mutateCreateOfferExchange, isPending } =
-    useCreateOfferExchange();
-  const { data } = useGetExchangeRequestById(id as string);
+  const { mutate: fetchInventories, isPending: isFetchingInventories } =
+    useGetAllInventory();
+  const { mutate: createOfferExchange, isPending } = useCreateOfferExchange();
+  const { data, isLoading: isLoadingTrade } = useGetExchangeRequestById(id);
   const tradeItemDetail = data?.result;
-  const toggleItemSelection = (itemId: string) => {
-    setSelectedItem(itemId);
-  };
+
+  const loadInventories = useCallback(() => {
+    if (!user?.id) return;
+
+    fetchInventories(
+      { accountId: user.id, pageNumber: page, pageSize: ITEMS_PER_PAGE },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            setInventories((prev) => [
+              ...prev,
+              ...data.result.items.filter((item) => item.product),
+            ]);
+            setTotalPages(data.result.totalPages);
+          }
+        },
+        onError: () =>
+          toast({ title: "Lỗi khi tải kho đồ", variant: "destructive" }),
+      }
+    );
+  }, [fetchInventories, page, user?.id]);
+
+  useEffect(() => {
+    loadInventories();
+  }, [loadInventories]);
 
   const handleSubmitTrade = () => {
-    mutateCreateOfferExchange(
-      {
-        exchangeId: id,
-        inventoryId: selectedItem,
-        content: content,
-      },
+    if (!selectedItem) return;
+
+    createOfferExchange(
+      { exchangeId: id, inventoryId: selectedItem, content },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
             setTradeSubmitted(true);
             toast({ title: "Đã gửi đề xuất giao dịch thành công" });
           } else {
-            toast({ title: data.messages[0] });
+            toast({ title: data.messages[0], variant: "destructive" });
           }
         },
+        onError: () =>
+          toast({ title: "Lỗi khi gửi đề xuất", variant: "destructive" }),
       }
     );
   };
 
-  const getRarityColor = (id: string) => {
-    const rarityMap = {
-      Common: "bg-gray-200 text-gray-800",
-      Uncommon: "bg-green-100 text-green-800",
-      Rare: "bg-blue-100 text-blue-800",
-      Epic: "bg-purple-100 text-purple-80 0",
-      Legendary: "bg-orange-100 text-orange-800",
-    };
-
-    // Assign rarity based on item id for demo purposes
-    const itemId = parseInt(id.replace("inv", "")) || parseInt(id);
-    const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
-    const rarity: keyof typeof rarityMap = rarities[
-      itemId % 5
-    ] as keyof typeof rarityMap;
-
-    return {
-      rarity,
-      classes: rarityMap[rarity],
-    };
-  };
-
-  console.log({ selectedItem });
-
-  useEffect(() => {
-    if (user) {
-      mutateGetAllInventory(
-        {
-          accountId: user?.id || "",
-          pageNumber: page,
-          pageSize: 10,
-        },
-        {
-          onSuccess: (data) => {
-            if (data.isSuccess) {
-              setInventories((inventories) => [
-                ...inventories,
-                ...data.result.items.filter((item) => item.product),
-              ]);
-              setTotalPage(data.result.totalPages);
-            }
-          },
-        }
-      );
-    }
-  }, [mutateGetAllInventory, page, user, user?.id]);
+  if (isLoadingTrade) {
+    return (
+      <div className="container mx-auto py-10 text-center bg-gray-50">
+        <LoadingIndicator />
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 min-h-screen ">
-      <div className="mb-6">
+    <div className="container mx-auto py-10 px-4 lg:px-6 bg-gray-50">
+      {/* Header */}
+      <div className="mb-8">
         <Link
           href="/marketplace"
-          className="flex items-center text-sm text-red-700 hover:text-red-900 mb-4 transition-colors duration-200"
+          className="flex items-center text-sm text-gray-600 hover:text-gray-800 transition-colors"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Quay Lại Thị Trường
+          <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại thị trường
         </Link>
-        <h1 className="text-3xl font-bold text-red-900 flex items-center">
+        <h1 className="mt-4 text-3xl md:text-4xl font-bold text-gray-900 flex items-center">
           {tradeItemDetail?.requestInventoryItem?.product?.name}
-          <Badge className="ml-3 bg-red-700 hover:bg-red-800 text-white">
+          <Badge className="ml-3 bg-red-600 hover:bg-red-700 text-white text-sm">
             {tradeItemDetail?.requestInventoryItem.collection?.collectionName}
           </Badge>
         </h1>
-        <div className="flex items-center mt-2">
-          <p className="text-gray-600">
-            Đăng bởi {tradeItemDetail?.createByAccount?.firstName}
-          </p>
-
-          <div className="ml-4 flex items-center text-gray-500">
+        <div className="mt-2 flex items-center text-gray-500 text-sm">
+          <span>Đăng bởi {tradeItemDetail?.createByAccount?.firstName}</span>
+          <div className="ml-4 flex items-center">
             <Clock className="h-4 w-4 mr-1" />
-            <span className="text-sm">
+            <span>
               {tradeItemDetail?.createDate
                 ? `${Math.floor(
-                    (new Date().getTime() -
+                    (Date.now() -
                       new Date(tradeItemDetail.createDate).getTime()) /
                       (1000 * 60 * 60 * 24)
-                  )} days ago`
-                : "Unknown date"}
+                  )} ngày trước`
+                : "Không rõ ngày"}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="rounded-lg overflow-hidden shadow-lg relative group">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Item Image */}
+        <div className="relative rounded-lg overflow-hidden shadow-lg group bg-white">
           <img
             src={
               tradeItemDetail?.requestInventoryItem.product?.imagePath ||
               "/mock-images/image2.png"
             }
             alt={tradeItemDetail?.requestInventoryItem?.product?.name}
-            className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
           />
-          <div className="absolute top-4 right-4 px-3 py-1 rounded-full">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute top-4 right-4">
             <RarityColorBadge
               dropRate={
                 tradeItemDetail?.requestInventoryItem?.product?.rarityStatus
@@ -185,186 +240,130 @@ export default function TradePage() {
           </div>
         </div>
 
-        <div>
-          <Card className="shadow-lg border-none overflow-hidden bg-white">
-            <CardHeader className=" text-red-700">
-              <CardTitle className="flex items-center text-xl">
-                <Package className="mr-2 h-5 w-5" />
-                Thông Tin Vật Phẩm
-              </CardTitle>
-              <CardDescription className="text-red-600">
-                Chi tiết về vật phẩm giao dịch này
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6 px-6 bg-white">
-              <div className="animate-fadeIn">
-                <h3 className="font-medium text-red-900 text-lg mb-2 flex items-center">
-                  <Star className="mr-2 h-4 w-4 text-red-700" />
-                  Mô Tả
-                </h3>
-                <p className="text-gray-600 bg-red-50 p-3 rounded-md border-l-2 border-red-700">
-                  {tradeItemDetail?.requestInventoryItem?.product?.description}
+        {/* Item Details and Trade Form */}
+        <Card className="shadow-xl border border-gray-200">
+          <CardHeader className="bg-white border-b border-gray-200">
+            <CardTitle className="flex items-center text-xl text-gray-900">
+              <Package className="mr-2 h-5 w-5" /> Thông tin vật phẩm
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-6">
+            <div>
+              <h3 className="font-semibold text-gray-900 flex items-center">
+                <Star className="mr-2 h-4 w-4" /> Mô tả
+              </h3>
+              <p className="mt-2 text-gray-700 bg-gray-100 p-3 rounded-md border-l-4 border-red-600">
+                {tradeItemDetail?.requestInventoryItem?.product?.description}
+              </p>
+            </div>
+            <Separator />
+            <div>
+              <h3 className="font-semibold text-gray-900 flex items-center">
+                <Package className="mr-2 h-4 w-4" /> Thông tin giao dịch
+              </h3>
+              <div className="mt-2 bg-gray-100 p-4 rounded-lg">
+                <p className="text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    {tradeItemDetail?.createByAccount?.firstName}
+                  </span>{" "}
+                  đang muốn giao dịch vật phẩm này. Hãy chọn vật phẩm từ kho đồ
+                  của bạn để đề xuất.
                 </p>
-              </div>
-
-              <Separator className="my-2" />
-
-              <div>
-                <h3 className="font-medium text-red-900 text-lg mb-2 flex items-center">
-                  <Package className="mr-2 h-4 w-4 text-red-700" />
-                  Thông Tin Giao Dịch
-                </h3>
-                <div className="bg-red-50 p-4 rounded-lg border border-red-100">
-                  <p className="text-gray-700">
-                    <span className="font-semibold text-red-900">
-                      {tradeItemDetail?.createByAccount?.firstName}
-                    </span>{" "}
-                    đang muốn giao dịch vật phẩm này. Hãy đưa ra đề nghị bằng
-                    cách chọn vật phẩm từ kho đồ của bạn.
-                  </p>
-                  <div className="mt-2 flex items-center text-sm text-gray-500">
-                    <Clock className="h-4 w-4 mr-1" />
-                    <span>Đề nghị hết hạn sau 48 giờ</span>
-                  </div>
+                <div className="mt-2 text-sm text-gray-500 flex items-center">
+                  <Clock className="h-4 w-4 mr-1" /> Đề nghị hết hạn sau 48 giờ
                 </div>
               </div>
-            </CardContent>
-            <CardFooter className="bg-white px-6 pb-6">
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 shadow-md text-lg py-6">
-                    Đề Xuất Giao Dịch
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-[70vh] p-0 overflow-y-hidden">
-                  <DialogHeader className="bg-gradient-to-r from-red-700 to-red-800 text-white p-6 rounded-t-lg">
-                    <DialogTitle className="text-xl flex items-center">
-                      <Package className="mr-2 h-5 w-5" />
-                      Đề Xuất Giao Dịch
-                    </DialogTitle>
-                    <DialogDescription className="text-red-100">
-                      Chọn vật phẩm từ kho đồ của bạn để đổi lấy{" "}
-                      <span className="font-semibold text-white"></span>
-                    </DialogDescription>
-                  </DialogHeader>
-                  {tradeSubmitted ? (
-                    <div className="flex flex-col items-center justify-center py-12 px-6 bg-white">
-                      <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-6 animate-bounce">
-                        <Check className="h-8 w-8 text-green-600" />
-                      </div>
-                      <h3 className="text-2xl font-semibold mb-2 text-red-900">
-                        Đã Gửi Đề Nghị Giao Dịch!
-                      </h3>
-                      <p className="text-center text-gray-600 max-w-md">
-                        Đề nghị giao dịch của bạn đã được gửi đến{" "}
-                        <span className="font-semibold text-red-700"></span>.
-                        Bạn sẽ nhận được thông báo khi họ phản hồi.
-                      </p>
-                      <Button
-                        className="mt-6 bg-gray-200 hover:bg-gray-300 text-gray-800"
-                        onClick={() => setIsDialogOpen(false)}
-                      >
-                        Đóng
-                      </Button>
+            </div>
+          </CardContent>
+          <CardFooter className="pt-0">
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
+                  Đề xuất giao dịch
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[650px] max-h-[80vh] p-0">
+                <DialogHeader className=" p-6 rounded-t-lg">
+                  <DialogTitle className="text-xl flex items-center">
+                    <Package className="mr-2 h-5 w-5" /> Đề xuất giao dịch
+                  </DialogTitle>
+                </DialogHeader>
+                {tradeSubmitted ? (
+                  <div className="flex flex-col items-center justify-center py-12 px-6">
+                    <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mb-6 animate-bounce">
+                      <Check className="h-8 w-8 text-green-600" />
                     </div>
-                  ) : (
-                    <div className="bg-white px-4">
-                      <div className="max-h-[500px] overflow-auto">
+                    <h3 className="text-2xl font-semibold text-gray-900">
+                      Đã gửi đề nghị!
+                    </h3>
+                    <p className="text-center text-gray-600 mt-2">
+                      Đề nghị của bạn đã được gửi. Bạn sẽ nhận thông báo khi
+                      được phản hồi.
+                    </p>
+                    <Button
+                      className="mt-6 bg-gray-200 hover:bg-gray-300 text-gray-800"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Đóng
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="p-6 space-y-6">
+                    <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
+                      {inventories.length === 0 && !isFetchingInventories ? (
+                        <p className="text-center text-gray-500 py-4">
+                          Không có vật phẩm nào để hiển thị
+                        </p>
+                      ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {inventories?.length > 0 &&
-                            inventories?.map((item) => (
-                              <div
-                                key={item.inventoryId}
-                                className={cn(
-                                  "border rounded-lg overflow-hidden cursor-pointer transition-all transform hover:translate-y-[-2px] hover:shadow-md hover:border-red-500",
-                                  selectedItem === item.inventoryId &&
-                                    "border-2 border-red-700 bg-red-50 shadow-md"
-                                )}
-                                onClick={() =>
-                                  toggleItemSelection(item.inventoryId)
-                                }
-                              >
-                                <div className="flex gap-3 p-3">
-                                  <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                      src={
-                                        item.product?.imagePath ||
-                                        "/mock-images/image2.png"
-                                      }
-                                      alt={item.product?.name}
-                                      className="h-full w-full object-cover transition-transform duration-300 hover:scale-110"
-                                    />
-                                  </div>
-                                  <div>
-                                    <div className="flex items-center">
-                                      <h4 className="font-medium text-red-900">
-                                        {item.product?.name}
-                                      </h4>
-                                      <Badge
-                                        className={`ml-2 text-xs ${
-                                          getRarityColor(item.inventoryId)
-                                            .classes
-                                        }`}
-                                      >
-                                        {
-                                          getRarityColor(item.inventoryId)
-                                            .rarity
-                                        }
-                                      </Badge>
-                                    </div>
-                                    <p className="text-xs text-gray-600 line-clamp-2 mt-1">
-                                      {item.product?.description}
-                                    </p>
-                                    {selectedItem === item.inventoryId && (
-                                      <div className="mt-1 text-xs text-green-600 flex items-center">
-                                        <Check className="h-3 w-3 mr-1" />
-                                        Đã chọn
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                          {inventories.map((item) => (
+                            <InventoryItem
+                              key={item.inventoryId}
+                              item={item}
+                              isSelected={selectedItem === item.inventoryId}
+                              onSelect={() => setSelectedItem(item.inventoryId)}
+                            />
+                          ))}
                         </div>
-                      </div>
-                      {page < totalPage && (
-                        <button
-                          className="mt-4 bg-transparent text-black underline mb-4"
-                          onClick={() => setPage((page) => page + 1)}
-                        >
-                          Tải thêm
-                        </button>
                       )}
-
-                      <div>
-                        <Label>Nhập nội dung</Label>
-                        <Textarea
-                          placeholder="Nhập nội dung..."
-                          onChange={(e) => setContent(e.target.value)}
-                        />
-                      </div>
-
-                      <DialogFooter className="px-6 pb-6 pt-2">
-                        <Button
-                          className="w-full"
-                          disabled={!selectedItem || isPending}
-                          onClick={handleSubmitTrade}
-                        >
-                          {isPending ? (
-                            <LoadingIndicator />
-                          ) : (
-                            "Đề xuất giao dịch"
-                          )}
-                        </Button>
-                      </DialogFooter>
+                      {isFetchingInventories && <LoadingIndicator />}
                     </div>
-                  )}
-                </DialogContent>
-              </Dialog>
-            </CardFooter>
-          </Card>
-        </div>
+                    {page < totalPages && (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setPage((prev) => prev + 1)}
+                        disabled={isFetchingInventories}
+                      >
+                        Tải thêm
+                      </Button>
+                    )}
+                    <div className="space-y-2">
+                      <Label className="text-gray-700">Nội dung đề xuất</Label>
+                      <Textarea
+                        placeholder="Nhập nội dung đề xuất của bạn..."
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        className="w-full bg-red-600 hover:bg-red-700"
+                        disabled={
+                          !selectedItem || isPending || isFetchingInventories
+                        }
+                        onClick={handleSubmitTrade}
+                      >
+                        {isPending ? <LoadingIndicator /> : "Gửi đề xuất"}
+                      </Button>
+                    </DialogFooter>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );

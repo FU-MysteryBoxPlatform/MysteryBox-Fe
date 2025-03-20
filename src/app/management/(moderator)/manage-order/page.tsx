@@ -50,7 +50,7 @@ export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = queryString.parse(searchParams.toString());
-  const page = params["page"] || 1;
+  const page = params["page"] || "1";
   const status = params["status"] || "1";
   const type = params["type"] || "0";
   const email = params["email"];
@@ -58,7 +58,7 @@ export default function Page() {
   const endDate = params["endDate"];
   const ref = useRef<NodeJS.Timeout>(null);
 
-  const [orders, setOrders] = useState<TOrder[]>();
+  const [orders, setOrders] = useState<TOrder[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [orderId, setOrderId] = useState("");
   const [orderDetail, setOrderDetail] = useState<TOrderDetail[]>();
@@ -67,25 +67,22 @@ export default function Page() {
   const { data, refetch } = useGetAdminOrderDetail(orderId);
 
   const handleFilterByEmail = (value: string) => {
-    if (ref.current) {
-      clearTimeout(ref.current);
-    }
+    if (ref.current) clearTimeout(ref.current);
     ref.current = setTimeout(() => {
-      params["email"] = value;
+      params["email"] = value || null;
       params["page"] = "1";
       router.push(`?${queryString.stringify(params)}`);
     }, 1000);
   };
 
-  const handleFilterByStartDate = (date?: Date) => {
-    if (!date) params["startDate"] = null;
-    else params["startDate"] = dayjs(date).toISOString();
+  const handleFilterByStartDate = (date: Date | [Date, Date] | null) => {
+    params["startDate"] = date && !Array.isArray(date) ? dayjs(date).toISOString() : null;
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
-  const handleFilterByEndDate = (date?: Date) => {
-    if (!date) params["endDate"] = null;
-    else params["endDate"] = dayjs(date).toISOString();
+
+  const handleFilterByEndDate = (date: Date | [Date, Date] | null) => {
+    params["endDate"] = date && !Array.isArray(date) ? dayjs(date).toISOString() : null;
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
@@ -95,17 +92,17 @@ export default function Page() {
       {
         orderType: +type,
         email: email as string,
-        startTime: startDate ? (startDate as string) : undefined,
-        endTime: endDate ? (endDate as string) : undefined,
+        startTime: startDate as string,
+        endTime: endDate as string,
         orderStatus: +status,
-        pageNumber: +(page as string),
+        pageNumber: +page,
         pageSize: 10,
       },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setOrders(data.result.items);
-            setTotalPages(data.result.totalPages);
+            setOrders(data.result.items || []);
+            setTotalPages(data.result.totalPages || 0);
           }
         },
       }
@@ -113,7 +110,7 @@ export default function Page() {
   }, [email, endDate, mutateGetOrders, page, startDate, status, type]);
 
   useEffect(() => {
-    refetch();
+    if (orderId) refetch();
   }, [refetch, orderId]);
 
   useEffect(() => {
@@ -121,172 +118,184 @@ export default function Page() {
   }, [data]);
 
   return (
-    <div className="p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 justify-between">
-            Quản lý tài khoản
-          </CardTitle>
-          <CardDescription>
-            Quản lý tất cả các tài khoản trên hệ thống
-          </CardDescription>
-        </CardHeader>
-        <div className="p-6">
-          {/* Tabs */}
-          <div className="p-2 flex items-center gap-2 [&>*]:flex-1 bg-gray-100 rounded-md mb-4">
-            {TABS.map((tab, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  tab.value === status && "bg-[#E12E43] text-white",
-                  "text-center rounded-lg cursor-pointer"
-                )}
-                onClick={() => {
-                  params["status"] = tab.value;
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Card className="shadow-lg border border-gray-200 rounded-xl">
+          <CardHeader className="bg-white border-b border-gray-200">
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              Quản Lý Đơn Hàng
+            </CardTitle>
+            <CardDescription className="text-gray-600 mt-1">
+              Xem và quản lý tất cả các đơn hàng trên hệ thống
+            </CardDescription>
+          </CardHeader>
+          <div className="p-6">
+            {/* Tabs */}
+            <div className="flex items-center gap-2 mb-6 bg-gray-100 p-2 rounded-lg">
+              {TABS.map((tab, idx) => (
+                <button
+                  key={idx}
+                  className={cn(
+                    "flex-1 py-2 text-center rounded-md text-sm font-medium transition-colors",
+                    tab.value === status
+                      ? "bg-red-600 text-white"
+                      : "text-gray-700 hover:bg-gray-200"
+                  )}
+                  onClick={() => {
+                    params["status"] = tab.value;
+                    params["page"] = "1";
+                    router.push(`?${queryString.stringify(params)}`);
+                  }}
+                >
+                  {tab.title}
+                </button>
+              ))}
+            </div>
+
+            {/* Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Input
+                placeholder="Tìm kiếm bằng email"
+                defaultValue={email as string}
+                onChange={(e) => handleFilterByEmail(e.target.value)}
+                className="bg-white border-gray-300"
+              />
+              <div>
+                <DatePicker
+                  className="w-full h-10"
+                  value={startDate ? new Date(startDate as string) : null}
+                  onChange={(value) => handleFilterByStartDate(value as Date | [Date, Date] | null)}
+                  clearIcon={null}
+                  calendarIcon={null}
+                />
+              </div>
+              <div>
+                <DatePicker
+                  className="w-full h-10"
+                  value={endDate ? new Date(endDate as string) : null}
+                  onChange={(value) => handleFilterByEndDate(value as Date | [Date, Date] | null)}
+                  clearIcon={null}
+                  calendarIcon={null}
+                />
+              </div>
+              <Select
+                value={type as string}
+                onValueChange={(value: string) => {
+                  params["type"] = value;
+                  params["page"] = "1";
                   router.push(`?${queryString.stringify(params)}`);
                 }}
               >
-                {tab.title}
-              </div>
-            ))}
-          </div>
-          <div className="flex gap-4 [&>*]:flex-1">
-            <Input
-              placeholder="Tìm kiếm bằng email"
-              defaultValue={email as string}
-              onChange={(e) => handleFilterByEmail(e.target.value)}
-            />
-
-            <DatePicker
-              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-              value={startDate ? new Date(startDate as string) : null}
-              onChange={(value) => {
-                handleFilterByStartDate(value as Date);
-              }}
-            />
-            <DatePicker
-              className="w-full h-9 [&>div]:border-gray-200 [&>div]:rounded-lg"
-              value={endDate ? new Date(endDate as string) : null}
-              onChange={(value) => handleFilterByEndDate(value as Date)}
-            />
-
-            <Select
-              value={type as string}
-              onValueChange={(value: string) => {
-                params["type"] = value;
-                params["page"] = "1";
-                router.push(`?${queryString.stringify(params)}`);
-              }}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Filter by order type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="2">Tất cả</SelectItem>
-                <SelectItem value="0">Mua vật phẩm</SelectItem>
-                <SelectItem value="1">Mua túi mù</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <CardContent>
-          {isPending ? (
-            <div className="w-full flex items-center justify-center">
-              <LoadingIndicator />
+                <SelectTrigger className="bg-white border-gray-300">
+                  <SelectValue placeholder="Chọn loại đơn hàng" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">Tất cả</SelectItem>
+                  <SelectItem value="0">Mua vật phẩm</SelectItem>
+                  <SelectItem value="1">Mua túi mù</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          ) : (
-            <>
-              <Table className="mb-4">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tên</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Ngày mua</TableHead>
-                    <TableHead>Thao tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {!!orders?.length &&
-                    orders?.length > 0 &&
-                    orders?.map((ord) => {
+          </div>
+
+          <CardContent className="p-6 pt-0">
+            {isPending ? (
+              <div className="flex justify-center py-12">
+                <LoadingIndicator />
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="text-center py-12 text-gray-600">
+                Không có đơn hàng nào phù hợp với bộ lọc.
+              </div>
+            ) : (
+              <>
+                <Table className="bg-white rounded-lg shadow-md border border-gray-200">
+                  <TableHeader className="bg-gray-50">
+                    <TableRow>
+                      <TableHead className="font-semibold text-gray-900">
+                        Tên
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900">
+                        Email
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900">
+                        Ngày Mua
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-900">
+                        Thao Tác
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {orders.map((ord) => {
                       const order = ord.order;
                       return (
-                        <TableRow key={order.orderId}>
-                          <TableCell>
-                            {order.account.firstName +
-                              " " +
-                              order.account.lastName}
+                        <TableRow
+                          key={order.orderId}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <TableCell className="font-medium text-gray-900">
+                            {order.account.firstName} {order.account.lastName}
                           </TableCell>
-                          <TableCell>{order.account.email}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-gray-700">
+                            {order.account.email}
+                          </TableCell>
+                          <TableCell className="text-gray-700">
                             {dayjs(order.orderDate).format("DD/MM/YYYY")}
                           </TableCell>
-
                           <TableCell>
-                            <div className="flex items-center gap-2">
-                              <Dialog>
-                                <DialogTrigger>
-                                  <Eye
-                                    className="h-4 w-4 cursor-pointer"
-                                    onClick={() => {
-                                      setOrderId(order.orderId);
-                                    }}
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <button
+                                  className="text-red-600 hover:text-red-700 transition-colors"
+                                  onClick={() => setOrderId(order.orderId)}
+                                >
+                                  <Eye className="h-5 w-5" />
+                                </button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl rounded-xl">
+                                <DialogHeader>
+                                  <DialogTitle className="text-xl text-gray-900">
+                                    Chi Tiết Đơn Hàng
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className="max-h-[60vh] overflow-auto">
+                                  <TableCollection
+                                    orderDetail={orderDetail?.filter(
+                                      (order) => order.collection
+                                    )}
                                   />
-                                </DialogTrigger>
-                                <DialogContent className="max-w-[80vw]">
-                                  <DialogHeader>
-                                    <DialogTitle>Chi tiết đặt hàng</DialogTitle>
-                                  </DialogHeader>
-                                  <div className="max-h-[50vh] overflow-auto">
-                                    <TableCollection
-                                      orderDetail={orderDetail?.filter(
-                                        (order) => order.collection
-                                      )}
-                                    />
-                                  </div>
-                                </DialogContent>
-                              </Dialog>
-                            </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
                           </TableCell>
                         </TableRow>
                       );
                     })}
-                </TableBody>
-              </Table>
-              {orders?.length && orders.length > 0 ? (
-                <Paginator
-                  currentPage={+(page as string)}
-                  totalPages={totalPages}
-                  onPageChange={(pageNumber) => {
-                    params["page"] = pageNumber.toString();
-                    router.push(`?${queryString.stringify(params)}`);
-                  }}
-                  showPreviousNext
-                />
-              ) : (
-                <div className="w-full text-center mt-10">
-                  Không có đơn hàng nào
+                  </TableBody>
+                </Table>
+                <div className="mt-6 flex justify-center">
+                  <Paginator
+                    currentPage={+page}
+                    totalPages={totalPages}
+                    onPageChange={(pageNumber) => {
+                      params["page"] = pageNumber.toString();
+                      router.push(`?${queryString.stringify(params)}`);
+                    }}
+                    showPreviousNext
+                  />
                 </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
 
 const TABS = [
-  {
-    title: "Hoàn thành",
-    value: "1",
-  },
-  {
-    title: "Chờ duyệt",
-    value: "0",
-  },
-  {
-    title: "Đã huỷ",
-    value: "2",
-  },
+  { title: "Hoàn Thành", value: "1" },
+  { title: "Chờ Duyệt", value: "0" },
+  { title: "Đã Hủy", value: "2" },
 ];

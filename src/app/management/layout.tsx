@@ -12,6 +12,7 @@ import cookie from "@/utils/cookie";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { AdminSidebar } from "../components/AdminSidebar";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -45,20 +46,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <AdminSidebar />
       <div className="w-full">
-        <div className="py-6 px-10 border-b border-gray-200 flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <UserIcon className="w-7 h-7" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="p-4 grid gap-2">
-              <button
-                className="px-2 py-1 hover:bg-gray-100 rounded-md text-red-500"
-                onClick={handleLogout}
-              >
-                Đăng xuất
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="bg-white shadow-sm border-b border-gray-200">
+          <div className="py-4 px-6 flex items-center justify-between">
+            <div className="text-lg font-semibold text-gray-800">
+              {user?.mainRole === "ADMIN"
+                ? "Admin Panel"
+                : "Moderator Dashboard"}
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-2 focus:outline-none">
+                <UserIcon className="w-7 h-7 text-gray-600 hover:text-indigo-600 transition-colors" />
+                <span className="text-sm font-medium text-gray-700">
+                  {user?.firstName || "User"}
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48 p-2 mt-2 bg-white rounded-lg shadow-lg border border-gray-100">
+                <DropdownMenuItem
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md cursor-pointer transition-colors"
+                  onClick={handleLogout}
+                >
+                  <span>Đăng xuất</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         {children}
       </div>

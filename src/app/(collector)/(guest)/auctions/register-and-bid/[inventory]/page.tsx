@@ -1,5 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import dayjs from "dayjs";
+import { CalendarIcon } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -10,172 +18,223 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useRequestAuction } from "@/hooks/api/useAuction";
 import { Inventory, useGetInventoryById } from "@/hooks/api/useInventory";
+import { useRequestAuction } from "@/hooks/api/useAuction";
 import { toast } from "@/hooks/use-toast";
-import { zodResolver } from "@hookform/resolvers/zod";
-import dayjs from "dayjs";
-import { CalendarIcon } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { cn } from "@/lib/utils";
 
 const RegisterSchema = z.object({
-  price: z.string().min(1, "Vui lòng nhập giá bắt đầu"),
+  price: z
+    .string()
+    .min(1, "Vui lòng nhập giá bắt đầu")
+    .regex(/^\d+$/, "Giá phải là một số hợp lệ"),
 });
 
 type RegisterForm = z.infer<typeof RegisterSchema>;
 
-export default function Page() {
-  const { inventory } = useParams();
-  const [inventoryDetail, setInventoryDetail] = useState<Inventory>();
-  const [startDate, setStartDate] = useState<Date | undefined>(new Date());
-  const [endDate, setEndDate] = useState<Date | undefined>(new Date());
+interface RarityInfo {
+  rarity: string;
+  classes: string;
+}
 
-  const { data } = useGetInventoryById(inventory as string);
-  const { mutate: mutateRequestAuction } = useRequestAuction();
-
-  const { handleSubmit, register, formState } = useForm<RegisterForm>({
-    resolver: zodResolver(RegisterSchema),
-  });
-
-  const getRarityColor = (id: string) => {
-    const rarityMap = {
-      Common: "bg-gray-200 text-gray-800",
-      Uncommon: "bg-green-100 text-green-800",
-      Rare: "bg-blue-100 text-blue-800",
-      Epic: "bg-purple-100 text-purple-80 0",
-      Legendary: "bg-orange-100 text-orange-800",
-    };
-
-    // Assign rarity based on item id for demo purposes
-    const itemId = parseInt(id.replace("inv", "")) || parseInt(id);
-    const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
-    const rarity: keyof typeof rarityMap = rarities[
-      itemId % 5
-    ] as keyof typeof rarityMap;
-
-    return {
-      rarity,
-      classes: rarityMap[rarity],
-    };
+const getRarityColor = (id: string): RarityInfo => {
+  const rarityMap = {
+    Common: "bg-gray-200 text-gray-800",
+    Uncommon: "bg-green-100 text-green-800",
+    Rare: "bg-blue-100 text-blue-800",
+    Epic: "bg-purple-100 text-purple-800",
+    Legendary: "bg-orange-100 text-orange-800",
   };
 
-  const onSubmit = (data: RegisterForm) => {
-    mutateRequestAuction(
+  const itemId = parseInt(id.replace("inv", "")) || parseInt(id);
+  const rarities = Object.keys(rarityMap);
+  const rarity = rarities[itemId % rarities.length] as keyof typeof rarityMap;
+
+  return {
+    rarity,
+    classes: rarityMap[rarity],
+  };
+};
+
+export default function AuctionRegisterPage() {
+  const { inventory } = useParams<{ inventory: string }>();
+  const [inventoryDetail, setInventoryDetail] = useState<Inventory | null>(
+    null
+  );
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(new Date());
+
+  const { data, isLoading } = useGetInventoryById(inventory);
+  const { mutate: requestAuction, isPending } = useRequestAuction();
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(RegisterSchema),
+    defaultValues: { price: "" },
+  });
+
+  useEffect(() => {
+    if (data?.result?.items?.[0]) {
+      setInventoryDetail(data.result.items[0]);
+    }
+  }, [data]);
+
+  const onSubmit = (formData: RegisterForm) => {
+    if (dayjs(endDate).isBefore(startDate)) {
+      toast({
+        title: "Lỗi",
+        description: "Ngày kết thúc phải sau ngày bắt đầu",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    requestAuction(
       {
-        inventoryId: inventory as string,
+        inventoryId: inventory,
         startTime: dayjs(startDate).toISOString(),
         endTime: dayjs(endDate).toISOString(),
-        minimunBid: +data.price,
+        minimunBid: parseInt(formData.price),
       },
       {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            toast({
-              title: "Đăng ký đấu giá thành công!",
-            });
-          } else {
-            toast({
-              title: data.messages[0],
-            });
-          }
+        onSuccess: (response) => {
+          toast({
+            title: response.isSuccess
+              ? "Đăng ký đấu giá thành công!"
+              : response.messages[0],
+            variant: response.isSuccess ? "default" : "destructive",
+          });
+        },
+        onError: () => {
+          toast({
+            title: "Đã xảy ra lỗi",
+            description: "Vui lòng thử lại sau",
+            variant: "destructive",
+          });
         },
       }
     );
   };
 
-  useEffect(() => {
-    setInventoryDetail(data?.result.items[0]);
-  }, [data?.result]);
+  if (isLoading || !inventoryDetail) {
+    return (
+      <div className="container mx-auto py-10 text-center">
+        <p className="text-gray-500">Đang tải...</p>
+      </div>
+    );
+  }
 
-  console.log({ inventoryDetail });
+  const { rarity, classes } = getRarityColor(inventory);
 
   return (
-    <div className="flex gap-6 lg:gap-10">
-      <img
-        src={inventoryDetail?.product.imagePath}
-        alt={inventoryDetail?.product.name}
-        className="object-cover w-[200px] h-[200px]"
-      />
-      <div>
-        <div className="flex items-center gap-2">
-          <p className="text-2xl font-bold">{inventoryDetail?.product.name}</p>
-          <Badge
-            className={`ml-2 text-xs ${
-              getRarityColor(inventory as string).classes
-            }`}
-          >
-            {getRarityColor(inventory as string).rarity}
-          </Badge>
+    <div className="container mx-auto py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        {/* Product Image */}
+        <div className="relative">
+          <img
+            src={inventoryDetail?.product?.imagePath || "/placeholder.png"}
+            alt={inventoryDetail?.product?.name}
+            className="w-full max-w-[300px] h-[300px] object-cover rounded-lg shadow-md"
+            loading="lazy"
+          />
         </div>
-        <p className="text-gray-400">{inventoryDetail?.product.description}</p>
-        <p className="font-bold text-sm">
-          {inventoryDetail?.product.price.toLocaleString()} VND
-        </p>
 
-        <div className="mt-6 grid gap-4">
-          <form id="register-form">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="price" className="font-bold">
+        {/* Product Details and Form */}
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                {inventoryDetail?.product?.name}
+              </h1>
+              <Badge className={cn("text-sm", classes)}>{rarity}</Badge>
+            </div>
+            <p className="text-gray-600 mt-2">
+              {inventoryDetail?.product?.description}
+            </p>
+            <p className="text-lg font-semibold text-gray-800 mt-1">
+              {inventoryDetail?.product?.price.toLocaleString()} VND
+            </p>
+          </div>
+
+          <form
+            id="register-form"
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-6"
+          >
+            {/* Starting Price */}
+            <div className="space-y-2">
+              <Label htmlFor="price" className="font-semibold text-gray-700">
                 Giá bắt đầu
               </Label>
               <Input
                 id="price"
-                placeholder="Nhập giá bắt đầu"
+                placeholder="Nhập giá bắt đầu (VND)"
                 {...register("price")}
+                className={cn(
+                  "w-full",
+                  errors.price && "border-red-500 focus:ring-red-500"
+                )}
               />
-              {formState.errors.price && (
-                <p className="text-red-500 text-sm">
-                  {formState.errors.price.message}
-                </p>
+              {errors.price && (
+                <p className="text-sm text-red-500">{errors.price.message}</p>
               )}
             </div>
+
+            {/* Date Pickers */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="font-semibold text-gray-700">
+                  Ngày bắt đầu
+                </Label>
+                <Popover>
+                  <PopoverTrigger className="w-full flex items-center justify-between p-2 border rounded-md bg-white text-sm text-gray-700 hover:border-gray-400">
+                    {dayjs(startDate).format("DD/MM/YYYY")}
+                    <CalendarIcon className="h-4 w-4 text-gray-500" />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={(date) => date && setStartDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label className="font-semibold text-gray-700">
+                  Ngày kết thúc
+                </Label>
+                <Popover>
+                  <PopoverTrigger className="w-full flex items-center justify-between p-2 border rounded-md bg-white text-sm text-gray-700 hover:border-gray-400">
+                    {dayjs(endDate).format("DD/MM/YYYY")}
+                    <CalendarIcon className="h-4 w-4 text-gray-500" />
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={(date) => date && setEndDate(date)}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <Button
+              form="register-form"
+              type="submit"
+              className="w-full bg-[#E12E43] hover:bg-[#c6283a] text-white"
+              disabled={isPending}
+            >
+              {isPending ? "Đang xử lý..." : "Đăng ký"}
+            </Button>
           </form>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label>Ngày bắt đầu</Label>
-              <Popover>
-                <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-                  <p>{dayjs(startDate).format("DD/MM/YYYY")}</p>
-                  <CalendarIcon />
-                </PopoverTrigger>
-                <PopoverContent>
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    className="rounded-md border w-fit"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label>Ngày kết thúc</Label>
-              <Popover>
-                <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-                  <p>{dayjs(endDate).format("DD/MM/YYYY")}</p>
-                  <CalendarIcon />
-                </PopoverTrigger>
-                <PopoverContent>
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={setEndDate}
-                    className="rounded-md border w-fit"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-          <Button
-            form="register-form"
-            className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
-            onClick={handleSubmit(onSubmit)}
-          >
-            Đăng ký
-          </Button>
         </div>
       </div>
     </div>

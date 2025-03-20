@@ -29,12 +29,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 
 const CreateCollectionSchema = z.object({
-  collectionName: z.string(),
-  description: z.string(),
-  rewards: z.string(),
-  blindBoxPrice: z.string(),
-  discountBlindBoxPrice: z.string(),
-  totalItem: z.string(),
+  collectionName: z.string().min(1, "Vui lòng nhập tên bộ sưu tập"),
+  description: z.string().min(1, "Vui lòng nhập mô tả"),
+  rewards: z.string().min(1, "Vui lòng nhập phần thưởng"),
+  blindBoxPrice: z.string().min(1, "Vui lòng nhập giá túi mù"),
+  discountBlindBoxPrice: z.string().optional(),
+  totalItem: z.string().min(1, "Vui lòng nhập tổng số túi mù"),
 });
 
 type CreateCollectionForm = z.infer<typeof CreateCollectionSchema>;
@@ -53,14 +53,17 @@ export default function FormCreateCollection() {
 
   const { handleSubmit, register, formState } = useForm<CreateCollectionForm>({
     resolver: zodResolver(CreateCollectionSchema),
+    defaultValues: {
+      discountBlindBoxPrice: "",
+    },
   });
 
   const handleRemoveProduct = (index: number) => {
-    setProducts((prevProducts) => prevProducts.filter((_, i) => i !== index));
+    setProducts((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleRemoveImage = (index: number) => () => {
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = (data: CreateCollectionForm) => {
@@ -68,24 +71,22 @@ export default function FormCreateCollection() {
       {
         ...data,
         blindBoxPrice: +data.blindBoxPrice,
-        discountBlindBoxPrice: +data.discountBlindBoxPrice,
+        discountBlindBoxPrice: data.discountBlindBoxPrice
+          ? +data.discountBlindBoxPrice
+          : 0,
         totalItem: +data.totalItem,
         productDtos: products,
-        startTime: dayjs(startDate)?.toISOString(),
-        endTime: dayjs(endDate)?.toISOString(),
+        startTime: dayjs(startDate).toISOString(),
+        endTime: dayjs(endDate).toISOString(),
         listImage: images,
       },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            toast({
-              title: "Tạo bộ sưu tập thành công!",
-            });
-            router.push(`/management/manage-collection`);
+            toast({ title: "Tạo bộ sưu tập thành công!" });
+            router.push("/management/manage-collection");
           } else {
-            toast({
-              title: data.messages[0],
-            });
+            toast({ title: data.messages[0], variant: "destructive" });
           }
         },
       }
@@ -93,237 +94,317 @@ export default function FormCreateCollection() {
   };
 
   return (
-    <>
-      <div className="flex mb-6 items-center justify-between">
-        <p className="text-lg font-bold">Tạo bộ sưu tập mới</p>
-        <Button
-          form="sell-inventory-form"
-          type="button"
-          className="bg-[#E12E43] hover:bg-[#B71C32]"
-          disabled={isPending}
-          onClick={handleSubmit(onSubmit)}
-        >
-          {false ? <LoadingIndicator /> : "Lưu bộ sưu tập"}
-        </Button>
-      </div>
-      <form className="grid grid-cols-2 gap-4" id="sell-inventory-form">
-        <div className="flex flex-col space-y-1.5 col-span-2">
-          <Label htmlFor="collectionName">Tên bộ sưu tập mới</Label>
-          <Input
-            id="collectionName"
-            placeholder="Nhập tên bộ sưu tập"
-            {...register("collectionName")}
-          />
-          {formState.errors.collectionName && (
-            <p className="text-red-500 text-sm">
-              {formState.errors.collectionName.message}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="description">Mô tả</Label>
-          <Textarea
-            id="description"
-            placeholder="Nhập mô tả"
-            {...register("description")}
-          />
-          {formState.errors.description && (
-            <p className="text-red-500 text-sm">
-              {formState.errors.description.message}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="rewards">Phần thưởng</Label>
-          <Textarea
-            id="rewards"
-            placeholder="Nhập phần thưởng"
-            {...register("rewards")}
-          />
-          {formState.errors.rewards && (
-            <p className="text-red-500 text-sm">
-              {formState.errors.rewards.message}
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label>Ngày bắt đầu</Label>
-          <Popover>
-            <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-              <p>{dayjs(startDate).format("DD/MM/YYYY")}</p>
-              <CalendarIcon />
-            </PopoverTrigger>
-            <PopoverContent>
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={setStartDate}
-                className="rounded-md border w-fit"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label>Ngày kết thúc</Label>
-          <Popover>
-            <PopoverTrigger className="px-2 py-1 text-sm rounded-md border border-gray-300 flex justify-between items-center">
-              <p>{dayjs(endDate).format("DD/MM/YYYY")}</p>
-              <CalendarIcon />
-            </PopoverTrigger>
-            <PopoverContent>
-              <Calendar
-                mode="single"
-                selected={endDate}
-                onSelect={setEndDate}
-                className="rounded-md border w-fit"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="col-span-2 grid grid-cols-3 gap-4">
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="totalItem">Tổng số túi mù</Label>
-            <Input
-              id="totalItem"
-              type="number"
-              placeholder="Nhập tổng số túi mù"
-              {...register("totalItem")}
-            />
-            {formState.errors.totalItem && (
-              <p className="text-red-500 text-sm">
-                {formState.errors.totalItem.message}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="blindBoxPrice">Giá túi mù</Label>
-            <Input
-              id="blindBoxPrice"
-              type="number"
-              placeholder="Nhập giá túi mù"
-              {...register("blindBoxPrice")}
-            />
-            {formState.errors.blindBoxPrice && (
-              <p className="text-red-500 text-sm">
-                {formState.errors.blindBoxPrice.message}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="discountBlindBoxPrice">Giảm giá túi mù</Label>
-            <Input
-              id="discountBlindBoxPrice"
-              type="number"
-              placeholder="Nhập giảm giá túi mù"
-              {...register("discountBlindBoxPrice")}
-            />
-            {formState.errors.discountBlindBoxPrice && (
-              <p className="text-red-500 text-sm">
-                {formState.errors.discountBlindBoxPrice.message}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="flex space-y-1.5 flex-col gap-4 col-span-2">
-          <Label>Danh sách hình ảnh</Label>
-          <div className="flex flex-wrap gap-4">
-            {images.map((image, idx) => (
-              <div key={idx} className="w-fit relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={image} alt="" className="w-24 h-24" />
-                <div
-                  className="absolute w-6 h-6 flex items-center justify-center rounded-full -top-3 -right-3 bg-[#E12E43] text-white cursor-pointer"
-                  onClick={handleRemoveImage(idx)}
-                >
-                  <X className="h-4 w-4" />
-                </div>
-              </div>
-            ))}
-            <ImageUploader
-              onChange={(url) =>
-                setImages((prevImages) => [...prevImages, url])
-              }
-              showPreview={false}
-              className="w-24 h-24"
-            />
-          </div>
-        </div>
-        <div className="flex space-y-1.5 items-center gap-4">
-          <Label>Danh sách vật phẩm</Label>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Tạo Bộ Sưu Tập Mới
+          </h1>
           <Button
-            type="button"
-            className="bg-[#E12E43] hover:bg-[#B71C32] w-6 h-6 rounded-full !mt-0"
-            onClick={() => setOpenCreateProductModal(true)}
+            type="submit"
+            form="create-collection-form"
+            className="bg-red-600 hover:bg-red-700 text-white"
+            disabled={isPending}
           >
-            <Plus />
+            {isPending ? <LoadingIndicator /> : "Lưu Bộ Sưu Tập"}
           </Button>
         </div>
-        <div className="col-span-2 flex gap-4 flex-wrap">
-          {products.map((product, index) => (
-            <div
-              key={product.name}
-              className="flex space-y-1.5 relative cursor-pointer"
-              onClick={() => {
-                setOpenCreateProductModal(true);
-                setDefaultProduct(product);
-                setEditIndex(index);
-              }}
-            >
-              <div className="flex flex-col justify-start items-center gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={product.imagePath}
-                  alt="Product image"
-                  className="w-20 h-20 border border-gray-200 object-cover"
-                />
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium">{product.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {product.price}
-                  </p>
-                </div>
-              </div>
-              <div
-                className="absolute w-6 h-6 flex items-center justify-center rounded-full -top-3 -right-3 bg-[#E12E43] text-white cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemoveProduct(index);
-                }}
+
+        <form
+          id="create-collection-form"
+          onSubmit={handleSubmit(onSubmit)}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        >
+          {/* Thông tin chung */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label
+                htmlFor="collectionName"
+                className="text-sm font-medium text-gray-700"
               >
-                <X className="h-4 w-4" />
+                Tên Bộ Sưu Tập
+              </Label>
+              <Input
+                id="collectionName"
+                placeholder="Nhập tên bộ sưu tập"
+                className="bg-white border-gray-300"
+                {...register("collectionName")}
+              />
+              {formState.errors.collectionName && (
+                <p className="text-red-500 text-sm">
+                  {formState.errors.collectionName.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="description"
+                className="text-sm font-medium text-gray-700"
+              >
+                Mô Tả
+              </Label>
+              <Textarea
+                id="description"
+                placeholder="Nhập mô tả"
+                className="bg-white border-gray-300 min-h-[100px]"
+                {...register("description")}
+              />
+              {formState.errors.description && (
+                <p className="text-red-500 text-sm">
+                  {formState.errors.description.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="rewards"
+                className="text-sm font-medium text-gray-700"
+              >
+                Phần Thưởng
+              </Label>
+              <Textarea
+                id="rewards"
+                placeholder="Nhập phần thưởng khi sưu tập đủ"
+                className="bg-white border-gray-300 min-h-[100px]"
+                {...register("rewards")}
+              />
+              {formState.errors.rewards && (
+                <p className="text-red-500 text-sm">
+                  {formState.errors.rewards.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Thông tin khác */}
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Ngày Bắt Đầu
+                </Label>
+                <Popover>
+                  <PopoverTrigger className="w-full h-10 bg-white border border-gray-300 rounded-md flex items-center justify-between px-3 text-gray-700 hover:border-gray-400 transition-colors">
+                    <span>{dayjs(startDate).format("DD/MM/YYYY")}</span>
+                    <CalendarIcon className="h-4 w-4 text-gray-500" />
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      className="rounded-md border shadow-md"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  Ngày Kết Thúc
+                </Label>
+                <Popover>
+                  <PopoverTrigger className="w-full h-10 bg-white border border-gray-300 rounded-md flex items-center justify-between px-3 text-gray-700 hover:border-gray-400 transition-colors">
+                    <span>{dayjs(endDate).format("DD/MM/YYYY")}</span>
+                    <CalendarIcon className="h-4 w-4 text-gray-500" />
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={setEndDate}
+                      className="rounded-md border shadow-md"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
-          ))}
-        </div>
-      </form>
 
-      <Dialog
-        open={openCreateProductModal}
-        onOpenChange={setOpenCreateProductModal}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tạo vật phẩm</DialogTitle>
-          </DialogHeader>
-          <FormCreateProduct
-            defaultProduct={defaultProduct}
-            onSaveProduct={(product) => {
-              setProducts((prevProducts) => {
-                const newProducts = [...prevProducts];
-                newProducts[editIndex || 0] = product;
-                return newProducts;
-              });
-              setOpenCreateProductModal(false);
-              setDefaultProduct(undefined);
-              setEditIndex(undefined);
-            }}
-            onCreateProduct={(product) => {
-              setProducts((prevProducts) => [...prevProducts, product]);
-              setOpenCreateProductModal(false);
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="totalItem"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Tổng Số Túi Mù
+                </Label>
+                <Input
+                  id="totalItem"
+                  type="number"
+                  placeholder="Nhập số lượng"
+                  className="bg-white border-gray-300"
+                  {...register("totalItem")}
+                />
+                {formState.errors.totalItem && (
+                  <p className="text-red-500 text-sm">
+                    {formState.errors.totalItem.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="blindBoxPrice"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Giá Túi Mù
+                </Label>
+                <Input
+                  id="blindBoxPrice"
+                  type="number"
+                  placeholder="Nhập giá"
+                  className="bg-white border-gray-300"
+                  {...register("blindBoxPrice")}
+                />
+                {formState.errors.blindBoxPrice && (
+                  <p className="text-red-500 text-sm">
+                    {formState.errors.blindBoxPrice.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="discountBlindBoxPrice"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Giảm Giá (Nếu Có)
+                </Label>
+                <Input
+                  id="discountBlindBoxPrice"
+                  type="number"
+                  placeholder="Nhập giá giảm"
+                  className="bg-white border-gray-300"
+                  {...register("discountBlindBoxPrice")}
+                />
+                {formState.errors.discountBlindBoxPrice && (
+                  <p className="text-red-500 text-sm">
+                    {formState.errors.discountBlindBoxPrice.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Hình ảnh */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Danh Sách Hình Ảnh
+              </Label>
+              <div className="flex flex-wrap gap-4">
+                {images.map((image, idx) => (
+                  <div key={idx} className="relative">
+                    <img
+                      src={image}
+                      alt={`Hình ảnh ${idx + 1}`}
+                      className="w-24 h-24 rounded-md object-cover border border-gray-200 shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors"
+                      onClick={handleRemoveImage(idx)}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <ImageUploader
+                  onChange={(url) => setImages((prev) => [...prev, url])}
+                  showPreview={false}
+                  className="w-24 h-24 rounded-md border border-dashed border-gray-300 bg-white flex items-center justify-center hover:border-red-600 transition-colors"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Vật phẩm */}
+          <div className="col-span-1 lg:col-span-2 space-y-2">
+            <div className="flex items-center gap-4">
+              <Label className="text-sm font-medium text-gray-700">
+                Danh Sách Vật Phẩm
+              </Label>
+              <Button
+                type="button"
+                className="bg-red-600 hover:bg-red-700 text-white w-8 h-8 rounded-full p-0"
+                onClick={() => setOpenCreateProductModal(true)}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-4">
+              {products.length === 0 ? (
+                <p className="text-gray-600">
+                  Chưa có vật phẩm nào. Nhấn nút "+" để thêm.
+                </p>
+              ) : (
+                products.map((product, index) => (
+                  <div
+                    key={product.name}
+                    className="relative group cursor-pointer"
+                    onClick={() => {
+                      setOpenCreateProductModal(true);
+                      setDefaultProduct(product);
+                      setEditIndex(index);
+                    }}
+                  >
+                    <div className="flex flex-col items-center gap-2 bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                      <img
+                        src={product.imagePath || "/placeholder.svg"}
+                        alt={product.name}
+                        className="w-20 h-20 rounded-md object-cover border border-gray-200"
+                      />
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-900">
+                          {product.name}
+                        </p>
+                        <p className="text-xs text-gray-500">{product.price}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 transition-colors opacity-0 group-hover:opacity-100"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveProduct(index);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </form>
+
+        <Dialog
+          open={openCreateProductModal}
+          onOpenChange={setOpenCreateProductModal}
+        >
+          <DialogContent className="max-w-lg rounded-xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-gray-900">
+                {defaultProduct ? "Chỉnh Sửa Vật Phẩm" : "Tạo Vật Phẩm"}
+              </DialogTitle>
+            </DialogHeader>
+            <FormCreateProduct
+              defaultProduct={defaultProduct}
+              onSaveProduct={(product) => {
+                setProducts((prev) => {
+                  const newProducts = [...prev];
+                  newProducts[editIndex || 0] = product;
+                  return newProducts;
+                });
+                setOpenCreateProductModal(false);
+                setDefaultProduct(undefined);
+                setEditIndex(undefined);
+              }}
+              onCreateProduct={(product) => {
+                setProducts((prev) => [...prev, product]);
+                setOpenCreateProductModal(false);
+              }}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
   );
 }

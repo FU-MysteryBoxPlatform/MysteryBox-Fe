@@ -20,68 +20,78 @@ export default function Page() {
   const { mutate: mutateGetInventory, isPending } = useGetInventory();
 
   useEffect(() => {
+    if (!user?.id) return;
     mutateGetInventory(
       {
-        accountId: user?.id || "",
+        accountId: user.id,
         pageNumber: +page,
         pageSize: 12,
       },
       {
         onSuccess: (data) => {
-          console.log(data);
-          setInventories(data.result.listProduct.items);
-          setTotalPages(data.result.listProduct.totalPages);
+          setInventories(data.result.listProduct.items || []);
+          setTotalPages(data.result.listProduct.totalPages || 0);
+        },
+        onError: () => {
+          console.error("Error fetching inventory");
         },
       }
     );
   }, [mutateGetInventory, page, user?.id]);
 
   return (
-    <div className="p-6 border border-gray-300 rounded-lg flex-1 max-md:w-full">
-      <p className="text-lg md:text-xl font-bold mb-4 md:mb-6">
-        Kho vật phẩm của tôi
-      </p>
+    <div className="w-full max-w-7xl mx-auto p-6 bg-white rounded-lg">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        Kho Vật Phẩm Của Tôi
+      </h1>
+
       {isPending ? (
-        <div className="w-full flex items-center justify-center mb-10">
+        <div className="flex justify-center py-12">
           <LoadingIndicator />
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-10">
-          {inventories.map((product) => (
-            <InventoryCard
-              key={product.product?.name}
-              id={
-                product.inventories[0].inventoryId ||
-                product.collection.collectionId
-              }
-              image={product.product?.imagePath || product.collection.imagePath}
-              title={
-                product.product
-                  ? product.product.name
-                  : `Túi mù ${product.collection.collectionName}`
-              }
-              price={product.product?.price}
-              stock={Number(product.inventories.length)}
-              status={product.inventories[0].itemStatus.id}
-              isPersonal
-              showPrice={false}
-              collectionId={product.collection?.collectionId}
-            />
-          ))}
+      ) : inventories.length === 0 ? (
+        <div className="text-center py-12 text-gray-600">
+          Bạn chưa sở hữu vật phẩm nào trong kho.
         </div>
-      )}
-      {inventories.length > 0 ? (
-        <Paginator
-          currentPage={+(page as string)}
-          totalPages={totalPages}
-          onPageChange={(pageNumber) => {
-            params["page"] = pageNumber.toString();
-            router.push(`?${queryString.stringify(params)}`);
-          }}
-          showPreviousNext
-        />
       ) : (
-        <div className="w-full text-center mt-10">Không có bộ sưu tập nào</div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {inventories.map((product) => (
+              <InventoryCard
+                key={product.product?.name || product.collection.collectionId}
+                id={
+                  product.inventories[0]?.inventoryId ||
+                  product.collection.collectionId
+                }
+                image={
+                  product.product?.imagePath || product.collection.imagePath
+                }
+                title={
+                  product.product
+                    ? product.product.name
+                    : `Túi mù ${product.collection.collectionName}`
+                }
+                price={product.product?.price}
+                stock={Number(product.inventories.length)}
+                status={product.inventories[0]?.itemStatus.id}
+                isPersonal
+                showPrice={false}
+                collectionId={product.collection?.collectionId}
+              />
+            ))}
+          </div>
+          <div className="mt-8 flex justify-center">
+            <Paginator
+              currentPage={+(page as string)}
+              totalPages={totalPages}
+              onPageChange={(pageNumber) => {
+                params["page"] = pageNumber.toString();
+                router.push(`?${queryString.stringify(params)}`);
+              }}
+              showPreviousNext
+            />
+          </div>
+        </>
       )}
     </div>
   );

@@ -2,13 +2,7 @@
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -71,9 +65,22 @@ export default function Page() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            toast({ title: "Up role thành công" });
+            toast({ title: "Up role thành công", variant: "default" });
             refetch();
-          } else toast({ title: data.messages[0] });
+          } else {
+            toast({
+              title: "Lỗi",
+              description: data.messages[0],
+              variant: "destructive",
+            });
+          }
+        },
+        onError: () => {
+          toast({
+            title: "Lỗi",
+            description: "Đã có lỗi xảy ra khi up role",
+            variant: "destructive",
+          });
         },
       }
     );
@@ -89,74 +96,98 @@ export default function Page() {
   }, [data]);
 
   return (
-    <div className="p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 justify-between">
-            Quản lý tài khoản
-          </CardTitle>
-          <CardDescription>
-            Quản lý tất cả các tài khoản trên hệ thống
-          </CardDescription>
-          <Input
-            placeholder="Tìm kiếm tài khoản"
-            defaultValue={keyword as string}
-            onChange={(e) => handleFilterByKeyword(e.target.value)}
-          />
+    <div className="p-6 max-w-7xl mx-auto">
+      <Card className="shadow-lg border-0">
+        <CardHeader className="border-b bg-gray-50">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-2xl font-semibold text-gray-800">
+                Quản lý tài khoản
+              </CardTitle>
+              <p className="text-sm text-gray-500 mt-1">
+                Quản lý tất cả các tài khoản trên hệ thống
+              </p>
+            </div>
+            <Input
+              placeholder="Tìm kiếm tài khoản..."
+              defaultValue={keyword as string}
+              onChange={(e) => handleFilterByKeyword(e.target.value)}
+              className="w-64 rounded-lg border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {isLoading ? (
-            <div className="w-full flex items-center justify-center">
+            <div className="flex items-center justify-center py-10">
               <LoadingIndicator />
+            </div>
+          ) : accounts.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">
+              Không tìm thấy tài khoản nào
             </div>
           ) : (
             <>
-              <Table className="mb-4">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tên</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>SĐT</TableHead>
-                    <TableHead>Vai trò</TableHead>
-                    <TableHead>Thao tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {accounts?.length > 0 &&
-                    accounts?.map((acc) => (
-                      <TableRow key={acc.id}>
-                        <TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-gray-100">
+                      <TableHead className="font-semibold text-gray-700">
+                        Tên
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-700">
+                        Email
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-700">
+                        SĐT
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-700">
+                        Vai trò
+                      </TableHead>
+                      <TableHead className="font-semibold text-gray-700">
+                        Thao tác
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {accounts.map((acc) => (
+                      <TableRow
+                        key={acc.id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <TableCell className="font-medium text-gray-900">
                           {acc.firstName + " " + acc.lastName}
                         </TableCell>
                         <TableCell>{acc.email}</TableCell>
-
-                        <TableCell>{acc.phoneNumber}</TableCell>
+                        <TableCell>{acc.phoneNumber || "N/A"}</TableCell>
                         <TableCell>
-                          <div
+                          <span
                             className={cn(
-                              "px-2 py-1 text-sm text-white w-fit rounded-lg",
+                              "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full",
                               acc.mainRole === "MODERATORS"
-                                ? "bg-orange-500"
+                                ? "bg-orange-100 text-orange-800"
                                 : acc.mainRole === "COLLECTOR"
-                                ? "bg-blue-500"
-                                : "bg-red-500"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-red-100 text-red-800"
                             )}
                           >
                             {acc.mainRole}
-                          </div>
+                          </span>
                         </TableCell>
-
                         <TableCell>
                           {acc.mainRole === "COLLECTOR" && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button className="bg-[#E12E43] hover:bg-[#B71C32]">
-                                  Up role
+                                <Button
+                                  className="bg-red-600 hover:bg-red-700 transition-colors"
+                                  disabled={isPending}
+                                >
+                                  {isPending ? "Đang xử lý..." : "Up role"}
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
+                              <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuItem
                                   onClick={handleUpRole(acc.id, "MODERATORS")}
+                                  className="flex items-center gap-2"
                                 >
                                   {isPending ? (
                                     <LoadingIndicator />
@@ -170,9 +201,10 @@ export default function Page() {
                         </TableCell>
                       </TableRow>
                     ))}
-                </TableBody>
-              </Table>
-              {accounts.length > 0 ? (
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="mt-6 flex justify-end">
                 <Paginator
                   currentPage={+(page as string)}
                   totalPages={totalPages}
@@ -182,11 +214,7 @@ export default function Page() {
                   }}
                   showPreviousNext
                 />
-              ) : (
-                <div className="w-full text-center mt-10">
-                  Không có tài khoản nào
-                </div>
-              )}
+              </div>
             </>
           )}
         </CardContent>

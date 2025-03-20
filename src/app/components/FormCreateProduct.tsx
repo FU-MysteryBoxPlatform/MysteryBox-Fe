@@ -1,3 +1,4 @@
+"use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -33,10 +34,10 @@ type TCreateProduct = {
 };
 
 const CreateProductSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  price: z.string(),
-  discount: z.string(),
+  name: z.string().min(1, "Vui lòng nhập tên vật phẩm"),
+  description: z.string().min(1, "Vui lòng nhập mô tả"),
+  price: z.string().min(1, "Vui lòng nhập giá"),
+  discount: z.string().optional(),
   rarityStatusId: z.string().optional(),
   productStatusId: z.string().optional(),
 });
@@ -49,6 +50,7 @@ export default function FormCreateProduct({
   onCreateProduct,
 }: TCreateProduct) {
   const [image, setImage] = useState(defaultProduct?.imagePath || "");
+
   const { handleSubmit, register, setValue, getValues, formState } =
     useForm<CreateProductForm>({
       resolver: zodResolver(CreateProductSchema),
@@ -57,40 +59,43 @@ export default function FormCreateProduct({
         description: defaultProduct?.description || "",
         price: defaultProduct?.price?.toString() || "",
         discount: defaultProduct?.discount?.toString() || "",
-        rarityStatusId: defaultProduct?.rarityStatusId.toString() || "0",
-        productStatusId: defaultProduct?.productStatusId.toString() || "0",
+        rarityStatusId: defaultProduct?.rarityStatusId?.toString() || "0",
+        productStatusId: defaultProduct?.productStatusId?.toString() || "0",
       },
     });
 
-  const onsubmit = (data: CreateProductForm) => {
-    if (!defaultProduct)
-      onCreateProduct({
-        ...data,
-        price: +data.price,
-        discount: +data.discount,
-        rarityStatusId: +(data.rarityStatusId || 0),
-        productStatusId: +(data.productStatusId || 0),
-        imagePath: image,
-      });
-    else
-      onSaveProduct({
-        ...data,
-        price: +data.price,
-        discount: +data.discount,
-        rarityStatusId: +(data.rarityStatusId || 0),
-        productStatusId: +(data.productStatusId || 0),
-        imagePath: image,
-      });
+  const onSubmit = (data: CreateProductForm) => {
+    const productData = {
+      ...data,
+      price: +data.price,
+      discount: data.discount ? +data.discount : 0,
+      rarityStatusId: +(data.rarityStatusId || 0),
+      productStatusId: +(data.productStatusId || 0),
+      imagePath: image,
+    };
+    if (defaultProduct) {
+      onSaveProduct(productData);
+    } else {
+      onCreateProduct(productData);
+    }
   };
 
   return (
-    <div>
-      <form className="grid gap-4 grid-cols-2" id="add-product-form">
-        <div className="flex flex-col space-y-1.5 col-span-2">
-          <Label htmlFor="name">Tên vật phẩm</Label>
+    <div className="space-y-6">
+      <form
+        id="add-product-form"
+        onSubmit={handleSubmit(onSubmit)}
+        className="grid gap-4 grid-cols-1 sm:grid-cols-2"
+      >
+        {/* Tên vật phẩm */}
+        <div className="space-y-2 col-span-1 sm:col-span-2">
+          <Label htmlFor="name" className="text-sm font-medium text-gray-700">
+            Tên Vật Phẩm
+          </Label>
           <Input
             id="name"
-            placeholder="Nhập tên bộ sưu tập"
+            placeholder="Nhập tên vật phẩm"
+            className="bg-white border-gray-300"
             {...register("name")}
           />
           {formState.errors.name && (
@@ -99,11 +104,19 @@ export default function FormCreateProduct({
             </p>
           )}
         </div>
-        <div className="flex flex-col space-y-1.5 col-span-2">
-          <Label htmlFor="description">Mô tả</Label>
+
+        {/* Mô tả */}
+        <div className="space-y-2 col-span-1 sm:col-span-2">
+          <Label
+            htmlFor="description"
+            className="text-sm font-medium text-gray-700"
+          >
+            Mô Tả
+          </Label>
           <Textarea
             id="description"
-            placeholder="Nhập mô tả"
+            placeholder="Nhập mô tả vật phẩm"
+            className="bg-white border-gray-300 min-h-[100px]"
             {...register("description")}
           />
           {formState.errors.description && (
@@ -113,12 +126,16 @@ export default function FormCreateProduct({
           )}
         </div>
 
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="price">Giá</Label>
+        {/* Giá và Giảm giá */}
+        <div className="space-y-2">
+          <Label htmlFor="price" className="text-sm font-medium text-gray-700">
+            Giá
+          </Label>
           <Input
             id="price"
             type="number"
             placeholder="Nhập giá"
+            className="bg-white border-gray-300"
             {...register("price")}
           />
           {formState.errors.price && (
@@ -127,12 +144,18 @@ export default function FormCreateProduct({
             </p>
           )}
         </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="discount">Giảm giá</Label>
+        <div className="space-y-2">
+          <Label
+            htmlFor="discount"
+            className="text-sm font-medium text-gray-700"
+          >
+            Giảm Giá (Nếu Có)
+          </Label>
           <Input
             id="discount"
             type="number"
-            placeholder="Nhập giảm giá"
+            placeholder="Nhập giá giảm"
+            className="bg-white border-gray-300"
             {...register("discount")}
           />
           {formState.errors.discount && (
@@ -141,15 +164,20 @@ export default function FormCreateProduct({
             </p>
           )}
         </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="name">Độ hiếm</Label>
+
+        {/* Độ hiếm */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="rarityStatusId"
+            className="text-sm font-medium text-gray-700"
+          >
+            Độ Hiếm
+          </Label>
           <Select
-            {...register("rarityStatusId")}
             value={getValues("rarityStatusId") || "0"}
-            defaultValue={getValues("rarityStatusId") || "0"}
             onValueChange={(value) => setValue("rarityStatusId", value)}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="bg-white border-gray-300">
               <SelectValue placeholder="Chọn độ hiếm" />
             </SelectTrigger>
             <SelectContent>
@@ -165,15 +193,20 @@ export default function FormCreateProduct({
             </p>
           )}
         </div>
-        <div className="flex flex-col space-y-1.5">
-          <Label htmlFor="name">Trạng thái vật phẩm</Label>
+
+        {/* Trạng thái */}
+        <div className="space-y-2">
+          <Label
+            htmlFor="productStatusId"
+            className="text-sm font-medium text-gray-700"
+          >
+            Trạng Thái
+          </Label>
           <Select
-            {...register("productStatusId")}
             value={getValues("productStatusId") || "0"}
-            defaultValue={getValues("productStatusId") || "0"}
             onValueChange={(value) => setValue("productStatusId", value)}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="bg-white border-gray-300">
               <SelectValue placeholder="Chọn trạng thái" />
             </SelectTrigger>
             <SelectContent>
@@ -185,26 +218,32 @@ export default function FormCreateProduct({
           </Select>
           {formState.errors.productStatusId && (
             <p className="text-red-500 text-sm">
-              {formState.errors.productStatusId?.message}
+              {formState.errors.productStatusId.message}
             </p>
           )}
         </div>
-        <div>
-          <Label htmlFor="name">Hình ảnh</Label>
+
+        {/* Hình ảnh */}
+        <div className="space-y-2 col-span-1 sm:col-span-2">
+          <Label className="text-sm font-medium text-gray-700">Hình Ảnh</Label>
           <ImageUploader
             onChange={(url) => setImage(url)}
             value={image}
-            className="w-24 h-24 rounded-[unset]"
+            className="w-32 h-32 rounded-md border border-dashed border-gray-300 bg-white flex items-center justify-center hover:border-red-600 transition-colors"
           />
+          {!image && (
+            <p className="text-red-500 text-sm">Vui lòng tải lên hình ảnh</p>
+          )}
         </div>
       </form>
+
       <Button
-        className="bg-[#E12E43] text-white hover:bg-[#B71C32] mt-6 w-full"
+        type="submit"
         form="add-product-form"
+        className="w-full bg-red-600 hover:bg-red-700 text-white mt-4"
         disabled={!image}
-        onClick={handleSubmit(onsubmit)}
       >
-        {!defaultProduct ? "Tạo vật phẩm" : "Lưu vật phẩm"}
+        {defaultProduct ? "Lưu Vật Phẩm" : "Tạo Vật Phẩm"}
       </Button>
     </div>
   );

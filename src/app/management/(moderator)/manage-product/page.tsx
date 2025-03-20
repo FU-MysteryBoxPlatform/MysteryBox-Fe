@@ -1,5 +1,4 @@
 "use client";
-
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import RequestSaleDetail from "@/app/components/RequestSaleDetail";
 import SaleStatusBadge from "@/app/components/SaleStatusBadge";
@@ -40,10 +39,9 @@ export default function Page() {
 
   const currTab = params["tab"] || "1";
   const keyword = params["keyword"];
-  const page = params["page"];
+  const page = params["page"] || "1";
   const minPrice = params["minPrice"];
   const maxPrice = params["maxPrice"];
-  //   const saleStatus = params["saleStatus"];
 
   const [saleData, setSaleData] = useState<Sale[]>([]);
   const [openDetailModal, setOpenDetailModal] = useState(false);
@@ -52,33 +50,27 @@ export default function Page() {
   const { mutate: mutateManageSale, isPending } = useManageSale();
 
   const handleFilterByKeyword = (value: string) => {
-    if (ref.current) {
-      clearTimeout(ref.current);
-    }
+    if (ref.current) clearTimeout(ref.current);
     ref.current = setTimeout(() => {
-      params["keyword"] = value;
+      params["keyword"] = value || null;
       params["page"] = "1";
       router.push(`?${queryString.stringify(params)}`);
     }, 1000);
   };
 
   const handleFilterByMinPrice = (value: string) => {
-    if (ref.current) {
-      clearTimeout(ref.current);
-    }
+    if (ref.current) clearTimeout(ref.current);
     ref.current = setTimeout(() => {
-      params["minPrice"] = value;
+      params["minPrice"] = value || null;
       params["page"] = "1";
       router.push(`?${queryString.stringify(params)}`);
     }, 1000);
   };
 
   const handleFilterByMaxPrice = (value: string) => {
-    if (ref.current) {
-      clearTimeout(ref.current);
-    }
+    if (ref.current) clearTimeout(ref.current);
     ref.current = setTimeout(() => {
-      params["maxPrice"] = value;
+      params["maxPrice"] = value || null;
       params["page"] = "1";
       router.push(`?${queryString.stringify(params)}`);
     }, 1000);
@@ -89,16 +81,16 @@ export default function Page() {
     mutateManageSale(
       {
         keyword: keyword as string,
-        pageNumber: +(page || 1),
+        pageNumber: +page,
         pageSize: 10,
-        saleStatus: +(currTab as string),
+        saleStatus: +currTab,
         minimumPrice: minPrice ? +minPrice : undefined,
         maximumPrice: maxPrice ? +maxPrice : undefined,
       },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setSaleData(data.result.items);
+            setSaleData(data.result.items || []);
           }
         },
       }
@@ -109,7 +101,7 @@ export default function Page() {
     mutateManageSale(
       {
         keyword: keyword as string,
-        pageNumber: +(page || 1),
+        pageNumber: +page,
         pageSize: 10,
         saleStatus: +currTab,
         minimumPrice: minPrice ? +minPrice : undefined,
@@ -118,7 +110,7 @@ export default function Page() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setSaleData(data.result.items);
+            setSaleData(data.result.items || []);
           }
         },
       }
@@ -126,168 +118,181 @@ export default function Page() {
   }, [currTab, keyword, maxPrice, minPrice, mutateManageSale, page]);
 
   return (
-    <div className="w-full p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 justify-between">
-            Sản phẩm rao bán
-          </CardTitle>
-          <CardDescription>
-            Quản lý tất cả các sản phẩm được người sưu tập rao bán
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* Tabs */}
-          <div className="p-2 flex items-center gap-2 [&>*]:flex-1 bg-gray-100 rounded-md mb-4">
-            {TABS.map((tab, idx) => (
-              <div
-                key={idx}
-                className={cn(
-                  tab.value === currTab && "bg-[#E12E43] text-white",
-                  "text-center rounded-lg cursor-pointer"
-                )}
-                onClick={() => {
-                  params["tab"] = tab.value;
-                  router.push(`?${queryString.stringify(params)}`);
-                }}
-              >
-                {tab.title}
-              </div>
-            ))}
-          </div>
-
-          <div className="mb-4 flex items-center gap-4">
-            <Input
-              placeholder="Tìm kiếm sản phẩm"
-              defaultValue={keyword as string}
-              onChange={(e) => handleFilterByKeyword(e.target.value)}
-            />
-            <Input
-              placeholder="Giá nhỏ nhất"
-              defaultValue={minPrice as string}
-              onChange={(e) => handleFilterByMinPrice(e.target.value)}
-            />
-            <Input
-              placeholder="Giá lớn nhất"
-              defaultValue={maxPrice as string}
-              onChange={(e) => handleFilterByMaxPrice(e.target.value)}
-            />
-          </div>
-          {isPending ? (
-            <div className="w-full flex items-center justify-center">
-              <LoadingIndicator />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Card className="shadow-lg border border-gray-200 rounded-xl">
+          <CardHeader className="bg-white border-b border-gray-200">
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              Quản Lý Sản Phẩm Rao Bán
+            </CardTitle>
+            <CardDescription className="text-gray-600 mt-1">
+              Xem và quản lý tất cả sản phẩm được người sưu tập rao bán
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            {/* Tabs */}
+            <div className="flex flex-wrap gap-2 mb-6 bg-gray-100 p-2 rounded-lg">
+              {TABS.map((tab, idx) => (
+                <button
+                  key={idx}
+                  className={cn(
+                    "flex-1 py-2 px-4 text-center rounded-md text-sm font-medium transition-colors min-w-[100px]",
+                    tab.value === currTab
+                      ? "bg-red-600 text-white"
+                      : "text-gray-700 hover:bg-gray-200"
+                  )}
+                  onClick={() => {
+                    params["tab"] = tab.value;
+                    params["page"] = "1";
+                    router.push(`?${queryString.stringify(params)}`);
+                  }}
+                >
+                  {tab.title}
+                </button>
+              ))}
             </div>
-          ) : (
-            <>
-              <Table>
-                <TableHeader>
+
+            {/* Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <Input
+                placeholder="Tìm kiếm sản phẩm"
+                defaultValue={keyword as string}
+                onChange={(e) => handleFilterByKeyword(e.target.value)}
+                className="bg-white border-gray-300"
+              />
+              <Input
+                placeholder="Giá nhỏ nhất"
+                defaultValue={minPrice as string}
+                onChange={(e) => handleFilterByMinPrice(e.target.value)}
+                type="number"
+                className="bg-white border-gray-300"
+              />
+              <Input
+                placeholder="Giá lớn nhất"
+                defaultValue={maxPrice as string}
+                onChange={(e) => handleFilterByMaxPrice(e.target.value)}
+                type="number"
+                className="bg-white border-gray-300"
+              />
+            </div>
+
+            {isPending ? (
+              <div className="flex justify-center py-12">
+                <LoadingIndicator />
+              </div>
+            ) : saleData.length === 0 ? (
+              <div className="text-center py-12 text-gray-600">
+                Không có sản phẩm nào phù hợp với bộ lọc.
+              </div>
+            ) : (
+              <Table className="bg-white rounded-lg shadow-md border border-gray-200">
+                <TableHeader className="bg-gray-50">
                   <TableRow>
-                    <TableHead className="w-[100px] sm:table-cell">
+                    <TableHead className="w-[100px] font-semibold text-gray-900">
                       Ảnh
                     </TableHead>
-                    <TableHead>Tên sản phẩm</TableHead>
-                    <TableHead>Người bán</TableHead>
-                    <TableHead className="md:table-cell">Giá bán</TableHead>
-                    <TableHead className="md:table-cell">Phí sàn</TableHead>
-                    <TableHead className="md:table-cell">Tổng cộng</TableHead>
-
-                    <TableHead>Trạng thái</TableHead>
-
-                    <TableHead>Thao tác</TableHead>
+                    <TableHead className="font-semibold text-gray-900">
+                      Tên Sản Phẩm
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-900">
+                      Người Bán
+                    </TableHead>
+                    <TableHead className="md:table-cell font-semibold text-gray-900">
+                      Giá Bán
+                    </TableHead>
+                    <TableHead className="md:table-cell font-semibold text-gray-900">
+                      Phí Sàn
+                    </TableHead>
+                    <TableHead className="md:table-cell font-semibold text-gray-900">
+                      Tổng Cộng
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-900">
+                      Trạng Thái
+                    </TableHead>
+                    <TableHead className="font-semibold text-gray-900">
+                      Thao Tác
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {saleData?.length > 0 &&
-                    saleData?.map((sale) => (
-                      <TableRow key={sale.saleId}>
-                        <TableCell className="sm:table-cell">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            alt="Product image"
-                            className="aspect-square rounded-md object-cover w-12 h-12"
-                            height="64"
-                            src={sale.inventory?.product?.imagePath}
-                            width="64"
-                          />
-                        </TableCell>
-                        <TableCell className="md:table-cell font-medium line-clamp-2">
-                          {sale.inventory.product.name}
-                        </TableCell>
-
-                        <TableCell className="md:table-cell">
-                          {sale.inventory.account.firstName +
-                            " " +
-                            sale.inventory.account.lastName}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {sale.unitPrice.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {sale.totalFee.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="md:table-cell">
-                          {sale.totalAmount.toLocaleString()}
-                        </TableCell>
-                        <TableCell className="">
-                          <SaleStatusBadge status={sale.saleStatus.name} />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
-                            onClick={() => {
-                              setOpenDetailModal(true);
-                              setProductSale(sale);
-                            }}
-                          >
-                            Xem chi tiết
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                  {saleData.map((sale) => (
+                    <TableRow
+                      key={sale.saleId}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <TableCell>
+                        <img
+                          alt={sale.inventory?.product?.name}
+                          className="aspect-square rounded-md object-cover w-12 h-12 border border-gray-200"
+                          src={
+                            sale.inventory?.product?.imagePath ||
+                            "/placeholder.svg"
+                          }
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium text-gray-900 line-clamp-2">
+                        {sale.inventory?.product?.name || "Không xác định"}
+                      </TableCell>
+                      <TableCell className="text-gray-700">
+                        {sale.inventory?.account?.firstName}{" "}
+                        {sale.inventory?.account?.lastName}
+                      </TableCell>
+                      <TableCell className="md:table-cell text-gray-700">
+                        {sale.unitPrice.toLocaleString()} VND
+                      </TableCell>
+                      <TableCell className="md:table-cell text-gray-700">
+                        {sale.totalFee.toLocaleString()} VND
+                      </TableCell>
+                      <TableCell className="md:table-cell text-gray-700">
+                        {sale.totalAmount.toLocaleString()} VND
+                      </TableCell>
+                      <TableCell>
+                        <SaleStatusBadge status={sale.saleStatus.name} />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          className="border-red-600 text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            setOpenDetailModal(true);
+                            setProductSale(sale);
+                          }}
+                        >
+                          Xem Chi Tiết
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
-              {saleData?.length === 0 && (
-                <div className="w-full text-center mt-10">
-                  Không có sản phẩm nào
-                </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
-      <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
-        <DialogContent className="max-w-[800px]">
-          <DialogHeader>
-            <DialogTitle>Chi tiết sản phẩm</DialogTitle>
-          </DialogHeader>
-          {productSale && (
-            <RequestSaleDetail sale={productSale} onApprove={refetchSaleData} />
-          )}
-        </DialogContent>
-      </Dialog>
+            )}
+          </CardContent>
+        </Card>
+
+        <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
+          <DialogContent className="max-w-2xl rounded-xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-gray-900">
+                Chi Tiết Sản Phẩm
+              </DialogTitle>
+            </DialogHeader>
+            {productSale && (
+              <RequestSaleDetail
+                sale={productSale}
+                onApprove={refetchSaleData}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }
 
 const TABS = [
-  {
-    title: "Có sẵn",
-    value: "1",
-  },
-  {
-    title: "Chờ duyệt",
-    value: "0",
-  },
-  {
-    title: "Hết hàng",
-    value: "2",
-  },
-  {
-    title: "Đã ngưng",
-    value: "3",
-  },
-  {
-    title: "Đã huỷ",
-    value: "4",
-  },
+  { title: "Có Sẵn", value: "1" },
+  { title: "Chờ Duyệt", value: "0" },
+  { title: "Hết Hàng", value: "2" },
+  { title: "Đã Ngưng", value: "3" },
+  { title: "Đã Hủy", value: "4" },
 ];
