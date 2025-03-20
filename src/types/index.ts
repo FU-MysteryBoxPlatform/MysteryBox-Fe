@@ -185,6 +185,7 @@ export type OrderDetail = {
   unitPrice: number;
   note: string;
   orderDetailStatusId: number;
+  isRated: boolean;
 };
 export type PaymentMethod = {
   id: number;

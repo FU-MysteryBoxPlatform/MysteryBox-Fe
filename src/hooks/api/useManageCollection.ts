@@ -1,3 +1,4 @@
+import { TAccount } from "@/types";
 import { useApiMutation, useApiQuery } from "./useApi";
 import { TCollectionProgress } from "./useCollection";
 import { TProductSale } from "./useSale";
@@ -37,10 +38,18 @@ export type TCollectionResponse = {
   items: TCollectionWithProgress[];
 };
 
+export type TRating = {
+  content: string;
+  createDate: string;
+  createByAccount: TAccount;
+  point: number;
+};
+
 export type TCollectionDetail = {
   collection: TCollection;
   collectionImage: { path: string }[];
   products: TProductSale[];
+  ratings: TRating[];
 };
 
 export type TCreateCollection = {

@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { useContext } from "react";
 import { GlobalContext } from "@/provider/global-provider";
 import { useToast } from "@/hooks/use-toast";
+import dayjs from "dayjs";
+import { Stars } from "./Stars";
 
 export default function Page() {
   const { id } = useParams();
@@ -26,6 +28,7 @@ export default function Page() {
   const { data: data, isLoading } = useGetCollectionById(id as string);
   const collection = data?.result.collection;
   const products = data?.result.products;
+  const ratings = data?.result.ratings;
 
   const handleBuyBlindBox = () => {
     // Implement your blind box purchase logic here
@@ -164,6 +167,35 @@ export default function Page() {
               </Button>
             </CardFooter>
           </Card>
+        </div>
+      </div>
+      <div className="mb-10">
+        <h2 className="text-2xl font-bold mb-6">Đánh giá</h2>
+        <div className="grid gap-6">
+          {!!ratings &&
+            ratings?.length > 0 &&
+            ratings?.map((rating, index) => (
+              <div key={index}>
+                <div className="flex items-center gap-2 mb-2">
+                  <img
+                    src={rating.createByAccount.avatar}
+                    alt="avatar"
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {rating.createByAccount.firstName}{" "}
+                      {rating.createByAccount.lastName}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {dayjs(rating.createDate).format("DD/MM/YYYY")}
+                    </p>
+                  </div>
+                </div>
+                <Stars rating={rating.point} />
+                <p className="text-sm mt-2">{rating.content}</p>
+              </div>
+            ))}
         </div>
       </div>
 

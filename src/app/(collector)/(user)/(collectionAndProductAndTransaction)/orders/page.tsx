@@ -3,6 +3,7 @@ import { Value } from "@/app/components/FormUpdateProfile";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   useGetAllOrderByAccount,
   useGetOrderDetail,
@@ -14,6 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useContext, useEffect, useState } from "react";
 import DatePicker from "react-date-picker";
+import RatingForm from "./components/RatingForm";
 
 export default function Page() {
   const { user } = useContext(GlobalContext);
@@ -24,6 +26,8 @@ export default function Page() {
   const page = params["page"] || 1;
 
   // Filter states
+  const [openRatingModal, setOpenRatingModal] = useState(false);
+  const [orderDetailId, setOrderDetailId] = useState("");
   const [startDate, setStartDate] = useState<Value>();
   const [endDate, setEndDate] = useState<Value>();
   const [statusFilter, setStatusFilter] = useState("");
@@ -46,7 +50,11 @@ export default function Page() {
 
   const orders = data?.result.items || [];
   const totalPages = data?.result.totalPages || 0;
-  const { data: detail, isLoading: isLoading2 } = useGetOrderDetail(id);
+  const {
+    data: detail,
+    isLoading: isLoading2,
+    refetch,
+  } = useGetOrderDetail(id);
 
   // Apply filters when orders or filter values change
   useEffect(() => {
@@ -108,10 +116,8 @@ export default function Page() {
       case 0:
         return "Chờ xác nhận";
       case 1:
-        return "Đang xử lý";
-      case 2:
         return "Hoàn thành";
-      case 3:
+      case 2:
         return "Đã hủy";
       default:
         return "Không xác định";
@@ -123,10 +129,8 @@ export default function Page() {
       case 0:
         return "text-orange-400";
       case 1:
-        return "text-blue-700";
-      case 2:
         return "text-green-500";
-      case 3:
+      case 2:
         return "text-red-500";
       default:
         return "text-gray-500";
@@ -136,6 +140,8 @@ export default function Page() {
   const fetchDetail = (id: string) => {
     setId(id);
   };
+
+  console.log({ detail });
 
   return (
     <div className="rounded-lg flex-1 max-md:w-full">
@@ -243,6 +249,21 @@ export default function Page() {
                                     <span className="text-blue-700 text-xs md:text-sm font-semibold">
                                       Đơn giá: {formatPriceVND(item.unitPrice)}
                                     </span>
+                                    {item.order.statusId === 1 &&
+                                      !item.isRated && (
+                                        <button
+                                          className="text-blue-500 underline text-sm text-left"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setOpenRatingModal(true);
+                                            setOrderDetailId(
+                                              item.orderDetailId
+                                            );
+                                          }}
+                                        >
+                                          Đánh giá
+                                        </button>
+                                      )}
                                   </div>
                                 </span>
 
@@ -351,6 +372,17 @@ export default function Page() {
           </Card>
         </div>
       </div>
+      <Dialog open={openRatingModal} onOpenChange={setOpenRatingModal}>
+        <DialogContent>
+          <RatingForm
+            orderDetailId={orderDetailId}
+            onFinish={() => {
+              setOpenRatingModal(false);
+              refetch();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
