@@ -307,8 +307,13 @@ export default function Page() {
                             </DropdownMenuContent>
                           </DropdownMenu>
 
-                          <Button 
-                          className="bg-white text-red-700 hover:bg-red-100"
+                          <Button
+                            className="bg-white text-red-700 hover:bg-red-100"
+                            onClick={() =>
+                              router.push(
+                                `/management/manage-collection/inventories/${collection.collection.collectionId}`
+                              )
+                            }
                           >
                             <EyeIcon className="h-4 w-4 " />
                           </Button>

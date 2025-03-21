@@ -1,4 +1,4 @@
-import { Collection, TAccount } from "@/types";
+import { Collection, TAccount, TransferItem } from "@/types";
 import { useApiMutation, useApiQuery } from "./useApi";
 import { Account } from "./useManageSale";
 import { TProductSale } from "./useSale";
@@ -86,6 +86,19 @@ export type TGetAllInventoryResponse = {
   items: Inventory[];
   totalPages: number;
 };
+export type TGetAllInventoryInCollection = {
+  collectionId: string;
+  pageNumber: number;
+  pageSize: number;
+};
+export type TGetAllInventoryInCollectionResponse = {
+  collection: Collection;
+  inventories: Inventory[];
+};
+export type TransferHistoryResponse = {
+  items: TransferItem[];
+  totalPages: number;
+};
 
 export const useSellInventory = () => {
   return useApiMutation<string, TSellInventory>("/order/sell-item", "post");
@@ -108,5 +121,18 @@ export const useGetAllInventory = () => {
 export const useGetInventoryById = (inventoryId: string) => {
   return useApiQuery<TGetAllInventoryResponse>(
     `/inventory/get-item-in-inventory/${inventoryId}`
+  );
+};
+
+export const useGetListItemInCollection = () => {
+  return useApiMutation<
+    TGetAllInventoryInCollectionResponse,
+    TGetAllInventoryInCollection
+  >("/inventory/get-list-item-in-collection", "post");
+};
+
+export const useGetHistoryTransferInventoryById = (inventoryId: string) => {
+  return useApiQuery<TransferHistoryResponse>(
+    `/inventory/get-transfer-history-by-inventory-id/${inventoryId}`
   );
 };

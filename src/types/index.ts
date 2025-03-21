@@ -307,3 +307,23 @@ export type AuctionHistory = BaseEntity & {
   statusId: number;
   auctionHistoryStatus: AuctionHistoryStatus | null;
 };
+export type TransferType = {
+  id: number;
+  name: string;
+};
+export type TransferItem = {
+  transferItemHistoryId: string;
+  transferDate: string;
+  senderId: string;
+  sender: Account;
+  receiverId: string;
+  receiver: Account;
+  auctionHistoryId: string | null;
+  auctionHistory: any | null; // Replace 'any' with specific type if auctionHistory structure is known
+  exchangeRequestId: string | null;
+  exchangeRequest: any | null; // Replace 'any' with specific type if exchangeRequest structure is known
+  inventoryId: string;
+  inventory: Inventory;
+  transferTypeId: number;
+  transferType: TransferType;
+};

@@ -106,11 +106,8 @@ export function AdminSidebar() {
                           <item.icon
                             className={cn(
                               "h-5 w-5 transition-colors duration-200",
-                              isActive
-                                ? "text-white"
-                                : "text-black "
+                            
                             )}
-                            strokeWidth={isActive ? 2.5 : 2}
                           />
                           <span className="font-medium ">
                             {item.title}
