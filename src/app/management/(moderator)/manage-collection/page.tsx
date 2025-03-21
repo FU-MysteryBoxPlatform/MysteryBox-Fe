@@ -33,7 +33,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { Dialog } from "@radix-ui/react-dialog";
 import dayjs from "dayjs";
-import { MoreHorizontal, PlusIcon } from "lucide-react";
+import { Eye, EyeIcon, MoreHorizontal, PlusIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useEffect, useRef, useState } from "react";
@@ -142,7 +142,7 @@ export default function Page() {
   }, [keyword, maxPrice, minPrice, mutateGetCollections, page]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <div className=" px-4 sm:px-6 lg:px-8 py-12">
         <Card className="shadow-lg border border-gray-200 rounded-xl">
           <CardHeader className="bg-white border-b border-gray-200">
@@ -306,6 +306,12 @@ export default function Page() {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
+
+                          <Button 
+                          className="bg-white text-red-700 hover:bg-red-100"
+                          >
+                            <EyeIcon className="h-4 w-4 " />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
