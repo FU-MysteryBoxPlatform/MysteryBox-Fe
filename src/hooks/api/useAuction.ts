@@ -1,4 +1,9 @@
-import { Auction, AuctionHistory, AuctionParticipantRequest } from "@/types";
+import {
+  Auction,
+  AuctionHistory,
+  AuctionParticipantRequest,
+  TAccount,
+} from "@/types";
 import { useApiMutation, useApiQuery } from "./useApi";
 
 export type GetAuction = {
@@ -29,8 +34,17 @@ export type RequestAuctionRequest = {
   endTime: string;
   minimunBid: number;
 };
+
+export type TAuctionParticipant = {
+  auctionParticipantRequestId: string;
+  createByAccount: TAccount;
+  statusId: number;
+  createDate: string;
+};
+
 export type AuctionDetailResponse = {
   auction: Auction;
+  auctionParticipantRequests: TAuctionParticipant[];
 };
 
 export type GetAuctionHistory = {
@@ -38,6 +52,17 @@ export type GetAuctionHistory = {
   totalItems: number;
   totalPages: number;
 };
+
+export type GetAuctionParticipantRequest = {
+  accountId: string;
+  auctionId: string;
+};
+
+export type ApproveAuctionRequest = {
+  accountId: string;
+  auctionRequestId: string;
+};
+
 export const useGetAllAuctions = () => {
   return useApiMutation<GetAuctionResponse, GetAuction>(
     "/auction/get-all-auction",
@@ -74,4 +99,18 @@ export const useCreateBid = () => {
     AuctionHistory,
     { auctionId: string; bidAmount: number; accountId: string }
   >("/auction/create-bid", "post");
+};
+
+export const getAllAuctionParticipant = () => {
+  return useApiMutation<unknown, GetAuctionParticipantRequest>(
+    "/auction/get-auction-participant-request",
+    "post"
+  );
+};
+
+export const useApproveAuctionRequest = () => {
+  return useApiMutation<unknown, ApproveAuctionRequest>(
+    "/auction/approved-auction-request",
+    "put"
+  );
 };

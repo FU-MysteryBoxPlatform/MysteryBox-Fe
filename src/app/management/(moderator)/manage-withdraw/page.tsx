@@ -124,6 +124,7 @@ export default function WithdrawManagementPage() {
   const endDate = params.endDate;
 
   const [openApproveModal, setOpenApproveModal] = useState(false);
+  const [approveRequestId, setApproveRequestId] = useState<string>();
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [withdraws, setWithdraws] = useState<TModWithdraw[]>([]);
   const [detailWithdraw, setDetailWithdraw] = useState<TModWithdraw>();
@@ -162,6 +163,8 @@ export default function WithdrawManagementPage() {
   useEffect(() => {
     fetchWithdraws();
   }, [page, status, startDate, endDate]);
+
+  console.log({ withdraws });
 
   return (
     <div className="container mx-auto py-8">
@@ -240,27 +243,16 @@ export default function WithdrawManagementPage() {
                       </TableCell>
                       <TableCell>
                         {w.walletRequestStatus.name === "PENDING" ? (
-                          <Dialog
-                            open={openApproveModal}
-                            onOpenChange={setOpenApproveModal}
+                          <Button
+                            variant="link"
+                            className="text-blue-600"
+                            onClick={() => {
+                              setOpenApproveModal(true);
+                              setApproveRequestId(w.walletRequestId);
+                            }}
                           >
-                            <DialogTrigger asChild>
-                              <Button variant="link" className="text-blue-600">
-                                Xác nhận
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Xác nhận yêu cầu rút tiền
-                                </DialogTitle>
-                              </DialogHeader>
-                              <FormApprove
-                                requestId={w.walletRequestId}
-                                onFinish={fetchWithdraws}
-                              />
-                            </DialogContent>
-                          </Dialog>
+                            Xác nhận
+                          </Button>
                         ) : w.walletRequestStatus.name === "COMPELETED" ? (
                           <Button
                             variant="outline"
@@ -300,6 +292,20 @@ export default function WithdrawManagementPage() {
           )}
         </CardContent>
       </Card>
+      <Dialog open={openApproveModal} onOpenChange={setOpenApproveModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận yêu cầu rút tiền</DialogTitle>
+          </DialogHeader>
+          <FormApprove
+            requestId={approveRequestId || ""}
+            onFinish={() => {
+              fetchWithdraws();
+              setOpenApproveModal(false);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={openDetailModal} onOpenChange={setOpenDetailModal}>
         <DialogContent className="sm:max-w-md">

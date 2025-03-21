@@ -18,15 +18,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useGetAllAuctions } from "@/hooks/api/useAuction";
+import {
+  useApproveAuctionRequest,
+  useGetAllAuctions,
+} from "@/hooks/api/useAuction";
 import { cn } from "@/lib/utils";
 import { Auction } from "@/types";
 import dayjs from "dayjs";
 import { Ellipsis } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useContext } from "react";
 import DatePicker from "react-date-picker";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import TableAuctionParticipant from "./components/TableAuctionParticipant";
+import { GlobalContext } from "@/provider/global-provider";
+import { toast } from "@/hooks/use-toast";
 
 // Component Tabs
 const FilterTabs = ({
@@ -56,22 +73,52 @@ const FilterTabs = ({
 // Component chính
 export default function AuctionManagementPage() {
   const router = useRouter();
+  const { user } = useContext(GlobalContext);
   const searchParams = useSearchParams();
   const params = useMemo(
     () => queryString.parse(searchParams.toString()),
     [searchParams]
   );
   const page = Number(params.page || 1);
-  const status = Array.isArray(params.status) ? params.status[0] : params.status || "1";
+  const status = Array.isArray(params.status)
+    ? params.status[0]
+    : params.status || "1";
   const keyword = params.keyword as string | undefined;
   const startDate = params.startDate as string | undefined;
   const endDate = params.endDate as string | undefined;
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const [participantModal, setParticipantModal] = useState(false);
+  const [auctionId, setAuctionId] = useState("");
+  const [isEnd, setIsEnd] = useState(false);
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [totalPages, setTotalPages] = useState(0);
 
   const { mutate: mutateGetAuction, isPending } = useGetAllAuctions();
+  const { mutate: approveAuctionRequest, isPending: pendingApprove } =
+    useApproveAuctionRequest();
+
+  const handleApprove = (requestId: string) => {
+    approveAuctionRequest(
+      {
+        accountId: user?.id ?? "",
+        auctionRequestId: requestId,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            toast({
+              title: "Đã duyệt",
+            });
+          } else {
+            toast({
+              title: data.messages[0],
+            });
+          }
+        },
+      }
+    );
+  };
 
   const fetchAuctions = () => {
     mutateGetAuction(
@@ -85,6 +132,8 @@ export default function AuctionManagementPage() {
       },
       {
         onSuccess: (data) => {
+          console.log({ data });
+
           if (data.isSuccess) {
             setAuctions(data.result.items);
             setTotalPages(data.result.totalPages);
@@ -210,9 +259,38 @@ export default function AuctionManagementPage() {
                         {dayjs(auc.endTime).format("DD/MM/YYYY")}
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <Ellipsis className="h-4 w-4" />
-                        </Button>
+                        <Popover>
+                          <PopoverTrigger>
+                            <Button variant="ghost" size="sm">
+                              <Ellipsis className="h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="grid gap-2 w-fit">
+                            <Button
+                              variant="ghost"
+                              className="w-fit"
+                              onClick={() => {
+                                setParticipantModal(true);
+                                setAuctionId(auc.auctionId);
+                                setIsEnd(auc.statusId === 2);
+                              }}
+                            >
+                              Danh sách tham dự
+                            </Button>
+                            <Button variant="ghost" className="w-fit">
+                              Xem chi tiết
+                            </Button>
+                            {auc.statusId === 0 && (
+                              <Button
+                                variant="ghost"
+                                className="w-fit"
+                                onClick={() => handleApprove(auc.auctionId)}
+                              >
+                                Duyệt
+                              </Button>
+                            )}
+                          </PopoverContent>
+                        </Popover>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -241,6 +319,15 @@ export default function AuctionManagementPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={participantModal} onOpenChange={setParticipantModal}>
+        <DialogContent className="max-w-[80vw]">
+          <DialogHeader>
+            <DialogTitle>Danh sách tham dự</DialogTitle>
+          </DialogHeader>
+          <TableAuctionParticipant auctionId={auctionId} isEnd={isEnd} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
