@@ -489,14 +489,15 @@ export default function Page() {
                           <Button
                             size="sm"
                             className="bg-red-600 hover:bg-red-700 text-white"
-                            onClick={() =>
+                            onClick={() => {
+                              setSelectedExchange(request.exchangeRequestId);
                               cancelExchange.mutate(request.exchangeRequestId, {
                                 onSuccess: () => {
                                   toast({ title: "Hủy yêu cầu thành công" });
                                   refetchGetAll();
                                 },
-                              })
-                            }
+                              });
+                            }}
                           >
                             <X className="h-4 w-4" />
                           </Button>

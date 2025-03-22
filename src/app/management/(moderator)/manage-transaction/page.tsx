@@ -1,6 +1,7 @@
 "use client";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
+import TransactionDetailModal from "@/app/components/TransactionDetailModal";
 import {
   Card,
   CardContent,
