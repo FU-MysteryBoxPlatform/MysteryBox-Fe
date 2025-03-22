@@ -54,7 +54,7 @@ const FilterTabs = ({
   status: string;
   onChange: (value: string) => void;
 }) => (
-  <div className="grid grid-cols-3 gap-2 p-2 bg-gray-100 rounded-lg">
+  <div className="grid grid-cols-4 gap-2 p-2 bg-gray-100 rounded-lg">
     {TABS.map((tab) => (
       <Button
         key={tab.value}
@@ -110,6 +110,8 @@ export default function AuctionManagementPage() {
       },
       {
         onSuccess: (data) => {
+          console.log({ data });
+
           if (data.isSuccess) {
             setAuctions(data.result.items);
             setTotalPages(data.result.totalPages);
@@ -133,6 +135,8 @@ export default function AuctionManagementPage() {
     newParams[key] = date ? dayjs(date).toISOString() : null;
     router.push(`?${queryString.stringify(newParams)}`);
   };
+
+  console.log({ auctions });
 
   useEffect(() => {
     fetchAuctions();
@@ -315,7 +319,8 @@ export default function AuctionManagementPage() {
 }
 
 const TABS = [
-  { title: "Hoàn thành", value: "1" },
-  { title: "Chờ duyệt", value: "0" },
-  { title: "Đã từ chối", value: "2" },
+  { title: "Đang diễn ra", value: "1" },
+  { title: "Sắp diễn ra", value: "0" },
+  { title: "Đã hoàn thành", value: "2" },
+  { title: "Đã huỷ", value: "3" },
 ];

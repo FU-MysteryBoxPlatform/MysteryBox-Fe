@@ -46,7 +46,11 @@ const MOD_ITEMS = [
     icon: ArrowLeftRight,
   },
   { title: "Quản lý đấu giá", url: "/management/manage-auction", icon: Crown },
-  { title: "Quản lý yêu cầu đấu giá", url: "/management/manage-auction-request", icon: Crown },
+  {
+    title: "Quản lý yêu cầu đấu giá",
+    url: "/management/auction-request",
+    icon: Crown,
+  },
   {
     title: "Quản lý yêu cầu rút tiền",
     url: "/management/manage-withdraw",
@@ -106,13 +110,10 @@ export function AdminSidebar() {
                         <Link href={item.url}>
                           <item.icon
                             className={cn(
-                              "h-5 w-5 transition-colors duration-200",
-                            
+                              "h-5 w-5 transition-colors duration-200"
                             )}
                           />
-                          <span className="font-medium ">
-                            {item.title}
-                          </span>
+                          <span className="font-medium ">{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
