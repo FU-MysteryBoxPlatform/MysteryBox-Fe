@@ -87,7 +87,7 @@ export default function Page() {
   const handleDeleteCollection = async () => {
     try {
       setIsLoading(true);
-      const response = await axiosClient.delete(
+      const response = await axiosClient.put(
         `/collection/delete-colleciton?collectionId=${collectionDeleteId}`
       );
       setIsLoading(false);

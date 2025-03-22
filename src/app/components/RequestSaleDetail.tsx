@@ -63,14 +63,14 @@ export default function RequestSaleDetail({
     <div className="flex gap-6">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={sale?.inventory.product.imagePath}
-        alt={sale?.inventory.product.name}
+        src={sale?.inventory?.product?.imagePath}
+        alt={sale?.inventory?.product?.name}
         className="w-[400px] h-[400px] rounded-md object-cover aspect-square"
       />
       <div className="flex flex-col gap-2">
-        <p className="text-lg font-bold">{sale?.inventory.product.name}</p>
+        <p className="text-lg font-bold">{sale?.inventory?.product?.name}</p>
         <p className="text-gray-500 text-sm">
-          {sale?.inventory.product.description}
+          {sale?.inventory?.product?.description}
         </p>
         <p className="text-sm">
           <span className="font-semibold">Giá bán:</span>{" "}
@@ -82,13 +82,13 @@ export default function RequestSaleDetail({
         </p>
         <p className="text-sm">
           <span className="font-semibold">Người bán: </span>
-          {sale?.inventory.account.firstName +
+          {sale?.inventory?.account?.firstName +
             " " +
-            sale?.inventory.account.lastName}
+            sale?.inventory?.account?.lastName}
         </p>
         <p className="text-sm">
           <span className="font-semibold">Độ hiếm:</span>{" "}
-          {sale?.inventory.product.rarityStatus.dropRate}
+          {sale?.inventory?.product?.rarityStatus?.dropRate}
         </p>
         {sale.saleStatusId === 0 && (
           <div className="flex gap-4 mt-auto [&>*]:flex-1">

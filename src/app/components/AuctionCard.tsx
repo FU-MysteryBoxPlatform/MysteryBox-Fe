@@ -23,35 +23,54 @@ const PolicyModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   auctionData: Auction;
-}> = ({ isOpen, onClose, auctionData }) => {
+  onOk?: () => void;
+}> = ({ isOpen, onClose, auctionData, onOk }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
-        <h2 className="text-xl font-bold mb-4 text-center text-red-600">
-          Chính sách đấu giá tại MYBOX
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100">
+        <h2 className="text-2xl font-bold mb-6 text-center text-red-600">
+          Chính Sách Đấu Giá MYBOX
         </h2>
-        <p className="font-sans text-base text-gray-600 font-bold">
-          1. Giá cọc tối thiểu khởi đầu:{" "}
-          {formatPriceVND(auctionData.minimunBid)} <br />
-          2. Thời gian đấu giá từ {formatDate(auctionData.startTime)} đến{" "}
-          {formatDate(auctionData.endTime)} <br />
-          3. Khi tham gia đấu giá phải cọc số tiền tối thiểu là{" "}
-          {formatPriceVND(auctionData.inventory.product.price * 0.1)} <br />
-          4. Sau khi kết thúc phiên đấu giá, người chiến thắng sẽ phải thanh
-          toán số tiền còn lại trong vòng 24h <br />
-          5. Nếu không thanh toán đúng hạn, số tiền cọc sẽ không được hoàn{" "}
-          <br />
-          6. Nếu trường hợp bạn không phải làngười chiến thắng, số tiền cọc sẽ
-          được hoàn lại cho người tham gia
-        </p>
-        <div className="flex justify-center">
+        <ul className="text-gray-700 space-y-3 text-sm">
+          <li>
+            <span className="font-semibold">1. Giá cọc tối thiểu:</span>{" "}
+            {formatPriceVND(auctionData.minimunBid)}
+          </li>
+          <li>
+            <span className="font-semibold">2. Thời gian đấu giá:</span>{" "}
+            {formatDate(auctionData.startTime)} -{" "}
+            {formatDate(auctionData.endTime)}
+          </li>
+          <li>
+            <span className="font-semibold">3. Tiền cọc tối thiểu:</span>{" "}
+            {formatPriceVND(auctionData.inventory.product.price * 0.1)}
+          </li>
+          <li>
+            <span className="font-semibold">4. Thanh toán sau thắng:</span>{" "}
+            Trong vòng 24h
+          </li>
+          <li>
+            <span className="font-semibold">5. Không thanh toán đúng hạn:</span>{" "}
+            Mất cọc
+          </li>
+          <li>
+            <span className="font-semibold">6. Hoàn cọc:</span> Nếu không thắng
+          </li>
+        </ul>
+        <div className="flex flex-col items-center justify-center mt-6">
           <Button
-            className="bg-red-600 text-white px-4 py-2 rounded mt-4"
+            className="bg-red-600 w-fit text-white hover:bg-red-700 px-6 py-2 rounded-full transition-all duration-300"
+            onClick={onOk}
+          >
+            Thanh Toán Cọc Ngay
+          </Button>
+          <Button
+            className="my-2 bg-red-600 w-fit text-white hover:bg-red-700 px-6 py-2 rounded-full transition-all duration-300"
             onClick={onClose}
           >
-            Thanh toán cọc ngay
+            Đóng
           </Button>
         </div>
       </div>
@@ -172,91 +191,83 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
 
   return (
     <>
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader className="pb-2">
+      <Card className="w-full max-w-md shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden bg-white">
+        <CardHeader className="relative p-4 bg-gradient-to-r from-gray-50 to-gray-100">
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="text-xl font-bold">
+              <CardTitle className="text-xl font-bold text-gray-800">
                 {auctionData.inventory.product.name}
               </CardTitle>
-              <CardDescription className="flex items-center mt-1">
+              <CardDescription className="flex items-center mt-1 text-gray-600">
                 <User className="h-4 w-4 mr-1 opacity-70" />
                 <span>Host: {auctionData.account?.firstName}</span>
               </CardDescription>
             </div>
-            <Badge
-              variant="secondary"
-              className={`px-2 py-1 ${getStatusColor()}`}
-            >
+            <Badge className={`px-3 py-1 font-semibold ${getStatusColor()}`}>
               {getStatusLabel()}
             </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="pb-2">
-          <div className="relative aspect-square w-full overflow-hidden rounded-md mb-4">
+        <CardContent className="p-4">
+          <div className="relative aspect-square w-full overflow-hidden rounded-lg mb-4">
             <img
               src={auctionData.inventory.product.imagePath}
-              className="object-cover w-full h-full"
+              className="object-cover w-full h-full transition-transform duration-300 hover:scale-110"
+              alt={auctionData.inventory.product.name}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="flex flex-col">
-              <span className="text-sm text-gray-500">Giá đặt hiện tại</span>
-              <span className="text-lg font-semibold">
-                {formatPriceVND(auctionData.currentBid)}
-              </span>
-            </div>
-            <div className="flex flex-col col-span-2">
-              <span className="text-sm text-gray-500">
-                Thời gian của phiên:
-              </span>
-              <div className="flex items-center text-sm">
-                <Clock className="h-4 w-4 mr-1 opacity-70" />
-                <span>
-                  {formatDate(auctionData.startTime)} -{" "}
-                  {formatDate(auctionData.endTime)}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="text-sm text-gray-500 block">
+                  Giá hiện tại
+                </span>
+                <span className="text-lg font-bold text-gray-800">
+                  {formatPriceVND(auctionData.currentBid)}
                 </span>
               </div>
+              <div>
+                <span className="text-sm text-gray-500 block">
+                  Giá cọc tối thiểu
+                </span>
+                <span className="text-lg font-bold text-green-600">
+                  {formatPriceVND(auctionData.minimunBid)}
+                </span>
+              </div>
+            </div>
+            <div>
+              <span className="text-sm text-gray-500 flex items-center">
+                <Clock className="h-4 w-4 mr-1 opacity-70" />
+                Thời gian: {formatDate(auctionData.startTime)} -{" "}
+                {formatDate(auctionData.endTime)}
+              </span>
+              <span className="text-sm font-medium text-amber-600 flex items-center mt-1">
+                <Clock className="h-4 w-4 mr-1" />
+                {calculateTimeRemaining()}
+              </span>
             </div>
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between pt-2 border-t">
-          <div className="flex items-center">
-            <Clock className="h-4 w-4 mr-1 text-amber-500" />
-            <span className="text-sm font-medium text-amber-500">
-              {calculateTimeRemaining()}
-            </span>
-          </div>
-          <div className="flex items-center">
-            <Tag className="h-4 w-4 mr-1 text-green-600" />
-            <span className="text-sm font-medium text-green-600">
-              Giá cọc tối thiểu khởi đầu:{" "}
-              {formatPriceVND(auctionData.minimunBid)}
-            </span>
-          </div>
-        </CardFooter>
-
-        {/* Button to open the policy modal */}
-        <div className="flex justify-center mt-4">
-          <button
+        <CardFooter className="p-4 border-t bg-gray-50">
+          <Button
             onClick={() => setIsModalOpen(true)}
-            className="flex animate-pulse font-bold items-center text-red-600 hover:text-red-800"
+            className="w-full bg-red-500 text-white hover:bg-red-600 rounded-full py-2 transition-all duration-300 flex items-center justify-center gap-2"
+            disabled={isPending}
           >
-            {isPending ? <LoadingIndicator /> : " Đấu giá ngay"}
-
-            <Info className="h-4 w-4 ml-2" />
-          </button>
-        </div>
+            {isPending ? <LoadingIndicator /> : "Đấu Giá Ngay"}
+            <Info className="h-4 w-4" />
+          </Button>
+        </CardFooter>
       </Card>
 
-      {/* Modal */}
       <PolicyModal
         isOpen={isModalOpen}
-        onClose={() => handleDeposit()}
+        onOk={handleDeposit}
         auctionData={auctionData}
+        onClose={() => setIsModalOpen(false)}
       />
     </>
   );

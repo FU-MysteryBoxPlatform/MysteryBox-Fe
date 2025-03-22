@@ -49,7 +49,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </p>
         <Countdown targetDate={dayjs("05/03/2025").toISOString()} />
       </div> */}
-      <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16 py-10">
+      <div className="max-w-7xl  mx-auto px-4 md:px-10 lg:px-16 py-10">
         <div className="w-full flex gap-6 flex-col lg:flex-row">
           <div className="shrink-0 max-lg:hidden">
             <p className="md:text-lg lg:text-xl bg-black text-white py-1 px-4 uppercase font-bold mb-2">

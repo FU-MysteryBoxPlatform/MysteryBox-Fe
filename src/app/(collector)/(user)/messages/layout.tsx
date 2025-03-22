@@ -89,7 +89,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, [connection]); // Ensure connection starts once it's set
 
   useEffect(() => {
-    setConversations(data?.result.items || []);
+    setConversations(data?.result?.items || []);
   }, [data]);
 
   useEffect(() => {

@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { Calendar, Eye, RefreshCw } from "lucide-react";
 import { useGetAllTransactionByAccountId } from "@/hooks/api/useTransactions";
 import { GlobalContext } from "@/provider/global-provider";
 import { formatDate } from "@/lib/utils";
@@ -25,6 +25,7 @@ import LoadingIndicator from "@/app/components/LoadingIndicator";
 import Paginator from "@/app/components/Paginator";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
+import { Button } from "@/components/ui/button";
 
 const PaymentHistoryDashboard: React.FC = () => {
   const { user } = useContext(GlobalContext);
@@ -64,6 +65,18 @@ const PaymentHistoryDashboard: React.FC = () => {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const handleRetryPayment = (paymentId: string) => {
+    // Logic xử lý retry payment ở đây
+    console.log(`Retrying payment for ${paymentId}`);
+    // Ví dụ: router.push(`/retry-payment/${paymentId}`);
+  };
+
+  const handleViewDetail = (paymentId: string) => {
+    // Logic xem chi tiết giao dịch
+    console.log(`Viewing details for ${paymentId}`);
+    router.push(`/payment-detail/${paymentId}`);
   };
 
   return (
@@ -116,19 +129,25 @@ const PaymentHistoryDashboard: React.FC = () => {
                   <TableHeader>
                     <TableRow className="">
                       <TableHead className="text-gray-900 font-semibold">
-                        Order ID
+                       Mã giao dịch
                       </TableHead>
                       <TableHead className="text-gray-900 font-semibold">
-                        Ngày đặt
+                        Ngày giao dịch
                       </TableHead>
                       <TableHead className="text-gray-900 font-semibold">
                         Tổng tiền
+                      </TableHead>
+                      <TableHead className="text-gray-900 font-semibold">
+                        Loại giao dịch
                       </TableHead>
                       <TableHead className="text-gray-900 font-semibold">
                         Phương thức
                       </TableHead>
                       <TableHead className="text-gray-900 font-semibold">
                         Trạng thái
+                      </TableHead>
+                      <TableHead className="text-gray-900 font-semibold">
+                        Thao tác
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -139,13 +158,16 @@ const PaymentHistoryDashboard: React.FC = () => {
                         className="hover:bg-gray-50 transition-colors duration-200"
                       >
                         <TableCell className="font-mono text-sm text-gray-700">
-                          {payment.orderId?.substring(0, 8)}...
+                          {payment.paymentHistoryId?.substring(0, 8)}...
                         </TableCell>
                         <TableCell className="font-medium text-gray-700">
                           {formatDate(payment.date)}
                         </TableCell>
                         <TableCell className="text-gray-900 font-semibold">
                           {formatCurrency(payment.amount)}
+                        </TableCell>
+                        <TableCell className="text-gray-900 font-semibold">
+                         {payment.transactionType.name}
                         </TableCell>
                         <TableCell className="text-gray-700">
                           {payment.paymentMethod?.name || "N/A"}
@@ -159,12 +181,36 @@ const PaymentHistoryDashboard: React.FC = () => {
                             {payment.transationStatus?.name || "UNKNOWN"}
                           </Badge>
                         </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            {payment.transationStatus?.name === "PENDING" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleRetryPayment(payment.paymentHistoryId)
+                                }
+                              >
+                                <RefreshCw className="h-4 w-4" />
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleViewDetail(payment.paymentHistoryId)
+                              }
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                     {paymentData.length === 0 && (
                       <TableRow>
                         <TableCell
-                          colSpan={5}
+                          colSpan={6}
                           className="text-center py-12 text-gray-500"
                         >
                           Không tìm thấy giao dịch nào
