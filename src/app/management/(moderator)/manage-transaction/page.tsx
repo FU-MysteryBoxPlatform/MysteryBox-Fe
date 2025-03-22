@@ -34,6 +34,7 @@ import { Eye } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { useEffect, useState } from "react";
+import TransactionDetail from "./components/TransactionDetail";
 
 export default function Page() {
   const router = useRouter();
@@ -62,36 +63,6 @@ export default function Page() {
       setTotalPages(data.result.totalPages || 0);
     }
   }, [data]);
-
-  const renderTransactionStatus = (status: number) => {
-    switch (status) {
-      case 0:
-        return "Chờ Xác Nhận";
-      case 1:
-        return "Hoàn Thành";
-      case 2:
-        return "Thất Bại";
-      case 3:
-        return "Đã Hủy";
-      default:
-        return "Không Xác Định";
-    }
-  };
-
-  const renderColorTransactionStatus = (status: number) => {
-    switch (status) {
-      case 0:
-        return "text-orange-500";
-      case 1:
-        return "text-red-600";
-      case 2:
-        return "text-red-500";
-      case 3:
-        return "text-gray-500";
-      default:
-        return "text-gray-500";
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -201,95 +172,18 @@ export default function Page() {
                                 <Eye className="h-5 w-5" />
                               </button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-3xl rounded-xl">
+                            <DialogContent className="max-w-[80vw] rounded-xl">
                               <DialogHeader>
                                 <DialogTitle className="text-xl text-gray-900">
                                   Chi Tiết Giao Dịch
                                 </DialogTitle>
                               </DialogHeader>
                               <div className="max-h-[60vh] overflow-auto">
-                                <Table>
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead className="font-semibold text-gray-900">
-                                        Người Mua
-                                      </TableHead>
-                                      <TableHead className="font-semibold text-gray-900">
-                                        Loại Giao Dịch
-                                      </TableHead>
-                                      <TableHead className="font-semibold text-gray-900">
-                                        Trạng Thái
-                                      </TableHead>
-                                      <TableHead className="font-semibold text-gray-900">
-                                        Giá
-                                      </TableHead>
-                                      <TableHead className="font-semibold text-gray-900">
-                                        Mã Đặt Hàng
-                                      </TableHead>
-                                      <TableHead className="font-semibold text-gray-900">
-                                        Ngày Giao Dịch
-                                      </TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    <TableRow>
-                                      <TableCell className="font-medium text-gray-900">
-                                        {transactionDetail?.account?.firstName}{" "}
-                                        {transactionDetail?.account?.lastName}
-                                      </TableCell>
-                                      <TableCell>
-                                        <span
-                                          className={cn(
-                                            "px-2 py-1 rounded-full text-xs font-semibold text-white",
-                                            transactionDetail?.transactionType
-                                              .name === "TRADING"
-                                              ? "bg-orange-500"
-                                              : transactionDetail
-                                                  ?.transactionType.name ===
-                                                "SELL"
-                                              ? "bg-blue-500"
-                                              : "bg-red-600"
-                                          )}
-                                        >
-                                          {transactionDetail?.transactionType
-                                            .name === "TRADING"
-                                            ? "Giao Dịch"
-                                            : transactionDetail?.transactionType
-                                                .name === "SELL"
-                                            ? "Bán"
-                                            : "Mua"}
-                                        </span>
-                                      </TableCell>
-                                      <TableCell
-                                        className={cn(
-                                          renderColorTransactionStatus(
-                                            transactionDetail?.transactionStatusId ||
-                                              0
-                                          )
-                                        )}
-                                      >
-                                        {renderTransactionStatus(
-                                          transactionDetail?.transactionStatusId ||
-                                            0
-                                        )}
-                                      </TableCell>
-                                      <TableCell className="text-gray-700">
-                                        {formatPriceVND(
-                                          transactionDetail?.order
-                                            .totalAmount || 0
-                                        )}
-                                      </TableCell>
-                                      <TableCell className="text-gray-700">
-                                        {transactionDetail?.orderId || "N/A"}
-                                      </TableCell>
-                                      <TableCell className="text-gray-700">
-                                        {dayjs(transactionDetail?.date).format(
-                                          "DD/MM/YYYY HH:mm"
-                                        )}
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableBody>
-                                </Table>
+                                <TransactionDetail
+                                  paymentHistoryId={
+                                    transactionDetail?.paymentHistoryId
+                                  }
+                                />
                               </div>
                             </DialogContent>
                           </Dialog>

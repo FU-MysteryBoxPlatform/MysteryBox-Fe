@@ -1,5 +1,12 @@
-import { Order, PaymentHistory, TAccount } from "@/types";
+import {
+  ExchangeRequest,
+  Order,
+  OrderDetail,
+  PaymentHistory,
+  TAccount,
+} from "@/types";
 import { useApiMutation, useApiQuery } from "./useApi";
+import { TOrder } from "./useOrder";
 
 export type TTransaction = {
   paymentHistoryId: string;
@@ -48,6 +55,11 @@ export type ReChargePayload = {
   returnUrl: string;
 };
 
+export type TTransactionDetail = TTransaction & {
+  orderResponse?: TOrder;
+  exchangeRequest?: ExchangeRequest;
+};
+
 export const useGetAllTransaction = (
   pageNumber: number,
   pageSize: number,
@@ -58,6 +70,12 @@ export const useGetAllTransaction = (
     totalPages: number;
   }>(
     `/transaction/get-all-transaction/${pageNumber}/${pageSize}?status=${status}`
+  );
+};
+
+export const useGetTransactionById = (id: string) => {
+  return useApiQuery<TTransactionDetail>(
+    `/transaction/get-transaction-by-id/${id}`
   );
 };
 

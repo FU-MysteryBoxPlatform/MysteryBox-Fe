@@ -30,6 +30,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import TransactionDetail from "@/app/management/(moderator)/manage-transaction/components/TransactionDetail";
 
 const PaymentHistoryDashboard: React.FC = () => {
   const { user } = useContext(GlobalContext);
@@ -38,6 +46,8 @@ const PaymentHistoryDashboard: React.FC = () => {
   const router = useRouter();
   const params = queryString.parse(searchParams.toString());
   const page = params["page"] || 1;
+
+  const [paymentHistoryId, setPaymentHistoryId] = useState("");
 
   const {
     data: initialData,
@@ -108,8 +118,7 @@ const PaymentHistoryDashboard: React.FC = () => {
   };
 
   const handleViewDetail = (paymentId: string) => {
-    // Logic xem chi tiết giao dịch
-    console.log(`Viewing details for ${paymentId}`);
+    setPaymentHistoryId(paymentId);
   };
 
   return (
@@ -227,15 +236,30 @@ const PaymentHistoryDashboard: React.FC = () => {
                                 <RefreshCw className="h-4 w-4" />
                               </Button>
                             )}
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() =>
-                                handleViewDetail(payment.paymentHistoryId)
-                              }
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <button
+                                  className="text-red-600 hover:text-red-700 transition-colors"
+                                  onClick={() =>
+                                    handleViewDetail(payment.paymentHistoryId)
+                                  }
+                                >
+                                  <Eye className="h-5 w-5" />
+                                </button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-[80vw] rounded-xl">
+                                <DialogHeader>
+                                  <DialogTitle className="text-xl text-gray-900">
+                                    Chi Tiết Giao Dịch
+                                  </DialogTitle>
+                                </DialogHeader>
+                                <div className="max-h-[60vh] overflow-auto">
+                                  <TransactionDetail
+                                    paymentHistoryId={paymentHistoryId}
+                                  />
+                                </div>
+                              </DialogContent>
+                            </Dialog>
                           </div>
                         </TableCell>
                       </TableRow>

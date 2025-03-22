@@ -13,7 +13,9 @@ import dayjs from "dayjs";
 
 export default function TableCollection({
   orderDetail,
+  title,
 }: {
+  title?: string;
   orderDetail?: TOrderDetail[];
 }) {
   if (!orderDetail) return null;
@@ -47,7 +49,7 @@ export default function TableCollection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bộ sưu tập</CardTitle>
+        <CardTitle>{title || "Bộ sưu tập"}</CardTitle>
       </CardHeader>
       <CardContent>
         <Table className="mb-4">
@@ -71,11 +73,21 @@ export default function TableCollection({
                 </TableCell>
                 <TableCell className="flex items-center gap-2">
                   <img
-                    src={o.collection?.imagePath}
+                    src={
+                      o.collection
+                        ? o.collection?.imagePath
+                        : o.inventory
+                        ? o.inventory.product.imagePath
+                        : ""
+                    }
                     alt="collection"
                     className="w-10 h-10 object-cover"
                   />
-                  {o.collection?.collectionName}
+                  {o.collection
+                    ? o.collection?.collectionName
+                    : o.inventory
+                    ? o.inventory.product.name
+                    : ""}
                 </TableCell>
                 <TableCell
                   className={cn(renderColorOrderStatus(o.order.statusId))}
