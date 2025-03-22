@@ -18,7 +18,10 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Eye, RefreshCw } from "lucide-react";
-import { useGetAllTransactionByAccountId } from "@/hooks/api/useTransactions";
+import {
+  useGetAllTransactionByAccountId,
+  useReCharge,
+} from "@/hooks/api/useTransactions";
 import { GlobalContext } from "@/provider/global-provider";
 import { formatDate } from "@/lib/utils";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
@@ -26,6 +29,7 @@ import Paginator from "@/app/components/Paginator";
 import { useRouter, useSearchParams } from "next/navigation";
 import queryString from "query-string";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 const PaymentHistoryDashboard: React.FC = () => {
   const { user } = useContext(GlobalContext);
@@ -44,7 +48,7 @@ const PaymentHistoryDashboard: React.FC = () => {
 
   const paymentData = initialData?.result.items || [];
   const totalPages = initialData?.result.totalPages || 0;
-
+  const { mutateAsync: reCharge } = useReCharge();
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -71,12 +75,34 @@ const PaymentHistoryDashboard: React.FC = () => {
     // Logic xử lý retry payment ở đây
     console.log(`Retrying payment for ${paymentId}`);
     // Ví dụ: router.push(`/retry-payment/${paymentId}`);
+    reCharge(
+      {
+        returnUrl: `${window.location.host}`.includes("localhost")
+          ? `http://${window.location.host}/payment`
+          : `https://${window.location.host}/payment`,
+        transactionId: paymentId,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            toast({
+              title: "Đã thử lại giao dịch thành công",
+            });
+          } else {
+            toast({
+              title: "Thử lại giao dịch thất bại",
+              description: data.messages[0],
+            });
+          }
+        },
+      }
+    );
   };
 
   const handleViewDetail = (paymentId: string) => {
     // Logic xem chi tiết giao dịch
     console.log(`Viewing details for ${paymentId}`);
-    router.push(`/payment-detail/${paymentId}`);
+   
   };
 
   return (
@@ -129,7 +155,7 @@ const PaymentHistoryDashboard: React.FC = () => {
                   <TableHeader>
                     <TableRow className="">
                       <TableHead className="text-gray-900 font-semibold">
-                       Mã giao dịch
+                        Mã giao dịch
                       </TableHead>
                       <TableHead className="text-gray-900 font-semibold">
                         Ngày giao dịch
@@ -167,7 +193,7 @@ const PaymentHistoryDashboard: React.FC = () => {
                           {formatCurrency(payment.amount)}
                         </TableCell>
                         <TableCell className="text-gray-900 font-semibold">
-                         {payment.transactionType.name}
+                          {payment.transactionType.name}
                         </TableCell>
                         <TableCell className="text-gray-700">
                           {payment.paymentMethod?.name || "N/A"}

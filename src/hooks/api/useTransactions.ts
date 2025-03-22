@@ -1,5 +1,5 @@
 import { Order, PaymentHistory, TAccount } from "@/types";
-import { useApiQuery } from "./useApi";
+import { useApiMutation, useApiQuery } from "./useApi";
 
 export type TTransaction = {
   paymentHistoryId: string;
@@ -43,6 +43,10 @@ export type TransactionResponse = {
   totalPages: number;
 };
 
+export type ReChargePayload = {
+  transactionId: string;
+  returnUrl: string;
+};
 export const useGetAllTransaction = (
   pageNumber: number,
   pageSize: number,
@@ -64,5 +68,12 @@ export const useGetAllTransactionByAccountId = (
 ) => {
   return useApiQuery<TransactionResponse>(
     `/transaction/get-transaction-by-account-id/${accountId}?pageNumber=${pageNumber}&pageSize=${pageSize}&status=${status}`
+  );
+};
+
+export const useReCharge = () => {
+  return useApiMutation<string, ReChargePayload>(
+    `/transaction/re-create-payment-link`,
+    "post"
   );
 };
