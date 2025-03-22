@@ -6,7 +6,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import dayjs from "dayjs";
-import { CalendarIcon, ClockIcon } from "lucide-react";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import { CalendarIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,10 @@ import { useRequestAuction } from "@/hooks/api/useAuction";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
+
+// Kích hoạt plugin UTC và timezone
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const RegisterSchema = z.object({
   price: z
@@ -57,7 +63,7 @@ const getRarityColor = (id: string): RarityInfo => {
   };
 };
 
-// Component chọn giờ đơn giản
+// Component chọn giờ
 const TimePicker = ({
   value,
   onChange,
@@ -82,8 +88,8 @@ export default function AuctionRegisterPage() {
   );
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
-  const [startTime, setStartTime] = useState<string>("00:00");
-  const [endTime, setEndTime] = useState<string>("23:59");
+  const [startTime, setStartTime] = useState<string>("12:00"); // Mặc định 12:00 trưa
+  const [endTime, setEndTime] = useState<string>("12:05"); // Mặc định 12:05 trưa
 
   const { data, isLoading } = useGetInventoryById(inventory);
   const { mutate: requestAuction, isPending } = useRequestAuction();
@@ -106,12 +112,15 @@ export default function AuctionRegisterPage() {
 
   const combineDateTime = (date: Date, time: string) => {
     const [hours, minutes] = time.split(":");
-    return dayjs(date)
+    // Tạo thời gian địa phương với giờ người dùng chọn
+    const localDateTime = dayjs(date)
       .set("hour", parseInt(hours))
       .set("minute", parseInt(minutes))
-      .toISOString();
-  };
+      .tz("Asia/Ho_Chi_Minh", true); // Giữ nguyên giờ địa phương
 
+    // Chuyển thành ISO string với múi giờ UTC+7
+    return localDateTime.format("YYYY-MM-DDTHH:mm:ss"); // Không có múi giờ  };
+  };
   const onSubmit = (formData: RegisterForm) => {
     const startDateTime = combineDateTime(startDate, startTime);
     const endDateTime = combineDateTime(endDate, endTime);
@@ -124,6 +133,15 @@ export default function AuctionRegisterPage() {
       });
       return;
     }
+
+    // Log để kiểm tra dữ liệu trước khi gửi
+    console.log({
+      accountId: user?.id ?? "",
+      inventoryId: inventory,
+      startDate: startDateTime,
+      endDate: endDateTime,
+      minimumBid: parseInt(formData.price),
+    });
 
     requestAuction(
       {
