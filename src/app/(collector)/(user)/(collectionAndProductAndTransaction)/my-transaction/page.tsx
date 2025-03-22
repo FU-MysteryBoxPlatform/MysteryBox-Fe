@@ -39,7 +39,11 @@ const PaymentHistoryDashboard: React.FC = () => {
   const params = queryString.parse(searchParams.toString());
   const page = params["page"] || 1;
 
-  const { data: initialData, isPending } = useGetAllTransactionByAccountId(
+  const {
+    data: initialData,
+    isPending,
+    refetch,
+  } = useGetAllTransactionByAccountId(
     user?.id ?? "",
     Number(statusFilter) || 0,
     +page,
@@ -71,7 +75,7 @@ const PaymentHistoryDashboard: React.FC = () => {
     }
   };
 
-  const handleRetryPayment = (paymentId: string) => {
+  const handleRetryPayment = async (paymentId: string) => {
     // Logic xử lý retry payment ở đây
     console.log(`Retrying payment for ${paymentId}`);
     // Ví dụ: router.push(`/retry-payment/${paymentId}`);
@@ -98,6 +102,7 @@ const PaymentHistoryDashboard: React.FC = () => {
         },
       }
     );
+    await refetch();
   };
 
   const handleViewDetail = (paymentId: string) => {
