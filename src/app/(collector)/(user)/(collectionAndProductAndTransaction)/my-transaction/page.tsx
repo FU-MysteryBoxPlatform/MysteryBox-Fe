@@ -88,6 +88,7 @@ const PaymentHistoryDashboard: React.FC = () => {
             toast({
               title: "Đã thử lại giao dịch thành công",
             });
+            window.location.href = data.result.returnUrl;
           } else {
             toast({
               title: "Thử lại giao dịch thất bại",
@@ -102,7 +103,6 @@ const PaymentHistoryDashboard: React.FC = () => {
   const handleViewDetail = (paymentId: string) => {
     // Logic xem chi tiết giao dịch
     console.log(`Viewing details for ${paymentId}`);
-   
   };
 
   return (
