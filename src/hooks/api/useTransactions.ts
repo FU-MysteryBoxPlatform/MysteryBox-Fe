@@ -47,9 +47,7 @@ export type ReChargePayload = {
   transactionId: string;
   returnUrl: string;
 };
-export type ReChargeResponse = {
-  returnUrl: string;
-};
+
 export const useGetAllTransaction = (
   pageNumber: number,
   pageSize: number,
@@ -75,7 +73,7 @@ export const useGetAllTransactionByAccountId = (
 };
 
 export const useReCharge = () => {
-  return useApiMutation<ReChargeResponse, ReChargePayload>(
+  return useApiMutation<string, ReChargePayload>(
     `/transaction/re-create-payment-link`,
     "post"
   );

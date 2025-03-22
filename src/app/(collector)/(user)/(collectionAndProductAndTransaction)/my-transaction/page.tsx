@@ -92,7 +92,9 @@ const PaymentHistoryDashboard: React.FC = () => {
             toast({
               title: "Đã thử lại giao dịch thành công",
             });
-            window.location.href = data.result.returnUrl;
+            if (data.result != null) {
+              window.location.href = data.result;
+            }
           } else {
             toast({
               title: "Thử lại giao dịch thất bại",
