@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import dayjs from "dayjs";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ClockIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import { Inventory, useGetInventoryById } from "@/hooks/api/useInventory";
 import { useRequestAuction } from "@/hooks/api/useAuction";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
 
 const RegisterSchema = z.object({
   price: z
@@ -46,7 +47,7 @@ const getRarityColor = (id: string): RarityInfo => {
     Legendary: "bg-orange-100 text-orange-800",
   };
 
-  const itemId = parseInt(id.replace("inv", "")) || parseInt(id);
+  const itemId = parseInt(id);
   const rarities = Object.keys(rarityMap);
   const rarity = rarities[itemId % rarities.length] as keyof typeof rarityMap;
 
@@ -56,6 +57,24 @@ const getRarityColor = (id: string): RarityInfo => {
   };
 };
 
+// Component chọn giờ đơn giản
+const TimePicker = ({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) => {
+  return (
+    <Input
+      type="time"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full"
+    />
+  );
+};
+
 export default function AuctionRegisterPage() {
   const { inventory } = useParams<{ inventory: string }>();
   const [inventoryDetail, setInventoryDetail] = useState<Inventory | null>(
@@ -63,10 +82,13 @@ export default function AuctionRegisterPage() {
   );
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
+  const [startTime, setStartTime] = useState<string>("00:00");
+  const [endTime, setEndTime] = useState<string>("23:59");
 
   const { data, isLoading } = useGetInventoryById(inventory);
   const { mutate: requestAuction, isPending } = useRequestAuction();
-
+  const { user } = useContext(GlobalContext);
+  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -82,11 +104,22 @@ export default function AuctionRegisterPage() {
     }
   }, [data]);
 
+  const combineDateTime = (date: Date, time: string) => {
+    const [hours, minutes] = time.split(":");
+    return dayjs(date)
+      .set("hour", parseInt(hours))
+      .set("minute", parseInt(minutes))
+      .toISOString();
+  };
+
   const onSubmit = (formData: RegisterForm) => {
-    if (dayjs(endDate).isBefore(startDate)) {
+    const startDateTime = combineDateTime(startDate, startTime);
+    const endDateTime = combineDateTime(endDate, endTime);
+
+    if (dayjs(endDateTime).isBefore(startDateTime)) {
       toast({
         title: "Lỗi",
-        description: "Ngày kết thúc phải sau ngày bắt đầu",
+        description: "Thời gian kết thúc phải sau thời gian bắt đầu",
         variant: "destructive",
       });
       return;
@@ -94,10 +127,11 @@ export default function AuctionRegisterPage() {
 
     requestAuction(
       {
+        accountId: user?.id ?? "",
         inventoryId: inventory,
-        startTime: dayjs(startDate).toISOString(),
-        endTime: dayjs(endDate).toISOString(),
-        minimunBid: parseInt(formData.price),
+        startDate: startDateTime,
+        endDate: endDateTime,
+        minimumBid: parseInt(formData.price),
       },
       {
         onSuccess: (response) => {
@@ -107,6 +141,9 @@ export default function AuctionRegisterPage() {
               : response.messages[0],
             variant: response.isSuccess ? "default" : "destructive",
           });
+          if (response.isSuccess) {
+            router.push("/auctions");
+          }
         },
         onError: () => {
           toast({
@@ -127,7 +164,9 @@ export default function AuctionRegisterPage() {
     );
   }
 
-  const { rarity, classes } = getRarityColor(inventory);
+  const { rarity, classes } = getRarityColor(
+    inventoryDetail?.itemStatusId.toString()
+  );
 
   return (
     <div className="container mx-auto py-10">
@@ -137,7 +176,7 @@ export default function AuctionRegisterPage() {
           <img
             src={inventoryDetail?.product?.imagePath || "/placeholder.png"}
             alt={inventoryDetail?.product?.name}
-            className="w-full max-w-[300px] h-[300px] object-cover rounded-lg shadow-md"
+            className="w-full max-w-[300px] h-[300px] object-cover rounded-md shadow-md"
             loading="lazy"
           />
         </div>
@@ -183,45 +222,54 @@ export default function AuctionRegisterPage() {
               )}
             </div>
 
-            {/* Date Pickers */}
+            {/* Date and Time Pickers */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Start Date and Time */}
               <div className="space-y-2">
                 <Label className="font-semibold text-gray-700">
-                  Ngày bắt đầu
+                  Thời gian bắt đầu
                 </Label>
-                <Popover>
-                  <PopoverTrigger className="w-full flex items-center justify-between p-2 border rounded-md bg-white text-sm text-gray-700 hover:border-gray-400">
-                    {dayjs(startDate).format("DD/MM/YYYY")}
-                    <CalendarIcon className="h-4 w-4 text-gray-500" />
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={(date) => date && setStartDate(date)}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="space-y-2">
+                  <Popover>
+                    <PopoverTrigger className="w-full flex items-center justify-between p-2 border rounded-md bg-white text-sm text-gray-700 hover:border-gray-400">
+                      {dayjs(startDate).format("DD/MM/YYYY")}
+                      <CalendarIcon className="h-4 w-4 text-gray-500" />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={startDate}
+                        onSelect={(date) => date && setStartDate(date)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <TimePicker value={startTime} onChange={setStartTime} />
+                </div>
               </div>
+
+              {/* End Date and Time */}
               <div className="space-y-2">
                 <Label className="font-semibold text-gray-700">
-                  Ngày kết thúc
+                  Thời gian kết thúc
                 </Label>
-                <Popover>
-                  <PopoverTrigger className="w-full flex items-center justify-between p-2 border rounded-md bg-white text-sm text-gray-700 hover:border-gray-400">
-                    {dayjs(endDate).format("DD/MM/YYYY")}
-                    <CalendarIcon className="h-4 w-4 text-gray-500" />
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={(date) => date && setEndDate(date)}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="space-y-2">
+                  <Popover>
+                    <PopoverTrigger className="w-full flex items-center justify-between p-2 border rounded-md bg-white text-sm text-gray-700 hover:border-gray-400">
+                      {dayjs(endDate).format("DD/MM/YYYY")}
+                      <CalendarIcon className="h-4 w-4 text-gray-500" />
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={endDate}
+                        onSelect={(date) => date && setEndDate(date)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <TimePicker value={endTime} onChange={setEndTime} />
+                </div>
               </div>
             </div>
 

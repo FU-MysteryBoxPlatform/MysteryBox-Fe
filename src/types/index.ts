@@ -327,3 +327,21 @@ export type TransferItem = {
   transferTypeId: number;
   transferType: TransferType;
 };
+export type AuctionRequest = {
+  auctionRequestId: string;
+  statusId: number;
+  auctionRequestStatus: any | null;
+  inventoryId: string;
+  inventory: Inventory;
+  auctionId: string | null;
+  auction: Auction | null;
+  startDate: string;
+  endDate: string;
+  minimumBid: number;
+  createDate: string;
+  updateDate: string;
+  createBy: string;
+  createByAccount: Account | null;
+  updateBy: string;
+  updateByAccount: Account | null;
+};

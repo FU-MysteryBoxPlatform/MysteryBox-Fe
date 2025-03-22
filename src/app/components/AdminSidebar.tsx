@@ -46,6 +46,7 @@ const MOD_ITEMS = [
     icon: ArrowLeftRight,
   },
   { title: "Quản lý đấu giá", url: "/management/manage-auction", icon: Crown },
+  { title: "Quản lý yêu cầu đấu giá", url: "/management/manage-auction-request", icon: Crown },
   {
     title: "Quản lý yêu cầu rút tiền",
     url: "/management/manage-withdraw",

@@ -2,6 +2,7 @@ import {
   Auction,
   AuctionHistory,
   AuctionParticipantRequest,
+  AuctionRequest,
   TAccount,
 } from "@/types";
 import { useApiMutation, useApiQuery } from "./useApi";
@@ -30,9 +31,10 @@ export type GetAuctionResponse = {
 
 export type RequestAuctionRequest = {
   inventoryId: string;
-  startTime: string;
-  endTime: string;
-  minimunBid: number;
+  startDate: string;
+  endDate: string;
+  minimumBid: number;
+  accountId: string;
 };
 
 export type TAuctionParticipant = {
@@ -63,6 +65,10 @@ export type ApproveAuctionRequest = {
   auctionRequestId: string;
 };
 
+export type GetAllAuctionRequest = {
+  items: AuctionRequest[];
+  totalPages: number;
+};
 export const useGetAllAuctions = () => {
   return useApiMutation<GetAuctionResponse, GetAuction>(
     "/auction/get-all-auction",
@@ -78,7 +84,7 @@ export const useJoinAuction = () => {
 };
 export const useRequestAuction = () => {
   return useApiMutation<string, RequestAuctionRequest>(
-    "/auction/create-auction"
+    "/auction/create-auction-request"
   );
 };
 
@@ -112,5 +118,15 @@ export const useApproveAuctionRequest = () => {
   return useApiMutation<unknown, ApproveAuctionRequest>(
     "/auction/approved-auction-request",
     "put"
+  );
+};
+
+export const useGetAllAuctionRequest = (
+  pageNumber: number,
+  pageSize: number,
+  status: number
+) => {
+  return useApiQuery<GetAllAuctionRequest>(
+    `/auction/get-all-auction-request?pageNumber=${pageNumber}&pageSize=${pageSize}&status=${status}`
   );
 };
