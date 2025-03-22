@@ -1,6 +1,5 @@
 import LoadingIndicator from "@/app/components/LoadingIndicator";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -9,62 +8,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  getAllAuctionParticipant,
-  useApproveAuctionRequest,
-  useGetAuctionById,
-} from "@/hooks/api/useAuction";
-import { TOrderDetail } from "@/hooks/api/useOrder";
-import { toast } from "@/hooks/use-toast";
+import { useGetAllBidByAuctionId } from "@/hooks/api/useAuction";
 import { cn, formatPriceVND } from "@/lib/utils";
-import { GlobalContext } from "@/provider/global-provider";
-import dayjs from "dayjs";
-import { useContext, useEffect, useState } from "react";
+import { Crown } from "lucide-react";
+import { useEffect } from "react";
 
 export default function TableAuctionParticipant({
   auctionId,
-  isEnd,
 }: {
   auctionId?: string;
-  isEnd?: boolean;
 }) {
-  const { user } = useContext(GlobalContext);
-
-  const [requestApproveId, setRequestApproveId] = useState("");
-
   const {
-    data: auction,
+    data,
     isLoading,
-    refetch: refetchDataAuction,
-  } = useGetAuctionById(auctionId || "");
-  const { mutate: approveAuctionRequest, isPending } =
-    useApproveAuctionRequest();
+    refetch: refetchList,
+  } = useGetAllBidByAuctionId(auctionId as string);
 
-  const participants = auction?.result.auctionParticipantRequests || [];
+  const bidList = data?.result?.items;
 
-  const handleApprove = (requestId: string) => {
-    setRequestApproveId(requestId);
-    approveAuctionRequest(
-      {
-        accountId: user?.id ?? "",
-        auctionRequestId: requestId,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            toast({
-              title: "Đã duyệt",
-            });
-            refetchDataAuction();
-          } else {
-            toast({
-              title: data.messages[0],
-            });
-          }
-        },
-      }
-    );
-  };
+  useEffect(() => {
+    refetchList();
+  }, [auctionId]);
 
   if (isLoading)
     return (
@@ -75,60 +39,49 @@ export default function TableAuctionParticipant({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Bộ sưu tập</CardTitle>
-      </CardHeader>
       <CardContent>
         <Table className="mb-4">
           <TableHeader>
             <TableRow>
               <TableHead>Tên</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Giá</TableHead>
               <TableHead>Trạng thái</TableHead>
-              <TableHead>Ngày yêu cầu</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {participants?.map((p) => (
-              <TableRow key={p.auctionParticipantRequestId}>
+            {bidList?.map((bid) => (
+              <TableRow key={bid.auctionHistoryId}>
                 <TableCell className="font-medium">
-                  {p.createByAccount?.firstName +
+                  {bid.createByAccount?.firstName +
                     " " +
-                    p.createByAccount?.lastName}
+                    bid.createByAccount?.lastName}
                 </TableCell>
-                <TableCell
-                  className={cn(
-                    "flex items-center gap-2",
-                    p.statusId === 0 && "text-red-500",
-                    p.statusId === 1 && "text-green-500",
-                    p.statusId === 2 && "text-gray-500"
-                  )}
-                >
-                  {p.statusId === 0
-                    ? "Đang chờ duyệt"
-                    : p.statusId === 1
-                    ? "Đã duyệt"
-                    : "Đã từ chối"}
-                </TableCell>
-
+                <TableCell>{bid.createByAccount?.email}</TableCell>
                 <TableCell>
-                  {dayjs(p.createDate).format("DD/MM/YYYY")}
+                  <p>{formatPriceVND(bid.amount)}</p>
                 </TableCell>
-                {p.statusId === 0 && (
-                  <TableCell>
-                    <Button
-                      onClick={() =>
-                        handleApprove(p.auctionParticipantRequestId)
-                      }
-                    >
-                      {isPending &&
-                      requestApproveId === p.auctionParticipantRequestId ? (
-                        <LoadingIndicator />
-                      ) : (
-                        "Duyệt"
-                      )}
-                    </Button>
-                  </TableCell>
-                )}
+                <TableCell>
+                  <div
+                    className={cn(
+                      "px-2 py-1 rounded-full text-white relative w-fit",
+                      bid.statusId === 0
+                        ? "bg-green-600"
+                        : bid.statusId === 1
+                        ? "bg-yellow-600"
+                        : "bg-red-600"
+                    )}
+                  >
+                    {bid.statusId === 1 && (
+                      <Crown className="absolute -top-2 -right-1 text-green-500 w-5 h-5 rotate-[20deg]" />
+                    )}
+                    {bid.statusId === 0
+                      ? "Đã đặt chỗ"
+                      : bid.statusId === 1
+                      ? "Chiến thắng"
+                      : "Thất bại"}
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

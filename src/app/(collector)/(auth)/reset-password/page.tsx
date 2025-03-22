@@ -59,8 +59,6 @@ function FormResetPassword({ email }: { email: string }) {
       },
       {
         onSuccess: (data) => {
-          console.log({ data });
-
           if (data.isSuccess) {
             toast({
               title: data.messages[0],

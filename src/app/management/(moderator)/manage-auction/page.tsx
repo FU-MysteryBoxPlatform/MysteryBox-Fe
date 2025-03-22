@@ -44,6 +44,7 @@ import {
 import TableAuctionParticipant from "./components/TableAuctionParticipant";
 import { GlobalContext } from "@/provider/global-provider";
 import { toast } from "@/hooks/use-toast";
+import AuctionDetail from "./components/AuctionDetail";
 
 // Component Tabs
 const FilterTabs = ({
@@ -89,36 +90,13 @@ export default function AuctionManagementPage() {
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [participantModal, setParticipantModal] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
   const [auctionId, setAuctionId] = useState("");
   const [isEnd, setIsEnd] = useState(false);
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const [totalPages, setTotalPages] = useState(0);
 
   const { mutate: mutateGetAuction, isPending } = useGetAllAuctions();
-  const { mutate: approveAuctionRequest, isPending: pendingApprove } =
-    useApproveAuctionRequest();
-
-  const handleApprove = (requestId: string) => {
-    approveAuctionRequest(
-      {
-        accountId: user?.id ?? "",
-        auctionRequestId: requestId,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            toast({
-              title: "Đã duyệt",
-            });
-          } else {
-            toast({
-              title: data.messages[0],
-            });
-          }
-        },
-      }
-    );
-  };
 
   const fetchAuctions = () => {
     mutateGetAuction(
@@ -132,8 +110,6 @@ export default function AuctionManagementPage() {
       },
       {
         onSuccess: (data) => {
-          console.log({ data });
-
           if (data.isSuccess) {
             setAuctions(data.result.items);
             setTotalPages(data.result.totalPages);
@@ -277,18 +253,16 @@ export default function AuctionManagementPage() {
                             >
                               Danh sách tham dự
                             </Button>
-                            <Button variant="ghost" className="w-fit">
+                            <Button
+                              variant="ghost"
+                              className="w-fit"
+                              onClick={() => {
+                                setOpenDetail(true);
+                                setAuctionId(auc.auctionId);
+                              }}
+                            >
                               Xem chi tiết
                             </Button>
-                            {auc.statusId === 0 && (
-                              <Button
-                                variant="ghost"
-                                className="w-fit"
-                                onClick={() => handleApprove(auc.auctionId)}
-                              >
-                                Duyệt
-                              </Button>
-                            )}
                           </PopoverContent>
                         </Popover>
                       </TableCell>
@@ -323,9 +297,17 @@ export default function AuctionManagementPage() {
       <Dialog open={participantModal} onOpenChange={setParticipantModal}>
         <DialogContent className="max-w-[80vw]">
           <DialogHeader>
-            <DialogTitle>Danh sách tham dự</DialogTitle>
+            <DialogTitle>Danh sách tham dự đấu giá</DialogTitle>
           </DialogHeader>
-          <TableAuctionParticipant auctionId={auctionId} isEnd={isEnd} />
+          <TableAuctionParticipant auctionId={auctionId} />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={openDetail} onOpenChange={setOpenDetail}>
+        <DialogContent className="max-w-[80vw]">
+          <DialogHeader>
+            <DialogTitle>Chi tiết đấu giá</DialogTitle>
+          </DialogHeader>
+          <AuctionDetail auctionId={auctionId} />
         </DialogContent>
       </Dialog>
     </div>

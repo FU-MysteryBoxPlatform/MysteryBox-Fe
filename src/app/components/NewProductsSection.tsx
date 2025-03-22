@@ -16,11 +16,8 @@ export default function NewProductsSection() {
       pageNumber: 1,
       pageSize: 10,
     });
-    console.log({ data });
-
     setItems(data.result.items);
   };
-  console.log({ items });
 
   useEffect(() => {
     fetchData();
