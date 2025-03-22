@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { History } from "lucide-react";
 import { useAllSaleByAccountId } from "@/hooks/api/useSale";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { GlobalContext } from "@/provider/global-provider";
 import { formatDate, formatPriceVND } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,6 +25,16 @@ import Paginator from "@/app/components/Paginator";
 import Link from "next/link";
 import LoadingIndicator from "@/app/components/LoadingIndicator";
 import SaleStatusBadge from "@/app/components/SaleStatusBadge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import axiosClient from "@/axios-client";
+import { toast } from "@/hooks/use-toast";
 
 export default function Page() {
   const { user } = useContext(GlobalContext);
@@ -34,6 +44,30 @@ export default function Page() {
   const page = params["page"] || 1;
   const { data, isPending } = useAllSaleByAccountId(user?.id ?? "", +page, 10);
   const totalPages = data?.result.totalPages ?? 0;
+
+  const [saleId, setSaleId] = useState("");
+  const [isLoadingCancel, setIsLoadingCancel] = useState(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+
+  const handleCancelSale = async () => {
+    try {
+      setIsLoadingCancel(true);
+      const response = await axiosClient.put(
+        `/sale/cancel-sale?saleId=${saleId}`
+      );
+
+      setIsLoadingCancel(false);
+
+      if (response.data.isSuccess) {
+        setOpenConfirmModal(false);
+        toast({
+          title: "Đã huỷ yêu cầu rao bán thành công!",
+        });
+      } else toast({ title: response.data.messages[0] });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6 bg-white rounded-lg">
@@ -126,6 +160,18 @@ export default function Page() {
                       <TableCell>
                         <SaleStatusBadge status={item.saleStatus.name} />
                       </TableCell>
+                      {item.saleStatus.name === "WaitingForApprove" && (
+                        <TableCell>
+                          <Button
+                            onClick={() => {
+                              setSaleId(item.saleId);
+                              setOpenConfirmModal(true);
+                            }}
+                          >
+                            Huỷ
+                          </Button>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                   {data?.result.items.length === 0 && (
@@ -157,6 +203,26 @@ export default function Page() {
           )}
         </CardContent>
       </Card>
+      <Dialog open={openConfirmModal} onOpenChange={setOpenConfirmModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Xác nhận huỷ yêu cầu rao bán</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn huỷ yêu cầu rao bán này không? Hành động này
+              sẽ không thể được thu hồi lại.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2">
+            <Button onClick={() => setOpenConfirmModal(false)}>Hủy</Button>
+            <Button
+              onClick={handleCancelSale}
+              className="bg-[#E12E43] hover:bg-[#B71C32]"
+            >
+              {isLoadingCancel ? <LoadingIndicator /> : "Xác nhận"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

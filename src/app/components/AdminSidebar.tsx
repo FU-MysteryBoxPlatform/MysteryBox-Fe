@@ -15,6 +15,8 @@ import {
   ChartArea,
   Coins,
   Crown,
+  CrownIcon,
+  Flag,
   HandCoins,
   Settings,
   ShoppingBasket,
@@ -31,7 +33,7 @@ const MOD_ITEMS = [
     icon: ChartArea,
   },
   {
-    title: "Quản lý vật phẩm",
+    title: "Quản lý mua bán",
     url: "/management/manage-product",
     icon: HandCoins,
   },
@@ -49,12 +51,17 @@ const MOD_ITEMS = [
   {
     title: "Quản lý yêu cầu đấu giá",
     url: "/management/auction-request",
-    icon: Crown,
+    icon: CrownIcon,
   },
   {
     title: "Quản lý yêu cầu rút tiền",
     url: "/management/manage-withdraw",
     icon: Coins,
+  },
+  {
+    title: "Quản lý báo cáo",
+    url: "/management/manage-report",
+    icon: Flag,
   },
 ];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingIndicator from "@/app/components/LoadingIndicator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,7 +56,7 @@ export default function ChatPage() {
   );
 
   const { mutate: sendMessage } = useCreateChatMessage();
-  const { mutate: createReport } = useCreateReport();
+  const { mutate: createReport, isPending } = useCreateReport();
 
   const partner = data?.result.converstationParticipants.find(
     (item) => item.account.id !== user?.id
@@ -65,11 +66,23 @@ export default function ChatPage() {
   const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   const onsubmit = (data: ReportUserForm) => {
-    createReport({
-      accountId: user?.id || "",
-      saleAccountId: partner?.id || "",
-      reason: data.reason,
-    });
+    createReport(
+      {
+        accountId: user?.id || "",
+        saleAccountId: partner?.id || "",
+        reason: data.reason,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            toast({
+              title: "Gửi báo cáo thành công",
+            });
+            setOpenReportModal(false);
+          } else toast({ title: data.messages[0] });
+        },
+      }
+    );
   };
 
   // Scroll to the bottom whenever messages change
@@ -259,7 +272,7 @@ export default function ChatPage() {
               className="bg-[#E12E43] text-white hover:bg-[#B71C32] w-full"
               onClick={handleSubmit(onsubmit)}
             >
-              Báo cáo
+              {isPending ? <LoadingIndicator /> : "Báo cáo"}
             </Button>
           </div>
         </DialogContent>
