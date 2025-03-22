@@ -14,7 +14,7 @@ import { formatPriceVND } from "@/lib/utils";
 import { GlobalContext } from "@/provider/global-provider";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
-import * as signalR from "@microsoft/signalr"; // Import SignalR
+import * as signalR from "@microsoft/signalr";
 
 export default function Page() {
   const { id } = useParams();
@@ -22,58 +22,75 @@ export default function Page() {
   if (typeof id !== "string") {
     throw new Error("Invalid id");
   }
+
   const {
     data: auction,
     isPending,
     refetch: refetchDataAuction,
   } = useGetAuctionById(id);
-  const {
-    data: bidList,
-    isPending: isCreatePending,
-    refetch: refetchList,
-  } = useGetAllBidByAuctionId(id);
-  const { mutateAsync: createBid } = useCreateBid();
-  //TODO: get box details here
-  const [amount, setAmount] = useState<number>(
-    auction?.result?.auction?.currentBid ?? 0
-  );
+  const { data: bidList, refetch: refetchList } = useGetAllBidByAuctionId(id);
+  const { mutateAsync: createBid, isPending: isCreatePending } = useCreateBid();
   const { user } = useContext(GlobalContext);
+  const [amount, setAmount] = useState("");
   const [connection, setConnection] = useState<signalR.HubConnection | null>(
     null
   );
 
+  // Format số tiền khi người dùng nhập
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ""); // Chỉ lấy số
+    setAmount(value);
+  };
+
+  // Kiểm tra và đặt giá đấu
   const handleConfirm = async () => {
     if (!auction?.result.auction.auctionId) return;
-    if (amount < auction?.result.auction.currentBid) return;
-    await createBid(
-      {
-        auctionId: auction?.result.auction.auctionId,
-        bidAmount: amount,
+
+    const numericAmount = Number(amount);
+    if (numericAmount <= auction?.result.auction.currentBid) {
+      toast({
+        title: "Lỗi",
+        description: "Giá đấu phải lớn hơn giá hiện tại",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await createBid({
+        auctionId: auction.result.auction.auctionId,
+        bidAmount: numericAmount,
         accountId: user?.id ?? "",
-      },
-      {
-        onSuccess: (data) => {
-          setAmount(0);
-          if (data.isSuccess) {
-            toast({
-              title: "Thành công",
-              description: "Đấu giá thành công",
-            });
-          } else {
-            toast({
-              description: data.messages[0],
-              title: "Đấu giá thất bại",
-            });
-          }
-        },
+      });
+
+      if (response.isSuccess) {
+        toast({
+          title: "Thành công",
+          description: "Đấu giá thành công",
+        });
+        setAmount("");
+        await fetchData();
+      } else {
+        toast({
+          description: response.messages[0],
+          title: "Đấu giá thất bại",
+          variant: "destructive",
+        });
       }
-    );
+    } catch (error) {
+      toast({
+        title: "Lỗi",
+        description: "Có lỗi xảy ra khi đặt giá",
+        variant: "destructive",
+      });
+    }
   };
 
   const fetchData = async () => {
-    await refetchDataAuction();
-    await refetchList();
+    await Promise.all([refetchDataAuction(), refetchList()]);
   };
+
+  // Thiết lập SignalR
   useEffect(() => {
     const newConnection = new signalR.HubConnectionBuilder()
       .withUrl(`${process.env.NEXT_PUBLIC_DOMAIN}/notifications/`)
@@ -83,130 +100,138 @@ export default function Page() {
     setConnection(newConnection);
 
     return () => {
-      if (connection) {
-        connection.stop();
-      }
+      newConnection.stop();
     };
   }, []);
 
   useEffect(() => {
-    let retryCount = 0;
-    const MAX_RETRIES = 5;
-    const RETRY_DELAY = 3000; // 3 seconds
+    if (!connection) return;
 
     const startConnection = async () => {
-      if (connection) {
-        try {
-          await connection.start();
-          connection.on("LOAD_NEW_BID", async () => {
-            await fetchData(); // Fetch new bids when a new bid is placed
-          });
-        } catch (error) {
-          if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            setTimeout(startConnection, RETRY_DELAY);
-            console.log(error); // Retry connection
-          } else {
-            console.log("Max retries reached. Could not connect to SignalR.");
-          }
-        }
+      try {
+        await connection.start();
+        connection.on("LOAD_NEW_BID", fetchData);
+      } catch (error) {
+        console.error("SignalR Connection Error:", error);
       }
     };
+
     startConnection();
   }, [connection]);
 
   if (isPending) return <LoadingIndicator />;
 
+  // Lấy người chiến thắng hiện tại
+  const currentWinner = bidList?.result?.items?.[0];
+
   return (
-    <div>
-      <div className="flex gap-6 max-md:flex-col">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={auction?.result?.auction.inventory.product.imagePath}
-          alt="image"
-          className="shrink-0 object-cover aspect-square max-h-[274px]"
-        />
-        <div className="flex-1 grid gap-6">
-          <p className="text-xl md:text-2xl lg:text-3xl font-bold">
-            Chi tiết sản phẩm
-          </p>
-          <Card className="w-full">
-            <CardContent className="p-6 grid xl:grid-cols-2 gap-4">
-              <div className="">
-                <p className="text-lg lg:text-xl font-bold mb-1">Giá bắt đầu</p>
-                <p className="font-bold mb-6">
-                  {formatPriceVND(Number(auction?.result?.auction?.minimunBid))}
-                </p>
-                <div className="flex items-center">
-                  {Array.from(
-                    { length: bidList?.result?.items?.length ?? 0 },
-                    (_, i) => (
-                      <div
-                        key={i}
-                        className="h-8 w-8 rounded-full bg-gray-400 border border-[#C4C4C4] [&:not(:first-of-type)]:-ml-2"
-                      />
-                    )
-                  )}
+    <div className="container mx-auto p-4">
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="flex justify-center">
+          <img
+            src={auction?.result?.auction.inventory.product.imagePath}
+            alt={auction?.result?.auction.inventory.product.name}
+            className="object-cover rounded-lg max-h-[400px] w-full"
+          />
+        </div>
+
+        <div className="space-y-6">
+          <h1 className="text-2xl md:text-3xl font-bold">
+            {auction?.result?.auction.inventory.product.name}
+          </h1>
+
+          <Card>
+            <CardContent className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Giá khởi điểm</p>
+                  <p className="font-bold">
+                    {formatPriceVND(
+                      Number(auction?.result?.auction.minimunBid)
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Giá hiện tại</p>
+                  <p className="font-bold text-red-600">
+                    {formatPriceVND(
+                      Number(auction?.result?.auction.currentBid)
+                    )}
+                  </p>
                 </div>
               </div>
-              <div className="">
-                <p className="text-lg lg:text-xl font-bold mb-1">
-                  Giá đấu thầu hiện tại
-                </p>
-                <p className="font-bold">
-                  {formatPriceVND(Number(auction?.result?.auction.currentBid))}
-                </p>
-              </div>
+
+              {/* Hiển thị người chiến thắng hiện tại */}
+              {currentWinner && (
+                <div className="border-t pt-4">
+                  <p className="text-sm text-gray-500">
+                    Người dẫn đầu hiện tại
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <img
+                      src={currentWinner.createByAccount?.avatar ?? ""}
+                      alt="winner avatar"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <p className="font-semibold">
+                      {currentWinner.createByAccount?.firstName}{" "}
+                      {currentWinner.createByAccount?.lastName}
+                    </p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          <div>
-            <div className="grid grid-cols-2 gap-6 bg-black p-6 text-white">
-              <div className="text-lg font-bold flex items-center gap-3">
-                <div className="w-4 h-4 rounded-full bg-[#E12E43] animate-ping"></div>
-                Đấu thầu hiện tại
-              </div>
-              <div className="text-lg font-bold">
-                {bidList?.result?.items?.length} ra giá
-              </div>
-            </div>
-            <div className="border border-black p-6 grid gap-4">
-              {bidList?.result?.items?.map((bid) => (
-                <div
-                  key={bid.auctionHistoryId}
-                  className="grid grid-cols-2 gap-6"
-                >
-                  <div className="flex items-center gap-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={bid.createByAccount?.avatar ?? ""}
-                      alt="image"
-                      className="w-12 h-12 rounded-full"
-                    />
-                    <p className="text-lg font-bold">
-                      {bid.createByAccount?.firstName}
-                    </p>
-                  </div>
-                  <p>{formatPriceVND(bid.amount)}</p>
-                </div>
-              ))}
-            </div>
+          {/* Input và Button đặt giá */}
+          <div className="flex gap-4">
+            <Input
+              type="text"
+              placeholder="Nhập giá đấu (VD: 1000000)"
+              value={amount ? Number(amount).toLocaleString("vi-VN") : ""}
+              onChange={handleAmountChange}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleConfirm}
+              disabled={isCreatePending}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isCreatePending ? <LoadingIndicator /> : "Đặt giá"}
+            </Button>
           </div>
 
-          <Input
-            type="number"
-            min={auction?.result?.auction.currentBid}
-            placeholder="Nhập giá đấu"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-          />
-
-          <Button
-            className="bg-[#E12E43] text-white hover:bg-[#B71C32]"
-            onClick={handleConfirm}
-          >
-            {isCreatePending ? <LoadingIndicator /> : "Đặt giá đấu thầu"}
-          </Button>
+          {/* Lịch sử đấu giá */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex justify-between mb-4">
+                <h3 className="font-semibold">Lịch sử đấu giá</h3>
+                <span className="text-sm text-gray-500">
+                  {bidList?.result?.items?.length ?? 0} lượt ra giá
+                </span>
+              </div>
+              <div className="space-y-4 max-h-[200px] overflow-y-auto">
+                {bidList?.result?.items?.map((bid) => (
+                  <div
+                    key={bid.auctionHistoryId}
+                    className="flex justify-between items-center"
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={bid.createByAccount?.avatar ?? ""}
+                        alt="bidder avatar"
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <p>{bid.createByAccount?.firstName}</p>
+                    </div>
+                    <p className="font-semibold">
+                      {formatPriceVND(bid.amount)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
