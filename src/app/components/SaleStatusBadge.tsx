@@ -6,7 +6,7 @@ export default function SaleStatusBadge({ status }: { status: string }) {
     OutOfStock: {
       color: "bg-green-100 text-green-800 border-green-200",
       icon: <div className="w-2 h-2 rounded-full bg-green-500 mr-1 shrink-0" />,
-      name: "Đã bán",
+      name: "Hết hàng",
     },
     WaitingForApprove: {
       color: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -28,7 +28,7 @@ export default function SaleStatusBadge({ status }: { status: string }) {
     Suspended: {
       color: "bg-red-100 text-red-800 border-red-200",
       icon: <div className="w-2 h-2 rounded-full bg-red-500 mr-1 shrink-0" />,
-      name: "Cấm",
+      name: "Đã ngưng",
     },
   };
 

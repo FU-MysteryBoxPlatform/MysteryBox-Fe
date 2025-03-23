@@ -42,7 +42,11 @@ export default function Page() {
   const searchParams = useSearchParams();
   const params = queryString.parse(searchParams.toString());
   const page = params["page"] || 1;
-  const { data, isPending } = useAllSaleByAccountId(user?.id ?? "", +page, 10);
+  const { data, isPending, refetch } = useAllSaleByAccountId(
+    user?.id ?? "",
+    +page,
+    10
+  );
   const totalPages = data?.result.totalPages ?? 0;
 
   const [saleId, setSaleId] = useState("");
@@ -60,6 +64,7 @@ export default function Page() {
 
       if (response.data.isSuccess) {
         setOpenConfirmModal(false);
+        refetch();
         toast({
           title: "Đã huỷ yêu cầu rao bán thành công!",
         });

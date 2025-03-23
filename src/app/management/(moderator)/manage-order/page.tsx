@@ -76,13 +76,15 @@ export default function Page() {
   };
 
   const handleFilterByStartDate = (date: Date | [Date, Date] | null) => {
-    params["startDate"] = date && !Array.isArray(date) ? dayjs(date).toISOString() : null;
+    params["startDate"] =
+      date && !Array.isArray(date) ? dayjs(date).toISOString() : null;
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
 
   const handleFilterByEndDate = (date: Date | [Date, Date] | null) => {
-    params["endDate"] = date && !Array.isArray(date) ? dayjs(date).toISOString() : null;
+    params["endDate"] =
+      date && !Array.isArray(date) ? dayjs(date).toISOString() : null;
     params["page"] = "1";
     router.push(`?${queryString.stringify(params)}`);
   };
@@ -164,7 +166,9 @@ export default function Page() {
                 <DatePicker
                   className="w-full h-10"
                   value={startDate ? new Date(startDate as string) : null}
-                  onChange={(value) => handleFilterByStartDate(value as Date | [Date, Date] | null)}
+                  onChange={(value) =>
+                    handleFilterByStartDate(value as Date | [Date, Date] | null)
+                  }
                   clearIcon={null}
                   calendarIcon={null}
                 />
@@ -173,7 +177,9 @@ export default function Page() {
                 <DatePicker
                   className="w-full h-10"
                   value={endDate ? new Date(endDate as string) : null}
-                  onChange={(value) => handleFilterByEndDate(value as Date | [Date, Date] | null)}
+                  onChange={(value) =>
+                    handleFilterByEndDate(value as Date | [Date, Date] | null)
+                  }
                   clearIcon={null}
                   calendarIcon={null}
                 />
@@ -262,7 +268,8 @@ export default function Page() {
                                 <div className="max-h-[60vh] overflow-auto">
                                   <TableCollection
                                     orderDetail={orderDetail?.filter(
-                                      (order) => order.collection
+                                      (order) =>
+                                        order.collection || order.inventory
                                     )}
                                   />
                                 </div>

@@ -18,6 +18,8 @@ export default function TableCollection({
   title?: string;
   orderDetail?: TOrderDetail[];
 }) {
+  console.log({ orderDetail });
+
   if (!orderDetail) return null;
 
   const renderOrderStatus = (status: number) => {

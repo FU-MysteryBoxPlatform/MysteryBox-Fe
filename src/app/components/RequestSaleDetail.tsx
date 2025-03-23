@@ -18,6 +18,7 @@ export default function RequestSaleDetail({
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingCancel, setIsLoadingCancel] = useState(false);
+  const [isRemove, setIsRemove] = useState(false);
 
   const handleApproveSale = async () => {
     try {
@@ -103,15 +104,28 @@ export default function RequestSaleDetail({
             </Button>
           </div>
         )}
+        {sale.saleStatusId === 1 && (
+          <div className="flex gap-4 mt-auto [&>*]:flex-1">
+            <Button
+              onClick={() => {
+                setOpen(true);
+                setIsRemove(true);
+              }}
+            >
+              {isLoadingCancel ? <LoadingIndicator /> : "Gỡ khỏi marketplace"}
+            </Button>
+          </div>
+        )}
       </div>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader className="font-bold">
-            Từ chối yêu cầu rao bán
+            {!isRemove ? "Từ chối yêu cầu rao bán" : "Gỡ vật phẩm rao bán"}
           </DialogHeader>
           <p>
-            Bạn có chắc chắn mình muốn từ chối yêu cầu rao bán này? Hành động
-            này sẽ không thể được thu hồi lại.
+            {!isRemove
+              ? "Bạn có chắc chắn mình muốn từ chối yêu cầu rao bán này? Hành động này sẽ không thể được thu hồi lại."
+              : "Bạn có chắc chắn mình muốn gỡ vật phẩm rao bán này? Hành động này sẽ không thể được thu hồi lại."}
           </p>
           <div className="flex items-center [&>*]:flex-1 gap-6">
             <Button onClick={() => setOpen(false)}>
