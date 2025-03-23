@@ -19,7 +19,7 @@ export default function Page() {
   const [inventories, setInventories] = useState<TInventoryItem[]>([]);
   const { mutate: mutateGetInventory, isPending } = useGetInventory();
 
-  useEffect(() => {
+  const fetchData = async () => {
     if (!user?.id) return;
     mutateGetInventory(
       {
@@ -37,6 +37,10 @@ export default function Page() {
         },
       }
     );
+  };
+  useEffect(() => {
+    if (!user?.id) return;
+    fetchData();
   }, [mutateGetInventory, page, user?.id]);
 
   return (
@@ -77,6 +81,7 @@ export default function Page() {
                 isPersonal
                 showPrice={false}
                 collectionId={product.collection?.collectionId}
+                fetchData={fetchData}
               />
             ))}
           </div>

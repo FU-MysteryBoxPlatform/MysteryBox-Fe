@@ -41,6 +41,7 @@ export type InventoryCardProps = {
   showPrice?: boolean;
   isPersonal?: boolean;
   collectionId: string;
+  fetchData?: () => void;
 };
 const SellInventorySchema = z.object({
   quantity: z.string(),
@@ -59,6 +60,7 @@ export default function InventoryCard({
   showPrice = true,
   isPersonal = false,
   collectionId,
+  fetchData,
 }: InventoryCardProps) {
   const [openPreview, setOpenPreview] = useState(false);
   const [openSellModal, setOpenSellModal] = useState(false);
@@ -114,6 +116,7 @@ export default function InventoryCard({
             });
             setOpenSellModal(false);
           } else toast({ title: "Rao bán vật phẩm thất bại!" });
+          fetchData && fetchData();
         },
       }
     );
@@ -133,6 +136,7 @@ export default function InventoryCard({
           }
         },
       });
+      fetchData && fetchData();
       setOpenConfirmModal(false);
     }
   };
@@ -149,7 +153,7 @@ export default function InventoryCard({
                 <Ellipsis className="h-4 w-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {status === 0 && !collectionId && (
+                {!collectionId && (
                   <DropdownMenuItem onClick={() => setOpenSellModal(true)}>
                     Bán
                   </DropdownMenuItem>
