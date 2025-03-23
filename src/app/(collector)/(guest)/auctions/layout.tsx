@@ -38,19 +38,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/auction-banner.png"
-        alt="Banner auctions"
-        className="object-cover w-full max-h-[70vh]"
-      />
-      {/* <div className="bg-[#F4F1F1] py-10 px-4 md:px-10 lg:px-16 flex flex-col xl:flex-row items-center justify-between">
-        <p className="uppercase text-xl md:text-2xl lg:text-4xl font-semibold max-xl:mb-10">
-          Đấu giá sắp diễn ra
-        </p>
-        <Countdown targetDate={dayjs("05/03/2025").toISOString()} />
-      </div> */}
+
       <div className="max-w-7xl  mx-auto px-4 md:px-10 lg:px-16 py-10">
-        <div className="w-full flex gap-6 flex-col lg:flex-row">
+        <div className="bg-[#F4F1F1] py-10 px-4 md:px-10 lg:px-16 flex flex-col xl:flex-row items-center justify-between">
+          <p className="uppercase text-xl md:text-2xl lg:text-4xl font-semibold max-xl:mb-10">
+            Đấu giá sắp diễn ra
+          </p>
+          <Countdown targetDate={dayjs("05/03/2025").toISOString()} />
+        </div>
+        <div className="my-2 w-full flex gap-6 flex-col lg:flex-row">
           <div className="shrink-0 max-lg:hidden">
             <p className="md:text-lg lg:text-xl bg-black text-white py-1 px-4 uppercase font-bold mb-2">
               Đấu giá

@@ -5,15 +5,18 @@ import { Button } from "@/components/ui/button";
 import { useGetAllAuctions } from "@/hooks/api/useAuction";
 import { Auction } from "@/types";
 import { useEffect, useState } from "react";
+import * as signalR from "@microsoft/signalr";
 
 export default function Page() {
   const [auctionData, setAuctionData] = useState<Auction[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
-
+  const [connection, setConnection] = useState<signalR.HubConnection | null>(
+    null
+  );
   const { mutateAsync: mutateAuction, isPending } = useGetAllAuctions();
 
-  useEffect(() => {
+  const refetch = async () => {
     mutateAuction(
       {
         pageNumber: pageNumber,
@@ -23,23 +26,50 @@ export default function Page() {
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            console.log("ehehe",data)
+            console.log("ehehe", data);
             setAuctionData(data.result.items);
             setTotalPages(data.result.totalPages);
           }
         },
       }
     );
+  };
+  useEffect(() => {
+    refetch();
   }, [pageNumber]);
 
+  useEffect(() => {
+    const newConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`${process.env.NEXT_PUBLIC_DOMAIN}/notifications/`)
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(newConnection);
+
+    return () => {
+      newConnection.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!connection) return;
+
+    const startConnection = async () => {
+      try {
+        await connection.start();
+        connection.on("LOAD_NEW_BID", refetch);
+      } catch (error) {
+        console.error("SignalR Connection Error:", error);
+      }
+    };
+
+    startConnection();
+  }, [connection]);
   return (
     <div className="">
       <div className="grid grid-cols-2 gap-4">
         {auctionData.map((product) => (
-          <div
-            key={product.auctionId}
-            className="cursor-pointer"
-          >
+          <div key={product.auctionId} className="cursor-pointer">
             <AuctionCard auction={product} />
           </div>
         ))}

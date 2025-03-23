@@ -123,16 +123,22 @@ export default function Page() {
 
   // Lấy người chiến thắng hiện tại
   const currentWinner = bidList?.result?.items?.[0];
-
+  console.log(auction?.result.auction.statusId);
   return (
     <div className="container mx-auto p-4">
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center justify-center">
           <img
             src={auction?.result?.auction.inventory.product.imagePath}
             alt={auction?.result?.auction.inventory.product.name}
             className="object-cover rounded-lg max-h-[400px] w-full"
           />
+
+          {auction?.result.auction.statusId === 2 && (
+            <div className=" flex items-center justify-center">
+              <p className="text-red-800 my-4 uppercase animate-pulse text-2xl  font-semibold">Đã kết thúc</p>
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -194,7 +200,9 @@ export default function Page() {
             />
             <Button
               onClick={handleConfirm}
-              disabled={isCreatePending}
+              disabled={
+                isCreatePending || auction?.result.auction.statusId === 2
+              }
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               {isCreatePending ? <LoadingIndicator /> : "Đặt giá"}
