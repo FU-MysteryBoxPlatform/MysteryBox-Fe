@@ -15,6 +15,8 @@ import { GlobalContext } from "@/provider/global-provider";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
+import Countdown from "@/app/components/Countdown";
+import dayjs from "dayjs";
 
 export default function Page() {
   const { id } = useParams();
@@ -125,7 +127,15 @@ export default function Page() {
   const currentWinner = bidList?.result?.items?.[0];
   console.log(auction?.result.auction.statusId);
   return (
-    <div className="container mx-auto p-4">
+    <div className=" mx-auto p-4">
+      <div className="bg-[#F4F1F1] py-10 px-4 md:px-10 lg:px-16 flex flex-col xl:flex-row items-center justify-between">
+        <p className="uppercase text-xl md:text-2xl  font-semibold max-xl:mb-10">
+          Đấu giá sắp kết thúc
+        </p>
+        <Countdown
+          targetDate={dayjs(auction?.result.auction.endTime).toISOString()}
+        />
+      </div>
       <div className="grid md:grid-cols-2 gap-8">
         <div className="flex flex-col items-center justify-center">
           <img
@@ -136,7 +146,9 @@ export default function Page() {
 
           {auction?.result.auction.statusId === 2 && (
             <div className=" flex items-center justify-center">
-              <p className="text-red-800 my-4 uppercase animate-pulse text-2xl  font-semibold">Đã kết thúc</p>
+              <p className="text-red-800 my-4 uppercase animate-pulse text-2xl  font-semibold">
+                Đã kết thúc
+              </p>
             </div>
           )}
         </div>
