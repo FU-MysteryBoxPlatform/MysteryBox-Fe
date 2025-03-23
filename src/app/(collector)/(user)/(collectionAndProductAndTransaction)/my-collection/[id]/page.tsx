@@ -41,13 +41,13 @@ export default function Page() {
     <div className="w-full max-w-7xl mx-auto p-6 bg-white rounded-lg">
       <h1 className="text-3xl font-bold text-gray-900 mb-4">
         Bộ Sưu Tập{" "}
-        <span className="text-emerald-600">
+        <span className="text-red-600">
           {collectionProgress.collection.collectionName}
         </span>
       </h1>
       <p className="text-lg font-semibold text-gray-700 mb-8">
         Bạn đã sưu tập được{" "}
-        <span className="text-emerald-600">
+        <span className="text-red-600">
           {ownedProductIds?.length || 0}/{collectionProducts.length}
         </span>{" "}
         vật phẩm
@@ -63,7 +63,7 @@ export default function Page() {
               className={cn(
                 "relative flex flex-col items-center gap-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm transition-all",
                 isOwned
-                  ? "border-emerald-300 hover:shadow-md hover:bg-emerald-50"
+                  ? "border-red-300 hover:shadow-md hover:bg-red-50"
                   : "opacity-60 border-gray-300"
               )}
             >
@@ -77,7 +77,7 @@ export default function Page() {
                 <div
                   className={cn(
                     "absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold text-white",
-                    isOwned ? "bg-emerald-600" : "bg-gray-500"
+                    isOwned ? "bg-red-600" : "bg-gray-500"
                   )}
                 >
                   {isOwned ? "Đã sở hữu" : "Chưa sở hữu"}

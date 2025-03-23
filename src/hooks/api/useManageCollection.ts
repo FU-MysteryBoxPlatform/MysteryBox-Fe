@@ -31,6 +31,7 @@ export type TCollectionRequest = {
   maximumPrice?: number;
   startTime?: string;
   endTime?: string;
+  accountId?: string;
 };
 
 export type TCollectionResponse = {

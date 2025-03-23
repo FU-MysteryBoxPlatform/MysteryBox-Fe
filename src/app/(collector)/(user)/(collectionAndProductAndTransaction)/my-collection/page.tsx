@@ -8,9 +8,10 @@ import {
 } from "@/hooks/api/useManageCollection";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
@@ -18,22 +19,25 @@ export default function Page() {
   const [totalPages, setTotalPages] = useState(0);
   const [collections, setCollections] = useState<TCollectionWithProgress[]>([]);
   const { mutate: mutateGetCollections, isPending } = useGetCollections();
-
+  const { user } = useContext(GlobalContext);
   useEffect(() => {
-    mutateGetCollections(
-      {
-        pageNumber: page,
-        pageSize: 12,
-      },
-      {
-        onSuccess: (data) => {
-          if (data.isSuccess) {
-            setCollections(data.result.items || []);
-            setTotalPages(data.result.totalPages || 0);
-          }
+    if (user) {
+      mutateGetCollections(
+        {
+          accountId: user.id,
+          pageNumber: page,
+          pageSize: 12,
         },
-      }
-    );
+        {
+          onSuccess: (data) => {
+            if (data.isSuccess) {
+              setCollections(data.result.items || []);
+              setTotalPages(data.result.totalPages || 0);
+            }
+          },
+        }
+      );
+    }
   }, [mutateGetCollections, page]);
 
   if (isPending) {
