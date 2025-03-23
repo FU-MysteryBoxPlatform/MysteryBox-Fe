@@ -44,7 +44,6 @@ export type InventoryCardProps = {
   fetchData?: () => void;
 };
 const SellInventorySchema = z.object({
-  quantity: z.string(),
   price: z.string(),
 });
 
@@ -90,20 +89,13 @@ export default function InventoryCard({
     });
 
   const onSubmit = (data: SellInventoryForm) => {
-    if (+data.quantity > stock) {
-      setError("quantity", {
-        message: "Số lượng bán vượt quá số lượng bạn sở hữu",
-      });
-      return;
-    }
-
     mutateSellInventory(
       {
         accountId: user?.id || "",
         sellerItems: [
           {
             inventoryId: id,
-            quantity: +data.quantity,
+            quantity: 1,
             price: +data.price,
           },
         ],
@@ -239,20 +231,6 @@ export default function InventoryCard({
               {formState.errors.price && (
                 <p className="text-red-500 text-sm">
                   {formState.errors.price.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="quantity">Số lượng bán</Label>
-              <Input
-                id="quantity"
-                type="number"
-                placeholder="Nhập số lượng bán"
-                {...register("quantity")}
-              />
-              {formState.errors.quantity && (
-                <p className="text-red-500 text-sm">
-                  {formState.errors.quantity.message}
                 </p>
               )}
             </div>
