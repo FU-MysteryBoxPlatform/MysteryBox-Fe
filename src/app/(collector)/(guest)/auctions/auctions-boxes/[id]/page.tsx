@@ -58,6 +58,17 @@ export default function Page() {
       return;
     }
 
+    if (
+      numericAmount < (Number((auction?.result?.auction.minimunBid ?? 0) * 0.1) +auction?.result.auction.currentBid)
+    ) {
+      toast({
+        title: "Lỗi",
+        description: "Giá đấu phải lớn hơn giá hiện tại cộng với bước nhảy",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const response = await createBid({
         auctionId: auction.result.auction.auctionId,
@@ -175,6 +186,15 @@ export default function Page() {
                     {formatPriceVND(
                       Number(auction?.result?.auction.currentBid)
                     )}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Bước nhảy</p>
+                  <p className="font-bold">
+                    {formatPriceVND(
+                      Number((auction?.result?.auction.minimunBid ?? 0) * 0.1))
+                    }
+
                   </p>
                 </div>
               </div>

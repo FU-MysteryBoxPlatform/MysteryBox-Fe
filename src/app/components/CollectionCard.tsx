@@ -92,11 +92,11 @@ export function CollectionCard({ collection }: CollectionCardProps) {
       </CardContent>
       <CardFooter className="p-4 pt-0 flex flex-col items-start">
         <p className="text-xs text-muted-foreground">
-          Bắt đầu: {startDate.toLocaleDateString("vi-VN")}
+          Bắt đầu: {startDate?.toLocaleDateString("vi-VN")}
         </p>
         {isValidEndDate && (
           <p className="text-xs text-muted-foreground">
-            Kết thúc: {endDate.toLocaleDateString("vi-VN")}
+            Kết thúc: {endDate?.toLocaleDateString("vi-VN")}
           </p>
         )}
       </CardFooter>
