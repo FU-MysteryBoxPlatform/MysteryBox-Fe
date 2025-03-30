@@ -7,6 +7,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { useGetProductById } from "@/hooks/api/useCollection";
+import { formatPriceVND } from "@/lib/utils";
 import { Product } from "@/types";
 import { useParams } from "next/navigation";
 
@@ -42,53 +44,10 @@ const generatePriceHistory = (basePrice: number): PriceData[] => {
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const mockProducts: Product[] = [
-    {
-      productId: "1",
-      name: "Cosmic Sword",
-      description: "A legendary blade forged from stardust",
-      price: 999.99,
-      discount: 10,
-      isDeleted: false,
-      rarityStatusId: 1,
-      rarityStatus: {
-        id: 1,
-        name: "Legendary",
-        dropRate: "0.1%",
-      },
-      productStatusId: 1,
-      productStatus: {
-        id: 1,
-        name: "Available",
-      },
-      imagePath:
-        "https://product.hstatic.net/1000328919/product/nh-labubu-the-monsters-flip-with-me-vinyl-plush-doll-40cm-pop-mart__1__a843bbd538b44d61a7c312f34ad0d449_grande.jpg",
-    },
-    {
-      productId: "2",
-      name: "Crystal Shield",
-      description: "Protective gear with mystical powers",
-      price: 599.99,
-      discount: 15,
-      isDeleted: false,
-      rarityStatusId: 2,
-      rarityStatus: {
-        id: 2,
-        name: "Rare",
-        dropRate: "1%",
-      },
-      productStatusId: 1,
-      productStatus: {
-        id: 1,
-        name: "Available",
-      },
-      imagePath:
-        "https://product.hstatic.net/1000328919/product/nh-labubu-the-monsters-flip-with-me-vinyl-plush-doll-40cm-pop-mart__1__a843bbd538b44d61a7c312f34ad0d449_grande.jpg",
-    },
-  ];
-  const product = mockProducts.find((p) => p.productId === id);
+  const { data: data } = useGetProductById(id as string);
 
-  if (!product) {
+  const product = data?.result.product as Product;
+  if (!data?.result.product) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="p-6">
@@ -98,9 +57,8 @@ export default function ProductDetail() {
     );
   }
 
-  const priceHistory = generatePriceHistory(product.price);
-  const finalPrice = product.price * (1 - product.discount / 100);
-console.log(priceHistory);
+  const priceHistory = data.result.salesDataPoints;
+  console.log("priceHistory", priceHistory);
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <Card className="shadow-lg border-none overflow-hidden">
@@ -146,13 +104,8 @@ console.log(priceHistory);
               <div className="space-y-4">
                 <div className="flex items-baseline gap-3">
                   <span className="text-3xl font-bold text-primary">
-                    ${finalPrice.toFixed(2)}
+                    {formatPriceVND(product.price)}
                   </span>
-                  {product.discount > 0 && (
-                    <span className="text-lg text-gray-500 line-through">
-                      ${product.price.toFixed(2)}
-                    </span>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -180,7 +133,7 @@ console.log(priceHistory);
 
           <div className="mt-12">
             <h3 className="text-xl font-semibold mb-6 text-gray-800">
-              Price History (Past Year)
+             Giá trị biến động trong năm qua
             </h3>
             <ChartContainer
               className="h-[400px] bg-gray-50 rounded-lg p-4 w-full"
@@ -211,7 +164,7 @@ console.log(priceHistory);
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line
                     type="monotone"
-                    dataKey="price"
+                    dataKey="unitPrice"
                     stroke="hsl(var(--primary))"
                     strokeWidth={2}
                     dot={{ r: 4 }}

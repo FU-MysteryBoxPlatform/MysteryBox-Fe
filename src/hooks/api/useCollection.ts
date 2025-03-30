@@ -1,5 +1,5 @@
-import { Collection, TAccount } from "@/types";
-import { useApiQuery } from "./useApi";
+import { Collection, Product, TAccount } from "@/types";
+import { useApiMutation, useApiQuery } from "./useApi";
 import { TCollection } from "./useManageCollection";
 import { TProductSale } from "./useSale";
 
@@ -24,7 +24,7 @@ export type TCollectionProgressResponse = {
   items: TCollectionProgressDetail[];
 };
 
-export type UserCollectionProgress= {
+export type UserCollectionProgress = {
   userCollecitonProgressId: string;
   isCompleted: boolean;
   completionDate: string;
@@ -34,13 +34,30 @@ export type UserCollectionProgress= {
   collectionId: string;
   collection: Collection;
   isRewardClaimed: boolean;
-}
+};
 
-export type RewardResponse= {
+export type RewardResponse = {
   collection: Collection;
   userCollectionProgress: UserCollectionProgress;
-}
-
+};
+export type GetProductPayload = {
+  keyword?: string;
+  rarityStatus?: number;
+  productStatus?: number;
+  pageNumber?: number;
+  pageSize?: number;
+};
+export type GetProductResponse = {
+  items: Product[];
+  totalPages: number;
+};
+type ProductResponse = {
+  product: Product;
+  salesDataPoints: Array<{
+    date: string;
+    unitPrice: number;
+  }>;
+};
 export const useGetUserCollection = (
   id: string,
   pageNumber: number,
@@ -61,4 +78,12 @@ export const useGetCollectionRewardById = (id: string, userId: string) => {
   return useApiQuery<RewardResponse>(
     `/collection/get-collection-reward-by-id/${id}/${userId}`
   );
-}
+};
+export const useGetAllProduct = () => {
+  return useApiMutation<GetProductResponse, GetProductPayload>(
+    `/collection/get-all-product`
+  );
+};
+export const useGetProductById = (id: string) => {
+  return useApiQuery<ProductResponse>(`collection/get-product-detail/${id}`);
+};

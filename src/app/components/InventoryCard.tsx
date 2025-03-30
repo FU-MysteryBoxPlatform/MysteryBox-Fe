@@ -41,6 +41,7 @@ export type InventoryCardProps = {
   showPrice?: boolean;
   isPersonal?: boolean;
   collectionId: string;
+  productId: string;
   fetchData?: () => void;
 };
 const SellInventorySchema = z.object({
@@ -59,6 +60,7 @@ export default function InventoryCard({
   showPrice = true,
   isPersonal = false,
   collectionId,
+  productId,
   fetchData,
 }: InventoryCardProps) {
   const [openPreview, setOpenPreview] = useState(false);
@@ -81,7 +83,6 @@ export default function InventoryCard({
   const [exchangeRequestData, setExchangeRequestData] =
     useState<ExchangeRequest>();
 
-  console.log({ collectionData });
 
   const { handleSubmit, register, formState, setError } =
     useForm<SellInventoryForm>({
@@ -199,6 +200,14 @@ export default function InventoryCard({
           width={120}
           height={120}
           className="cursor-pointer w-full aspect-square object-cover border rounded-lg shadow-lg border-gray-200"
+          loading="lazy"
+          onClick={() => {
+            if (collectionId) {
+              setOpenPreview(true);
+            } else {
+              router.push(`/items/${productId}`);
+            }
+          }}
         />
       </div>
       <p className="font-semibold text-center mt-2 line-clamp-2">{title}</p>

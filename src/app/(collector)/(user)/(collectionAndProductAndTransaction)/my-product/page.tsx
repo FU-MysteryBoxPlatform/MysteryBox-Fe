@@ -82,6 +82,7 @@ export default function Page() {
                 showPrice={false}
                 collectionId={product.collection?.collectionId}
                 fetchData={fetchData}
+                productId={product.product?.productId || ""}
               />
             ))}
           </div>
