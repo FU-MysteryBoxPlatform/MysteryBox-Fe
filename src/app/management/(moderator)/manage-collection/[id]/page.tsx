@@ -392,7 +392,7 @@ export default function Page() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="text-xl text-gray-800">
-              Tạo vật phẩm
+              {editIndex ? `Sửa vật phẩm` : `Tạo vật phẩm`}
             </DialogTitle>
           </DialogHeader>
           <FormCreateProduct
@@ -400,7 +400,10 @@ export default function Page() {
             onSaveProduct={(product) => {
               setProducts((prevProducts) => {
                 const newProducts = [...prevProducts];
-                newProducts[editIndex || 0] = product;
+                newProducts[editIndex || 0] = {
+                  ...product,
+                  productId: prevProducts[editIndex || 0].productId,
+                };
                 return newProducts;
               });
               setOpenCreateProductModal(false);
