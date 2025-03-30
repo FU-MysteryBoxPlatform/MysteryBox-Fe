@@ -23,6 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   useGetCollectionById,
+  useRemoveProductFromCollection,
   useUpdateCollection,
 } from "@/hooks/api/useManageCollection";
 import dayjs from "dayjs";
@@ -61,6 +62,8 @@ export default function Page() {
     new Date(collection?.collection.endTime || "")
   );
   const { mutate: mutateUpdateCollection, isPending } = useUpdateCollection();
+  const { mutate: mutateRemoveProduct, isPending: isPendingRemoveProduct } =
+    useRemoveProductFromCollection();
 
   const { handleSubmit, register, setValue, formState } =
     useForm<UpdateCollectionForm>({
@@ -79,8 +82,29 @@ export default function Page() {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  const handleRemoveProduct = (index: number) => {
-    setProducts((prevProducts) => prevProducts.filter((_, i) => i !== index));
+  const handleRemoveProduct = (id: string) => {
+    mutateRemoveProduct(
+      {
+        collectionId: collection?.collection.collectionId || "",
+        productId: id,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            toast({
+              title: "Đã xóa sản phẩm thành công!",
+            });
+            setProducts((prevProducts) =>
+              prevProducts.filter((p) => p.productId !== id)
+            );
+          } else {
+            toast({
+              title: data.messages[0],
+            });
+          }
+        },
+      }
+    );
   };
 
   const onSubmit = (data: UpdateCollectionForm) => {
@@ -359,6 +383,15 @@ export default function Page() {
                     setEditIndex(index);
                   }}
                 >
+                  <div
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveProduct(product.productId || "");
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </div>
                   <img
                     src={product.imagePath}
                     alt="Product image"
@@ -368,15 +401,6 @@ export default function Page() {
                     {product.name}
                   </p>
                   <p className="text-xs text-gray-500">{product.price}</p>
-                  <div
-                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveProduct(index);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </div>
                 </div>
               ))}
             </div>
@@ -392,7 +416,7 @@ export default function Page() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle className="text-xl text-gray-800">
-              Tạo vật phẩm
+              {editIndex ? `Sửa vật phẩm` : `Tạo vật phẩm`}
             </DialogTitle>
           </DialogHeader>
           <FormCreateProduct
@@ -400,7 +424,10 @@ export default function Page() {
             onSaveProduct={(product) => {
               setProducts((prevProducts) => {
                 const newProducts = [...prevProducts];
-                newProducts[editIndex || 0] = product;
+                newProducts[editIndex || 0] = {
+                  ...product,
+                  productId: prevProducts[editIndex || 0].productId,
+                };
                 return newProducts;
               });
               setOpenCreateProductModal(false);
