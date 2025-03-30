@@ -150,28 +150,30 @@ export default function Page() {
               </CardContent>
             </Card>
 
-            {/* Rewards */}
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
-              <p className="font-semibold text-lg text-gray-900 mb-3 tracking-tight">
-                Phần thưởng khi sưu tập đủ:
-              </p>
-              <p className="text-gray-800 font-medium text-base leading-relaxed">
-                {collection?.product.name}
-              </p>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-sm text-gray-600 font-medium">
-                  Độ hiếm:
-                </span>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {collection?.product.rarityStatus.dropRate} (%)
-                </span>
-                <span className="text-sm text-blue-600 font-medium">
-                  <Link href={`/items/${collection?.product.productId}`}>
-                    Xem chi tiết
-                  </Link>
-                </span>
+            {collection?.product && (
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
+                <p className="font-semibold text-lg text-gray-900 mb-3 tracking-tight">
+                  Phần thưởng khi sưu tập đủ:
+                </p>
+                <p className="text-gray-800 font-medium text-base leading-relaxed">
+                  {collection?.product.name}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-sm text-gray-600 font-medium">
+                    Độ hiếm:
+                  </span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {collection?.product.rarityStatus.dropRate} (%)
+                  </span>
+                  <span className="text-sm text-blue-600 font-medium">
+                    <Link href={`/items/${collection?.product.productId}`}>
+                      Xem chi tiết
+                    </Link>
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
+            {/* Rewards */}
 
             <Card className="border border-gray-200 shadow-lg rounded-xl">
               <CardHeader className="bg-white border-b border-gray-200">
