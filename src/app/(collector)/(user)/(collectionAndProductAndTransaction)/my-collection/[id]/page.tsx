@@ -1,16 +1,23 @@
 "use client";
-import { useGetCollectionProgressById } from "@/hooks/api/useCollection";
+import RewardProgress from "@/app/components/RewardProgress";
+import { useGetCollectionProgressById, useGetCollectionRewardById, RewardResponse } from "@/hooks/api/useCollection";
 import { useGetCollectionById } from "@/hooks/api/useManageCollection";
 import { cn } from "@/lib/utils";
+import { GlobalContext } from "@/provider/global-provider";
 import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 
 export default function Page() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const collectionId = searchParams.get("collectionId");
-  console.log("collectionId", collectionId);
+  const {user}=useContext(GlobalContext)
+const { data: rewardData, refetch } = useGetCollectionRewardById(
+  collectionId as string,
+  user?.id as string
+);
+
   const { data: progressData, refetch: refetchProgress } =
     useGetCollectionProgressById(id as string);
   const { data: collectionData, refetch: refetchCollection } =
@@ -93,6 +100,7 @@ export default function Page() {
           );
         })}
       </div>
+      <RewardProgress data={rewardData?.result as RewardResponse || null} />
     </div>
   );
 }

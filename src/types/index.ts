@@ -141,6 +141,8 @@ export type Collection = {
   imagePath: string;
   endTime: string;
   blindBoxPrice: number;
+  productId: string;
+  product: Product | null;
 };
 
 export type CollectionProduct = {
