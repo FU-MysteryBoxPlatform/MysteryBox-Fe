@@ -112,7 +112,7 @@ const SaleDetailsPage = () => {
         </Link>
         <span className="mx-2">/</span>
         <Link
-          href="/collections"
+          href="/products"
           className="hover:text-primary transition-colors"
         >
           Bộ sưu tập

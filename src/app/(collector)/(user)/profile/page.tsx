@@ -58,9 +58,6 @@ export default function Page() {
                     {user?.firstName + " " + user?.lastName}
                   </p>
                 )}
-                <Link href="/profile/edit" className="text-sm underline">
-                  Cập nhật hồ sơ
-                </Link>
               </div>
               <div className="w-fit p-4 border border-gray-300 rounded-lg grid gap-2">
                 {SIDEBAR.map((item) => {
