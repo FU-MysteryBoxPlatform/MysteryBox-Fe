@@ -79,7 +79,7 @@ export default function Page() {
           {/* Collection Image */}
           <div className="relative">
             <img
-              src={collection?.imagePath || "/placeholder.svg"}
+              src={collection?.imagePath }
               alt={collection?.collectionName}
               className="rounded-xl object-cover w-full h-[500px] shadow-lg transition-transform duration-300 hover:scale-[1.02]"
             />

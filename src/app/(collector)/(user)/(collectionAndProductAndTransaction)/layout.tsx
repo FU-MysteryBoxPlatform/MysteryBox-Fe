@@ -18,7 +18,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <aside className="lg:sticky lg:top-10 h-fit w-full lg:w-[250px] p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
               <div className="flex flex-col items-center gap-4 mb-6">
                 <img
-                  src={user?.avatar || "/placeholder-avatar.png"}
+                  src={
+                    user?.avatar ||
+                    "https://www.svgrepo.com/show/452030/avatar-default.svg"
+                  }
                   alt={`${user?.firstName} ${user?.lastName}`}
                   className="rounded-full object-cover w-24 h-24 border-2 border-gray-200"
                 />

@@ -62,92 +62,104 @@ function FormResetPassword({ email }: { email: string }) {
           if (data.isSuccess) {
             toast({
               title: data.messages[0],
+              variant: "default",
             });
             router.push("/login");
-          } else toast({ title: data.messages[0] });
+          } else {
+            toast({
+              title: data.messages[0],
+              variant: "destructive",
+            });
+          }
         },
       }
     );
   };
 
   return (
-    <form id="reset-password-form" className="grid gap-4">
-      <div className="flex flex-col space-y-1.5">
-        <Label htmlFor="name">Mã khôi phục</Label>
+    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6">
+      <div className="space-y-2">
+        <Label htmlFor="recoveryCode" className="text-gray-700 font-medium">
+          Mã khôi phục
+        </Label>
         <Input
           id="recoveryCode"
           placeholder="Nhập mã khôi phục"
+          className="h-11 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500"
           {...register("recoveryCode")}
         />
         {formState.errors.recoveryCode && (
-          <p className="text-red-500 text-sm">
+          <p className="text-sm text-red-500">
             {formState.errors.recoveryCode.message}
           </p>
         )}
       </div>
-      <div className="flex flex-col space-y-1.5">
-        <Label htmlFor="framework">Mật khẩu mới</Label>
+      <div className="space-y-2">
+        <Label htmlFor="password" className="text-gray-700 font-medium">
+          Mật khẩu mới
+        </Label>
         <div className="relative">
           <Input
             id="password"
             type={isShowPassword ? "text" : "password"}
             placeholder="Nhập mật khẩu mới"
-            className="pr-10"
+            className="h-11 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500 pr-10"
             {...register("password")}
           />
-          {isShowPassword ? (
-            <EyeIcon
-              className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-              onClick={() => setIsShowPassword(false)}
-            />
-          ) : (
-            <EyeClosedIcon
-              className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-              onClick={() => setIsShowPassword(true)}
-            />
-          )}
+          <button
+            type="button"
+            onClick={() => setIsShowPassword(!isShowPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            {isShowPassword ? (
+              <EyeIcon className="w-5 h-5" />
+            ) : (
+              <EyeClosedIcon className="w-5 h-5" />
+            )}
+          </button>
         </div>
         {formState.errors.password && (
-          <p className="text-red-500 text-sm">
+          <p className="text-sm text-red-500">
             {formState.errors.password.message}
           </p>
         )}
       </div>
-      <div className="flex flex-col space-y-1.5">
-        <Label htmlFor="framework">Xác nhận mật khẩu mới</Label>
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
+          Xác nhận mật khẩu mới
+        </Label>
         <div className="relative">
           <Input
             id="confirmPassword"
             type={isShowRePassword ? "text" : "password"}
             placeholder="Nhập lại mật khẩu mới"
-            className="pr-10"
+            className="h-11 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500 pr-10"
             {...register("confirmPassword")}
           />
-          {isShowRePassword ? (
-            <EyeIcon
-              className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-              onClick={() => setIsShowRePassword(false)}
-            />
-          ) : (
-            <EyeClosedIcon
-              className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
-              onClick={() => setIsShowRePassword(true)}
-            />
-          )}
+          <button
+            type="button"
+            onClick={() => setIsShowRePassword(!isShowRePassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            {isShowRePassword ? (
+              <EyeIcon className="w-5 h-5" />
+            ) : (
+              <EyeClosedIcon className="w-5 h-5" />
+            )}
+          </button>
         </div>
-        {formState.errors.password && (
-          <p className="text-red-500 text-sm">
-            {formState.errors.password.message}
+        {formState.errors.confirmPassword && (
+          <p className="text-sm text-red-500">
+            {formState.errors.confirmPassword.message}
           </p>
         )}
       </div>
       <Button
-        form="reset-password-form"
+        type="submit"
         disabled={resetPasswordMutation.isPending}
-        className="w-full bg-[#E12E43] text-white hover:bg-[#B71C32]"
-        onClick={handleSubmit(onSubmit)}
+        className="w-full h-11 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-md hover:from-red-600 hover:to-red-700 transition-all duration-200"
       >
-        {resetPasswordMutation.isPending ? <LoadingIndicator /> : "Gửi"}
+        {resetPasswordMutation.isPending ? <LoadingIndicator /> : "Xác nhận"}
       </Button>
     </form>
   );
@@ -165,7 +177,7 @@ export default function Page() {
     try {
       const response = await axiosClient.post(
         "/account/send-email-forgot-password",
-        data.email,
+        JSON.stringify(data.email),
         {
           headers: {
             "Content-Type": "application/json",
@@ -174,53 +186,73 @@ export default function Page() {
       );
       if (response.data.isSuccess) {
         setIsValidated(true);
-      } else toast({ title: response.data.messages[0] });
+        toast({
+          title: "Mã khôi phục đã được gửi đến email của bạn",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: response.data.messages[0],
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.log({ error });
+      toast({
+        title: "Đã xảy ra lỗi khi gửi email",
+        variant: "destructive",
+      });
     }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Đặt lại mật khẩu</CardTitle>
-          <CardDescription>
-            {isValidated ? "Nhập mật khẩu mới" : "Nhập email của bạn"}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 px-4">
+      <Card className="w-full max-w-md shadow-xl rounded-lg border-none">
+        <CardHeader className="text-center pb-2">
+          <CardTitle className="text-2xl font-bold text-gray-800">
+            Đặt lại mật khẩu
+          </CardTitle>
+          <CardDescription className="text-gray-600">
+            {isValidated
+              ? "Nhập mã khôi phục và mật khẩu mới"
+              : "Nhập email để nhận mã khôi phục"}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           {isValidated ? (
             <FormResetPassword email={getValues("email")} />
           ) : (
-            <form id="login-form" className="mb-2">
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="name">Email</Label>
-                  <Input
-                    id="email"
-                    placeholder="Nhập email"
-                    {...register("email")}
-                  />
-                  {formState.errors.email && (
-                    <p className="text-red-500 text-sm">
-                      {formState.errors.email.message}
-                    </p>
-                  )}
-                </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-gray-700 font-medium">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  placeholder="nhap@email.com"
+                  className="h-11 rounded-md border-gray-300 focus:ring-2 focus:ring-blue-500"
+                  {...register("email")}
+                />
+                {formState.errors.email && (
+                  <p className="text-sm text-red-500">
+                    {formState.errors.email.message}
+                  </p>
+                )}
               </div>
-              <div className="mt-2 text-sm">
-                Bạn đã có tài khoản?{" "}
-                <Link href="login" className="text-blue-500 underline">
+              <div className="text-center text-sm text-gray-600">
+                Đã có tài khoản?{" "}
+                <Link
+                  href="/login"
+                  className="text-blue-600 hover:underline font-medium"
+                >
                   Đăng nhập
                 </Link>
               </div>
               <Button
-                form={isValidated ? "reset-password-form" : "login-form"}
-                className="w-full mt-4 bg-[#E12E43] text-white hover:bg-[#B71C32]"
-                onClick={handleSubmit(onSubmit)}
+                type="submit"
+                className="w-full h-11 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-md hover:from-red-600 hover:to-red-700 transition-all duration-200"
               >
-                Gửi
+                Gửi mã khôi phục
               </Button>
             </form>
           )}

@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       value: "/auctions/auctions-boxes",
     },
     {
-      name: "Winning bids",
+      name: "Các phiên đấu giá thắng",
       value: "/auctions/winning-bids",
     },
   ];

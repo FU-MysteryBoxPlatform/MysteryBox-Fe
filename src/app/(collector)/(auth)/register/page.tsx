@@ -35,7 +35,13 @@ const RegisterSchema = z
       .string()
       .min(9, "Số điện thoại phải có ít nhất 9 số")
       .regex(/^\d+$/, "Số điện thoại chỉ được chứa số"),
-    password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+    password: z
+      .string()
+      .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
+      .regex(
+        /^(?=.*[A-Z])(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/,
+        "Mật khẩu phải chứa ít nhất 1 chữ cái in hoa và 1 ký tự đặc biệt (ví dụ: !@#$%^&*)"
+      ),
     rePassword: z.string(),
   })
   .refine((data) => data.password === data.rePassword, {
