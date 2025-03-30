@@ -228,12 +228,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                       </span>
                                       <span className="text-xs text-muted-foreground">
                                         {dayjs(
-                                          c.latestChatMessage.createDate
+                                          c.latestChatMessage?.createDate
                                         ).format("DD/MM/YYYY")}
                                       </span>
                                     </div>
                                     <p className="text-sm text-muted-foreground truncate">
-                                      {c.latestChatMessage.content}
+                                      {c.latestChatMessage?.content}
                                     </p>
                                   </div>
                                 </SidebarMenuButton>
