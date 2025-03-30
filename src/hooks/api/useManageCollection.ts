@@ -131,3 +131,10 @@ export const useDeleteCollection = (id: string) => {
     "delete"
   );
 };
+
+export const useRemoveProductFromCollection = () => {
+  return useApiMutation<unknown, { collectionId: string; productId: string }>(
+    "collection/remove-product",
+    "put"
+  );
+};
