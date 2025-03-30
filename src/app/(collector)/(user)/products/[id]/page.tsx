@@ -151,11 +151,21 @@ export default function Page() {
             </Card>
 
             {/* Rewards */}
-            <div className="bg-gray-100 p-4 rounded-lg">
-              <p className="font-semibold text-gray-900 mb-2">
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-200">
+              <p className="font-semibold text-lg text-gray-900 mb-3 tracking-tight">
                 Phần thưởng khi sưu tập đủ:
               </p>
-              <p className="text-gray-700">{collection?.rewards}</p>
+              <p className="text-gray-800 font-medium text-base leading-relaxed">
+                {collection?.product.name}
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-sm text-gray-600 font-medium">
+                  Độ hiếm:
+                </span>
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {collection?.product.rarityStatus.dropRate} (%)
+                </span>
+              </div>
             </div>
 
             {/* Buy Blind Box Card */}

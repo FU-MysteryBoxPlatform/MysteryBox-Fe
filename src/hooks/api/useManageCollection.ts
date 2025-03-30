@@ -1,4 +1,4 @@
-import { TAccount } from "@/types";
+import { Product, TAccount } from "@/types";
 import { useApiMutation, useApiQuery } from "./useApi";
 import { TCollectionProgress } from "./useCollection";
 import { TProductSale } from "./useSale";
@@ -16,6 +16,8 @@ export type TCollection = {
   endTime: string;
   blindBoxPrice: number;
   discountBlindBoxPrice: number;
+  productId: string;
+  product: Product;
 };
 
 export type TCollectionWithProgress = {

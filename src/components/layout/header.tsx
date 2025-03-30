@@ -208,6 +208,10 @@ const NAV_ITEMS = [
     href: "/marketplace",
   },
   {
+    name: "Sản phẩm ",
+    href: "/items",
+  },
+  {
     name: "Đấu giá",
     href: "/auctions",
   },
