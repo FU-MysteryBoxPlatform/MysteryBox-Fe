@@ -243,7 +243,7 @@ const TradeDetailsModal = ({
         </div>
       </div>
 
-      <div className="p-6 flex-1 overflow-y-auto">
+      <div className="p-6 flex-1 overflow-y-auto max-h-[60vh] bg-gray-50">
         <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <ArrowLeftRight className="h-5 w-5 text-emerald-600" />
           Đề Nghị Trao Đổi ({offers.length})
