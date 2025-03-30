@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatDate, formatPriceVND } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import {  Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useGetCollectionById } from "@/hooks/api/useManageCollection";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { GlobalContext } from "@/provider/global-provider";
 import { useToast } from "@/hooks/use-toast";
 import dayjs from "dayjs";
 import { Stars } from "./Stars";
+import Link from "next/link";
 
 export default function Page() {
   const { id } = useParams();
@@ -75,11 +76,26 @@ export default function Page() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Section */}
+        <nav className="flex items-center text-sm text-gray-500 mb-6">
+          <Link href="/" className="hover:text-primary transition-colors">
+            Trang chủ
+          </Link>
+          <span className="mx-2">/</span>
+          <Link
+            href="/products"
+            className="hover:text-primary transition-colors"
+          >
+            Bộ sưu tập
+          </Link>
+          <span className="mx-2">/</span>
+
+          <span className="mx-2">{collection?.collectionName}/</span>
+        </nav>
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
           {/* Collection Image */}
           <div className="relative">
             <img
-              src={collection?.imagePath }
+              src={collection?.imagePath}
               alt={collection?.collectionName}
               className="rounded-xl object-cover w-full h-[500px] shadow-lg transition-transform duration-300 hover:scale-[1.02]"
             />

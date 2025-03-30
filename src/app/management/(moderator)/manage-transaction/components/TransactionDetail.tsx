@@ -87,7 +87,7 @@ export default function TransactionDetail({
   useEffect(() => {
     refetch();
   }, [paymentHistoryId]);
-
+console.log("transactionDetail", transactionDetail);
   return (
     <div className="grid gap-10">
       <Table>
@@ -143,7 +143,9 @@ export default function TransactionDetail({
             </TableCell>
             <TableCell>{detail?.paymentMethod.name}</TableCell>
             <TableCell className="text-gray-700">
-              {formatPriceVND(detail?.order?.totalAmount || 0)}
+              {formatPriceVND(
+                Number(detail?.order?.totalAmount || detail?.amount)
+              )}
             </TableCell>
             <TableCell className="text-gray-700">
               {dayjs(detail?.date).format("DD/MM/YYYY HH:mm")}

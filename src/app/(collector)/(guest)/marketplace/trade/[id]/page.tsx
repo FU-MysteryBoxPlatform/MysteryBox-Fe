@@ -66,7 +66,8 @@ const InventoryItem = ({
   isSelected: boolean;
   onSelect: () => void;
 }) => {
-  const { rarity, classes } = getRarityColor(item.itemStatusId);
+  console.log(item)
+  const { rarity, classes } = getRarityColor(item.product.rarityStatusId);
 
   return (
     <div
@@ -78,6 +79,7 @@ const InventoryItem = ({
       onClick={onSelect}
     >
       <div className="flex gap-3 p-3">
+        
         <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0 bg-gray-100">
           <img
             src={item.product?.imagePath || "/mock-images/image2.png"}
@@ -191,9 +193,7 @@ export default function TradePage() {
         </Link>
         <h1 className="mt-4 text-3xl md:text-4xl font-bold text-gray-900 flex items-center">
           {tradeItemDetail?.requestInventoryItem?.product?.name}
-          <Badge className="ml-3 bg-red-600 hover:bg-red-700 text-white text-sm">
-            {tradeItemDetail?.requestInventoryItem.collection?.collectionName}
-          </Badge>
+         
         </h1>
         <div className="mt-2 flex items-center text-gray-500 text-sm">
           <span>Đăng bởi {tradeItemDetail?.createByAccount?.firstName}</span>

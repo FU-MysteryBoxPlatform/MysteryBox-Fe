@@ -197,15 +197,15 @@ const NAV_ITEMS = [
     href: "/",
   },
   {
-    name: "Sản phẩm",
+    name: "Túi mù",
     href: "/products",
   },
   {
-    name: "Bán",
+    name: "Mua/bán vật phẩm",
     href: "/sell",
   },
   {
-    name: "Trao đổi",
+    name: "Trao đổi vật phẩm",
     href: "/marketplace",
   },
   {

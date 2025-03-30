@@ -56,7 +56,7 @@ export default function Page() {
   const isMomo = searchParams.get("partnerCode") === "MOMO";
   // Lấy ID giao dịch
   const transactionId = data.extraData || dataVNPay.vnp_TxnRef || "";
-  const checkout = useUpdateTransaction(
+  const { mutateAsync: checkout , isPending} = useUpdateTransaction(
     transactionId,
     isSuccess || isVNPaySuccess ? 1 : 2
   );
@@ -106,12 +106,17 @@ export default function Page() {
     if (!isReady || !transactionId) return;
 
     debugger;
-    checkout.mutate(
+    checkout(
       { transactionId, transactionStatus: isSuccess || isVNPaySuccess ? 1 : 2 },
       {
         onSuccess: (data) => {
           if (data.isSuccess) {
-            setCart((cart || []).filter((item) => item.selected === false));
+           if(data.result !=null){
+              setCart((cart || []).filter((item) => item.selected === false));
+              toast({
+                title: "Cập nhật đơn hàng thành công!",
+              });
+           }
             if ((auctionId && isSuccess) || (auctionId && isVNPaySuccess)) {
               router.push(`/auctions/auctions-boxes/${auctionId}`);
             }
@@ -122,6 +127,13 @@ export default function Page() {
     );
   }, [isReady, transactionId]);
 
+  if(isPending) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <LoadingIndicator />
+      </div>
+    );
+  }
   return (
     <Suspense>
       <div className="max-w-[1280px] mx-auto px-4 md:px-10 lg:px-16 h-[90vh] flex items-center justify-center">
@@ -132,7 +144,6 @@ export default function Page() {
                 ? "Thanh toán thành công!"
                 : "Thanh toán thất bại!"}
             </p>
-            {checkout.isPending && <LoadingIndicator />}
             <div className="text-sm my-4 text-center lg:text-left">
               <p>
                 Mã giao dịch:{" "}
