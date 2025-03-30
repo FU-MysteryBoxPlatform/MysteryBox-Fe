@@ -485,23 +485,29 @@ export default function Page() {
                             />
                           )}
                         </Dialog>
-                        {request.statusId !== ExchangeStatus.CANCELLED && (
-                          <Button
-                            size="sm"
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                            onClick={() => {
-                              setSelectedExchange(request.exchangeRequestId);
-                              cancelExchange.mutate(request.exchangeRequestId, {
-                                onSuccess: () => {
-                                  toast({ title: "Hủy yêu cầu thành công" });
-                                  refetchGetAll();
-                                },
-                              });
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        )}
+                        {request.statusId !== ExchangeStatus.CANCELLED &&
+                          request.statusId !== ExchangeStatus.COMPLETED && (
+                            <Button
+                              size="sm"
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                              onClick={() => {
+                                setSelectedExchange(request.exchangeRequestId);
+                                cancelExchange.mutate(
+                                  request.exchangeRequestId,
+                                  {
+                                    onSuccess: () => {
+                                      toast({
+                                        title: "Hủy yêu cầu thành công",
+                                      });
+                                      refetchGetAll();
+                                    },
+                                  }
+                                );
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
                       </TableCell>
                     </TableRow>
                   ))}
