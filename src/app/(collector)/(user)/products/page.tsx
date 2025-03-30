@@ -1,27 +1,98 @@
 "use client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   TCollectionWithProgress,
   useGetCollections,
 } from "@/hooks/api/useManageCollection";
 import { formatPriceVND } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import { useRouter, useSearchParams } from "next/navigation";
+import queryString from "query-string";
+import { useEffect, useRef, useState } from "react";
+import DatePicker from "react-date-picker";
 
 export default function Page() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = queryString.parse(searchParams.toString());
+  const ref = useRef<NodeJS.Timeout>(null);
+
+  const keyword = params["keyword"];
+  const page = params["page"] || 1;
+  const minPrice = params["minPrice"];
+  const maxPrice = params["maxPrice"];
+  const startDate = params.startDate as string | undefined;
+  const endDate = params.endDate as string | undefined;
+
   const [items, setItems] = useState<TCollectionWithProgress[]>([]);
-  const getData = useGetCollections();
-  const route = useRouter();
-  const fetchData = async () => {
-    const data = await getData.mutateAsync({
-      pageNumber: 1,
-      pageSize: 10,
-    });
-    setItems(data.result.items);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const { mutate: mutateGetCollections, isPending } = useGetCollections();
+
+  const handleFilterByKeyword = (value: string) => {
+    if (ref.current) clearTimeout(ref.current);
+    ref.current = setTimeout(() => {
+      params["keyword"] = value || null;
+      params["page"] = "1";
+      router.push(`?${queryString.stringify(params)}`);
+    }, 1000);
   };
+
+  const handleFilterByMinPrice = (value: string) => {
+    if (ref.current) clearTimeout(ref.current);
+    ref.current = setTimeout(() => {
+      params["minPrice"] = value || null;
+      params["page"] = "1";
+      router.push(`?${queryString.stringify(params)}`);
+    }, 1000);
+  };
+
+  const handleFilterByMaxPrice = (value: string) => {
+    if (ref.current) clearTimeout(ref.current);
+    ref.current = setTimeout(() => {
+      params["maxPrice"] = value || null;
+      params["page"] = "1";
+      router.push(`?${queryString.stringify(params)}`);
+    }, 1000);
+  };
+
+  const handleFilterByDate = (key: "startDate" | "endDate", date?: Date) => {
+    const newParams: { [key: string]: any } = { ...params, page: "1" };
+    newParams[key] = date ? dayjs(date).toISOString() : null;
+    router.push(`?${queryString.stringify(newParams)}`);
+  };
+
   useEffect(() => {
-    fetchData();
-  }, []);
+    mutateGetCollections(
+      {
+        keyword: keyword as string,
+        pageNumber: +page,
+        pageSize: 1000,
+        minimumPrice: minPrice ? +minPrice : undefined,
+        maximumPrice: maxPrice ? +maxPrice : undefined,
+        startTime: startDate ? dayjs(startDate).toISOString() : undefined,
+        endTime: endDate ? dayjs(endDate).toISOString() : undefined,
+      },
+      {
+        onSuccess: (data) => {
+          if (data.isSuccess) {
+            setItems(data.result.items || []);
+            setTotalPages(data.result.totalPages || 0);
+          }
+        },
+      }
+    );
+  }, [
+    keyword,
+    maxPrice,
+    minPrice,
+    mutateGetCollections,
+    page,
+    startDate,
+    endDate,
+  ]);
 
   return (
     <div>
@@ -30,13 +101,64 @@ export default function Page() {
           <div className="md:min-w-[180px] lg:min-w-[250px]">
             <p className="text-xl font-semibold mb-6">Bộ lọc</p>
             <div>
-              <div>
-                <p className="text-base font-semibold">Danh mục</p>
+              <div className="grid gap-4 mb-6">
+                <div>
+                  <Label>Tìm kiếm bộ sưu tập</Label>
+                  <Input
+                    placeholder="Tìm kiếm bộ sưu tập"
+                    defaultValue={keyword as string}
+                    onChange={(e) => handleFilterByKeyword(e.target.value)}
+                    className="bg-white border-gray-300"
+                  />
+                </div>
+                <div>
+                  <Label>Giá nhỏ nhất</Label>
+                  <Input
+                    placeholder="Giá nhỏ nhất"
+                    defaultValue={minPrice as string}
+                    onChange={(e) => handleFilterByMinPrice(e.target.value)}
+                    className="bg-white border-gray-300"
+                    type="number"
+                  />
+                </div>
+                <div>
+                  <Label>Giá lớn nhất</Label>
+                  <Input
+                    placeholder="Giá lớn nhất"
+                    defaultValue={maxPrice as string}
+                    onChange={(e) => handleFilterByMaxPrice(e.target.value)}
+                    className="bg-white border-gray-300"
+                    type="number"
+                  />
+                </div>
+                <div>
+                  <Label>Ngày bắt đầu</Label>
+                  <DatePicker
+                    className="w-full h-10 rounded-lg border-gray-200"
+                    value={startDate ? new Date(startDate) : null}
+                    onChange={(value) =>
+                      handleFilterByDate("startDate", value as Date)
+                    }
+                    clearIcon={null}
+                  />
+                </div>
+                <div>
+                  <Label>Ngày kết thúc</Label>
+                  <DatePicker
+                    className="w-full h-10 rounded-lg border-gray-200"
+                    value={endDate ? new Date(endDate) : null}
+                    onChange={(value) =>
+                      handleFilterByDate("endDate", value as Date)
+                    }
+                    clearIcon={null}
+                  />
+                </div>
               </div>
             </div>
           </div>
+
           <div className="">
-            {getData.isPending ? (
+            {isPending ? (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-10 flex-1">
                 {PRODUCTS.map((product) => (
                   <div key={product.id} className="flex flex-col items-center">
@@ -56,7 +178,7 @@ export default function Page() {
                       key={item.collection.collectionId}
                       className="bg-white rounded-lg shadow-md flex flex-col items-center overflow-hidden cursor-pointer"
                       onClick={() =>
-                        route.push(`/products/${item.collection.collectionId}`)
+                        router.push(`/products/${item.collection.collectionId}`)
                       }
                     >
                       <img
