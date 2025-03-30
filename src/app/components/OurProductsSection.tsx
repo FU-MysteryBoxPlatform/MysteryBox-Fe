@@ -30,7 +30,7 @@ export default function OurProductsSection() {
   return (
     <div className="my-10 md:my-16">
       <p className="text-2xl md:text-4xl font-semibold text-center mb-2 md:mb-4">
-        Bộ sưu tập của chúng tôi
+       Thị trường mua bán của chúng tôi
       </p>
       <p className="text-center text-gray-500 mb-6">
         Khám phá những sản phẩm mới được ra mắt cùng cộng đồng

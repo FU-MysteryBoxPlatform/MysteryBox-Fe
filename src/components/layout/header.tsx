@@ -59,7 +59,6 @@ export default function Header() {
         </div>
 
         <div className="hidden items-center gap-8 lg:flex">
-          <SearchIcon />
           <Notification />
           {!isFetchingUser && user?.mainRole !== "MODERATORS" && (
             <Link href="/cart">
