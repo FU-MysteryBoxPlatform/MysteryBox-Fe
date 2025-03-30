@@ -69,7 +69,7 @@ export default function Page() {
                 onClick={() => {
                   if (item.userCollectionProgress?.userCollecitonProgressId) {
                     router.push(
-                      `/my-collection/${item.userCollectionProgress.userCollecitonProgressId}`
+                      `/my-collection/${item.userCollectionProgress.userCollecitonProgressId}?collectionId=${item.collection.collectionId}`
                     );
                   } else {
                     toast({

@@ -237,30 +237,34 @@ const AuctionCard: React.FC<AuctionCardProps> = ({ auction }) => {
                 </span>
               </div>
             </div>
-            <div>
-              <span className="text-sm text-gray-500 flex items-center">
-                <Clock className="h-4 w-4 mr-1 opacity-70" />
-                Thời gian: {formatDate(auctionData.startTime)} -{" "}
-                {formatDate(auctionData.endTime)}
-              </span>
-              <span className="text-sm font-medium text-amber-600 flex items-center mt-1">
-                <Clock className="h-4 w-4 mr-1" />
-                {calculateTimeRemaining()}
-              </span>
-            </div>
+            {auctionData.statusId != 0 && (
+              <div>
+                <span className="text-sm text-gray-500 flex items-center">
+                  <Clock className="h-4 w-4 mr-1 opacity-70" />
+                  Thời gian: {formatDate(auctionData.startTime)} -{" "}
+                  {formatDate(auctionData.endTime)}
+                </span>
+                <span className="text-sm font-medium text-amber-600 flex items-center mt-1">
+                  <Clock className="h-4 w-4 mr-1" />
+                  {calculateTimeRemaining()}
+                </span>
+              </div>
+            )}
           </div>
         </CardContent>
 
-        <CardFooter className="p-4 border-t bg-gray-50">
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="w-full bg-red-500 text-white hover:bg-red-600 rounded-full py-2 transition-all duration-300 flex items-center justify-center gap-2"
-            disabled={isPending}
-          >
-            {isPending ? <LoadingIndicator /> : "Đấu Giá Ngay"}
-            <Info className="h-4 w-4" />
-          </Button>
-        </CardFooter>
+        {auctionData.statusId != 0 && (
+          <CardFooter className="p-4 border-t bg-gray-50">
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              className="w-full bg-red-500 text-white hover:bg-red-600 rounded-full py-2 transition-all duration-300 flex items-center justify-center gap-2"
+              disabled={isPending}
+            >
+              {isPending ? <LoadingIndicator /> : "Đấu Giá Ngay"}
+              <Info className="h-4 w-4" />
+            </Button>
+          </CardFooter>
+        )}
       </Card>
 
       <PolicyModal

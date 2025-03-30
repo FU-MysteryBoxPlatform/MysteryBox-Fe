@@ -3,11 +3,14 @@ import { useGetCollectionProgressById } from "@/hooks/api/useCollection";
 import { useGetCollectionById } from "@/hooks/api/useManageCollection";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Page() {
   const { id } = useParams();
+  const searchParams = useSearchParams();
+  const collectionId = searchParams.get("collectionId");
+  console.log("collectionId", collectionId);
   const { data: progressData, refetch: refetchProgress } =
     useGetCollectionProgressById(id as string);
   const { data: collectionData, refetch: refetchCollection } =
