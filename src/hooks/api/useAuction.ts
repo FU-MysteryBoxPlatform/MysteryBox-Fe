@@ -69,6 +69,12 @@ export type GetAllAuctionRequest = {
   items: AuctionRequest[];
   totalPages: number;
 };
+
+
+export type AuctionResult= {
+    auction: Auction;
+    auctionHistories: AuctionHistory[];
+}
 export const useGetAllAuctions = () => {
   return useApiMutation<GetAuctionResponse, GetAuction>(
     "/auction/get-all-auction",
@@ -130,3 +136,14 @@ export const useGetAllAuctionRequest = (
     `/auction/get-all-auction-request?pageNumber=${pageNumber}&pageSize=${pageSize}&status=${status}`
   );
 };
+
+export const useGetAllAuctionHistory = (
+  userId: string,
+  pageNumber: number,
+  pageSize: number
+) => {
+  return useApiQuery<AuctionResult[]>(
+    `/auction/get-all-auction-history-of-an-auction/${userId}/${pageNumber}/${pageSize}`
+  );
+};
+

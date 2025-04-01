@@ -162,7 +162,7 @@ export default function Page() {
                       <TableCell className="hidden md:table-cell text-gray-600 text-sm">
                         {formatDate(item.updateDate) || "-"}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-nowrap">
                         <SaleStatusBadge status={item.saleStatus.name} />
                       </TableCell>
                       {item.saleStatus.name === "WaitingForApprove" && (
