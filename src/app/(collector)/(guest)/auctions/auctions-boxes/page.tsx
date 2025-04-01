@@ -114,7 +114,7 @@ export default function Page() {
 
   return (
     <div className="">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 grid-cols-1 md:gap-4">
         {auctionData.map((product) => (
           <div key={product.auctionId} className="cursor-pointer">
             <AuctionCard auction={product} />
